@@ -194,7 +194,7 @@ if not df.empty:
 )
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.warning("⚠️ Wellness data loaded, but no date column found. Columns: " + str(df.columns.tolist()))
+        st.warning("⚠️ Wellness data loaded, but no date column found.")
 else:
     st.warning("No wellness data found.")
 
