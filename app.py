@@ -163,21 +163,27 @@ if not df.empty:
             title="Fitness (CTL), Fatigue (ATL) and Form (TSB)",
             labels=pretty_labels
         )
-        
-        # ... (Keep your existing fig.update_traces and fig.update_layout code here) ...
-        
-        st.plotly_chart(fig, use_container_width=True)
+    fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
+    fig.update_traces(stackgroup=None, fill='tozeroy', opacity=0.5,
+    hovertemplate="<b>%{fullData.name} Score:</b> %{y:.1f}<extra></extra>"
+    )
 
-        with st.expander("ℹ️ What do these metrics mean?"):
+    fig.update_layout(
+    hovermode="x unified", # Group all metrics into one box for that date
+    hoverlabel=dict(bgcolor="white", font_size=14),
+    xaxis=dict(hoverformat="%b %d, %Y"), # Formats Date as "Jul 25, 2025"
+    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1) # Moves legend to top
+    )
+    st.plotly_chart(fig)
+
+    with st.expander("ℹ️ What do these metrics mean?"):
             st.markdown("""
             * **Fitness (CTL)**: 42-day rolling average load. Long-term capacity.
             * **Fatigue (ATL)**: 7-day rolling average load. Recent stress.
             * **Form (TSB)**: Fitness minus Fatigue. Negative (-10 to -30) is the 'Optimal' zone.
             """)
-    else:
-        st.warning("⚠️ Data found, but no date/timestamp column was identified.")
 else:
-    st.warning("No wellness data found.")
+    st.warning("⚠️ Data found, but no date/timestamp column was identified.")
 
 st.divider()
 
