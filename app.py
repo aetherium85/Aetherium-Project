@@ -124,7 +124,7 @@ if well_json is not None:
 
         g1.plotly_chart(create_gauge(latest['ctl'], "Fitness (CTL)", [{'range': [0, 100], 'color': "#70B3C4"}], 0, 100))
         g2.plotly_chart(create_gauge(latest['atl'], "Fatigue (ATL)", [{'range': [0, 120], 'color': "#F35555"}], 0, 120))
-        form_steps = [{'range': [-60, -30], 'color': "#F35555"}, {'range': [-30, -10], 'color': "#4BD4B0"}, {'range': [-10, 10], 'color': "#DF8537"}, {'range': [10, 60], 'color': "#F35555"}]
+        form_steps = [{'range': [-60, -30], 'color': "#F35555"}, {'range': [-30, -10], 'color': "#4BD4B0"}, {'range': [-10, 10], 'color': "#C69C49"}, {'range': [10, 60], 'color': "#F35555"}]
         g3.plotly_chart(create_gauge(latest['tsb'], "Form (TSB)", form_steps, -60, 60))
 
         # Yearly Chart
