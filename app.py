@@ -62,7 +62,7 @@ if not st.session_state.authenticated:
     col1, _ = st.columns([1, 2])
     with col1:
         st.subheader("🔑 Access")
-        entered_id = st.text_input("Enter Athlete ID (e.g., i322980):", value=st.session_state.athlete_id)
+        entered_id = st.text_input("Enter Athlete ID (e.g., i123456):", value=st.session_state.athlete_id)
         if st.button("Log In"):
             if entered_id:
                 st.session_state.authenticated = True
