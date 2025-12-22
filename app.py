@@ -7,7 +7,7 @@ from datetime import datetime
 
 # --- 1. CONFIGURATION ---
 DEFAULT_ID = "i322980"
-API_KEY = "3u9d5nxuxpf2i52j60zmhgi3n"
+API_KEY = st.secrets["INTERVALS_API_KEY"]
 
 st.set_page_config(page_title="Yearly Fitness Dashboard", layout="wide")
 
@@ -33,13 +33,34 @@ def get_ytd_data(athlete_id, params=None):
 # --- 3. MAIN DASHBOARD LOGIC ---
 st.title("❤️ My Fitness Command Center")
 
-col1, col2 = st.columns([0.5, 3]) 
+# --- INITIALIZE SESSION STATE ---
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+    st.session_state.athlete_id = ""
 
-with col1:
-    athlete_id_input = st.text_input("Enter Athlete ID:", value="i322980")
+if not st.session_state.authenticated:
+    col1, _ = st.columns([1, 2])
+    with col1:
+        st.subheader("🔑 Access")
+        entered_id = st.text_input("Enter Athlete ID:", value=st.session_state.athlete_id)
+        if st.button("Log In"):
+            if entered_id:
+                st.session_state.authenticated = True
+                st.session_state.athlete_id = entered_id
+                st.rerun()
+            else:
+                st.error("ID is required.")
+    st.stop()
 
-if athlete_id_input:
-    well_json, act_json = get_ytd_data(athlete_id=athlete_id_input)
+# --- IF AUTHENTICATED, THE REST OF THE CODE RUNS ---
+athlete_id_input = st.session_state.athlete_id
+
+# Button to "Logout" or switch athletes
+if st.button("Logout / Switch Athlete"):
+    st.session_state.authenticated = False
+    st.rerun()
+
+well_json, act_json = get_ytd_data(athlete_id=st.session_state.athlete_id)
 
 TYPE_MAPPING = {
     "Ride": "Cycling", "GravelRide": "Cycling", "VirtualRide": "Cycling", 
@@ -54,7 +75,10 @@ TYPE_MAPPING = {
 # --- 4. CURRENT STATUS SECTION (WELLNESS) ---
 if well_json:
     st.subheader("⚡ Current Training Status")
-    df = pd.DataFrame(well_json)
+    if isinstance(well_json, dict):
+        df = pd.DataFrame([well_json])
+    else:
+        df = pd.DataFrame(well_json)
     
     # Calculate Form (TSB)
     if 'ctl' in df.columns and 'atl' in df.columns:
@@ -111,10 +135,17 @@ if well_json:
     "id": "Date",
     "value": "Score"
 }
+    
+if 'timestamp' in df.columns:
+    df = df.rename(columns={'timestamp': 'date'})
+
+# 2. Convert the column to actual datetime objects
+    df['date'] = pd.to_datetime(df['date'])
+
     st.subheader("📈 Yearly Training Load Progression")
     fig = px.area(
     df,
-    x='id',
+    x='date',
     y=['ctl', 'atl', 'tsb'],
     title="Fitness (CTL), Fatigue (ATL) and Form (TSB)",
     labels=pretty_labels
@@ -143,17 +174,34 @@ else:
 st.divider()
 
 # --- 5. MONTHLY BREAKDOWN SECTION (ACTIVITIES) ---
+all_categories = []
+df_activities = pd.DataFrame()
+
 if act_json:
-    df_activities = pd.DataFrame(act_json)
-    df_activities['type'] = df_activities['type'].fillna('Other').astype(str)
-    df_activities['category'] = df_activities['type'].map(lambda x: TYPE_MAPPING.get(x, x))
+    # 2. Load data safely
+    data_list = act_json if isinstance(act_json, list) else [act_json]
+    df_activities = pd.DataFrame(data_list)
     
-    # Filter moved from sidebar to main page
-    all_categories = sorted(df_activities['category'].unique().tolist())
-    selected_categories = st.multiselect("Filter Monthly Breakdown by Sport:", options=all_categories, default=all_categories)
+    # 3. Process if 'type' exists
+    if 'type' in df_activities.columns:
+        df_activities['type'] = df_activities['type'].fillna('Other').astype(str)
+        df_activities['category'] = df_activities['type'].map(lambda x: TYPE_MAPPING.get(x, x))
+        
+        # Now this variable is guaranteed to be defined here
+        all_categories = sorted(df_activities['category'].unique().tolist())
+    else:
+        st.warning("⚠️ No activity types found for 2025.")
+
+# 4. Only show the filter if we actually found categories
+if all_categories:
+    selected_categories = st.multiselect(
+        "Filter Monthly Breakdown by Sport:", 
+        options=all_categories, 
+        default=all_categories
+    )
     
     df_filtered_act = df_activities[df_activities['category'].isin(selected_categories)]
-
+    
     if not df_filtered_act.empty:
         df_filtered_act['date_dt'] = pd.to_datetime(df_filtered_act['start_date_local'])
         df_filtered_act['Sort_Key'] = df_filtered_act['date_dt'].dt.strftime('%Y-%m')
@@ -194,4 +242,7 @@ if act_json:
     else:
         st.info("Select a sport to see the monthly breakdown.")
 else:
+    st.info("💡 Once you upload 2025 activities to Intervals.icu, your breakdown will appear here.")
+
+if not act_json:
     st.warning("No activity data found.")
