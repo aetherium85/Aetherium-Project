@@ -147,15 +147,49 @@ else:
 
 # --- ACTIVITIES SECTION ---
 st.divider()
-if act_json:
-    df_act = pd.DataFrame([act_json]) if isinstance(act_json, dict) else pd.DataFrame(act_json)
+
+all_categories = []
+df_activities = pd.DataFrame()
+
+if not act_json:
+    st.warning("No activity data found.")
+else:
+    # 1. Load data safely
+    data_list = act_json if isinstance(act_json, list) else [act_json]
+    df_activities = pd.DataFrame(data_list)
     
-    if 'type' in df_act.columns and 'start_date_local' in df_act.columns:
-        df_act['category'] = df_act['type'].map(lambda x: TYPE_MAPPING.get(x, x))
-        all_cats = sorted(df_act['category'].unique().tolist())
+    # 2. Safety Check: Ensure 'type' exists before processing
+    if 'type' not in df_activities.columns:
+        st.warning("⚠️ No activity types found for 2025.")
+    else:
+        # Fill missing types and map to categories
+        df_activities['type'] = df_activities['type'].fillna('Other').astype(str)
+        df_activities['category'] = df_activities['type'].map(lambda x: TYPE_MAPPING.get(x, x))
         
-        selected = st.multiselect("Filter by Sport:", all_cats, default=all_cats)
-        df_filt = df_act[df_act['category'].isin(selected)]
+        # 3. FIX FOR SORT ERROR: Convert to strings and filter out None
+        unique_cats = df_activities['category'].unique()
+        all_categories = sorted([str(cat) for cat in unique_cats if pd.notna(cat)])
+
+# 4. Only show the filter if we found categories
+if all_categories:
+    selected_categories = st.multiselect(
+        "Filter Monthly Breakdown by Sport:", 
+        options=all_categories, 
+        default=all_categories
+    )
+    
+    # Filter the data based on selection
+    df_filtered_act = df_activities[df_activities['category'].isin(selected_categories)]
+    
+    # Only run summary if the filtered data isn't empty
+    if not df_filtered_act.empty:
+        # ... Insert your Monthly Summary logic here (Averages & Table) ...
+        pass
+    else:
+        st.info("Select a sport to see the monthly breakdown.")
+        
+        selected = st.multiselect("Filter by Sport:", all_categories, default=all_categories)
+        df_filt = df_filtered_act[df_filtered_act['category'].isin(selected)]
         
         if not df_filt.empty:
             df_filt['date_dt'] = pd.to_datetime(df_filt['start_date_local'])
@@ -168,7 +202,5 @@ if act_json:
             st.dataframe(summary.drop(columns=['Sort']), use_container_width=True, hide_index=True)
         else:
             st.info("Select a sport to see details.")
-    else:
-        st.warning("No activity details available.")
 else:
     st.info("No activities found for this year.")
