@@ -5,6 +5,15 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
+# Layout: Large YTD Chart
+pretty_labels = {
+    "ctl": "Fitness (CTL)",
+    "atl": "Fatigue (ATL)",
+    "tsb": "Form (TSB)",
+    "id": "Date",
+    "value": "Score"
+}
+
 # --- 1. CONFIGURATION ---
 DEFAULT_ID = "i322980"
 API_KEY = st.secrets["INTERVALS_API_KEY"]
@@ -127,15 +136,7 @@ if well_json:
 
     st.divider()
 
-    # Layout: Large YTD Chart
-    pretty_labels = {
-    "ctl": "Fitness (CTL)",
-    "atl": "Fatigue (ATL)",
-    "tsb": "Form (TSB)",
-    "id": "Date",
-    "value": "Score"
-}
-    
+   
 if not df.empty:
     # 1. FIND THE DATE COLUMN (Whatever the API decided to call it)
     possible_date_cols = ['timestamp', 'id', 'date']
