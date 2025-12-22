@@ -157,27 +157,37 @@ if not df.empty:
             if col not in df.columns:
                 df[col] = 0.0
 
-    if not df.empty:    
+    if not df.empty:
+    # 1. Standardize the date column name
+        if 'timestamp' in df.columns:
+            df = df.rename(columns={'timestamp': 'date'})
+    elif 'id' in df.columns:
+        df = df.rename(columns={'id': 'date'})
     
+    # 2. Check if 'date' now exists
+    if 'date' in df.columns:
+        df['date'] = pd.to_datetime(df['date'])
+        
+        # 3. Ensure the Y-axis columns exist so Plotly doesn't panic
+        for col in ['ctl', 'atl', 'tsb']:
+            if col not in df.columns:
+                df[col] = 0.0
+
+        # 4. Create Figure
         fig = px.area(
             df,
-            x='date',
+            x='date', # This matches the rename above
             y=['ctl', 'atl', 'tsb'],
             title="Fitness (CTL), Fatigue (ATL) and Form (TSB)",
             labels=pretty_labels
         )
-    fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
-    fig.update_traces(stackgroup=None, fill='tozeroy', opacity=0.5,
-    hovertemplate="<b>%{fullData.name} Score:</b> %{y:.1f}<extra></extra>"
-    )
 
-    fig.update_layout(
-    hovermode="x unified", # Group all metrics into one box for that date
-    hoverlabel=dict(bgcolor="white", font_size=14),
-    xaxis=dict(hoverformat="%b %d, %Y"), # Formats Date as "Jul 25, 2025"
-    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1) # Moves legend to top
-    )
-    st.plotly_chart(fig, use_container_width=True)
+        # 5. ALL styling MUST be indented here
+        fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
+        fig.update_layout(hovermode="x unified")
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("⚠️ Wellness data loaded, but no date column found. Columns: " + str(df.columns.tolist()))
 else:
     st.warning("No wellness data found.")
 
