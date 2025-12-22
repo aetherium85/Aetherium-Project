@@ -73,7 +73,7 @@ if not st.session_state.authenticated:
     st.stop()
 
 # --- 4. MAIN DASHBOARD ---
-st.title(f"📊 Dashboard for {st.session_state.athlete_id}")
+st.title(f"📊 Performance Dashboard")
 
 if st.sidebar.button("Logout / Switch Athlete"):
     st.session_state.authenticated = False
@@ -148,7 +148,7 @@ else:
 # --- ACTIVITIES SECTION ---
 st.divider()
 
-st.header("📅 Monthly Performance Summary")
+st.subheader("📅 Monthly Performance Summary")
 
 all_categories = []
 df_activities = pd.DataFrame()
