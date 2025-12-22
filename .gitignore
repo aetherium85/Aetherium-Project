@@ -1,1 +1,7 @@
 .streamlit/
+__pycache__/
+.venv/
+env/
+venv/
+*.pyc
+.DS_Store
