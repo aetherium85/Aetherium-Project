@@ -157,6 +157,8 @@ if not df.empty:
             if col not in df.columns:
                 df[col] = 0.0
 
+    if not df.empty:    
+    
         fig = px.area(
             df,
             x='date',
