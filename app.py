@@ -184,7 +184,7 @@ if not df.empty:
 
         # 5. ALL styling MUST be indented here
         fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
-        fig.update_traces(stackgroup=None, fill='tozeroy', opacity=0.3,
+        fig.update_traces(stackgroup=None, fill='tozeroy', opacity=0.1,
     hovertemplate="<b>%{fullData.name} Score:</b> %{y:.1f}<extra></extra>"
 
 )
