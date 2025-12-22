@@ -177,7 +177,9 @@ if not df.empty:
     xaxis=dict(hoverformat="%b %d, %Y"), # Formats Date as "Jul 25, 2025"
     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1) # Moves legend to top
     )
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.warning("No wellness data found.")
 
     with st.expander("ℹ️ What do these metrics mean?"):
             st.markdown("""
@@ -185,8 +187,6 @@ if not df.empty:
             * **Fatigue (ATL)**: 7-day rolling average load. Recent stress.
             * **Form (TSB)**: Fitness minus Fatigue. Negative (-10 to -30) is the 'Optimal' zone.
             """)
-else:
-    st.warning("⚠️ Data found, but no date/timestamp column was identified.")
 
 st.divider()
 
