@@ -25,6 +25,7 @@ def get_strava_access_token():
     res = requests.post("https://www.strava.com/oauth/token", data=payload)
     return res.json().get('access_token')
 
+@st.cache_data(ttl=900) # 👈 This saves your API quota for 15 minutes
 def fetch_strava_activities(access_token):
     after = int(datetime(datetime.now().year, 1, 1).timestamp())
     url = "https://www.strava.com/api/v3/athlete/activities"
@@ -32,20 +33,30 @@ def fetch_strava_activities(access_token):
     
     activities = []
     page = 1
+    
     while True:
         params = {'after': after, 'per_page': 100, 'page': page}
-        # Add a timeout of 10 seconds so it doesn't get stuck
         res = requests.get(url, headers=headers, params=params, timeout=10)
         
+        # 1. Handle Rate Limiting
+        if res.status_code == 429:
+            st.error("🚦 Strava Rate Limit Hit! Please wait 15 minutes.")
+            return activities # Return whatever we managed to get so far
+            
+        # 2. Handle other Errors
         if res.status_code != 200:
-            st.error(f"Strava API Error: {res.json()}") # This will tell you why it's stuck
-            break
+            st.error(f"Strava API Error: {res.json()}")
+            break # 👈 Now inside the 'while' loop, so this works!
             
         data = res.json()
-        if not data: # Break if no more activities
+        
+        # 3. Check if we are at the end of the list
+        if not data: 
             break
+            
         activities.extend(data)
         page += 1
+        
     return activities
 
 # --- 3. MAIN DASHBOARD ---
