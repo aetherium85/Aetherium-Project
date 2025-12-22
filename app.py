@@ -148,59 +148,67 @@ else:
 # --- ACTIVITIES SECTION ---
 st.divider()
 
+st.header("📅 Monthly Performance Summary")
+
 all_categories = []
 df_activities = pd.DataFrame()
 
 if not act_json:
     st.warning("No activity data found.")
 else:
-    # 1. Load data safely
     data_list = act_json if isinstance(act_json, list) else [act_json]
     df_activities = pd.DataFrame(data_list)
     
-    # 2. Safety Check: Ensure 'type' exists before processing
     if 'type' not in df_activities.columns:
-        st.warning("⚠️ No activity types found for 2025.")
+        st.warning("⚠️ No activity types found.")
     else:
-        # Fill missing types and map to categories
         df_activities['type'] = df_activities['type'].fillna('Other').astype(str)
         df_activities['category'] = df_activities['type'].map(lambda x: TYPE_MAPPING.get(x, x))
         
-        # 3. FIX FOR SORT ERROR: Convert to strings and filter out None
         unique_cats = df_activities['category'].unique()
         all_categories = sorted([str(cat) for cat in unique_cats if pd.notna(cat)])
 
-# 4. Only show the filter if we found categories
+# 1. Show the filter
 if all_categories:
     selected_categories = st.multiselect(
-        "Filter Monthly Breakdown by Sport:", 
+        "Filter by Sport:", 
         options=all_categories, 
         default=all_categories
     )
     
-    # Filter the data based on selection
+    # 2. Filter the data
     df_filtered_act = df_activities[df_activities['category'].isin(selected_categories)]
     
-    # Only run summary if the filtered data isn't empty
+    # 3. RUN CALCULATIONS (This replaces the 'pass')
     if not df_filtered_act.empty:
-        # ... Insert your Monthly Summary logic here (Averages & Table) ...
-        pass
+        df_filtered_act['date_dt'] = pd.to_datetime(df_filtered_act['start_date_local'])
+        df_filtered_act['Sort_Key'] = df_filtered_act['date_dt'].dt.strftime('%Y-%m')
+        df_filtered_act['Month_Name'] = df_filtered_act['date_dt'].dt.strftime('%B %Y')
+
+        # Group and aggregate
+        monthly_summary = df_filtered_act.groupby(['Sort_Key', 'Month_Name']).agg({
+            'id': 'count',
+            'icu_training_load': 'sum'
+        }).reset_index().sort_values('Sort_Key')
+
+        # Display Metrics
+        avg_sessions = monthly_summary['id'].mean()
+        avg_load = monthly_summary['icu_training_load'].mean()
+        
+        m1, m2 = st.columns(2)
+        m1.metric("Avg. Monthly Sessions", f"{avg_sessions:.1f}")
+        m2.metric("Avg. Monthly Load", f"{avg_load:.0f}")
+
+        # Display Table
+        st.dataframe(
+            monthly_summary.drop(columns=['Sort_Key']),
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Month_Name": "Month",
+                "id": "Sessions",
+                "icu_training_load": "Total Load"
+            }
+        )
     else:
-        st.info("Select a sport to see the monthly breakdown.")
-        
-        selected = st.multiselect("Filter by Sport:", all_categories, default=all_categories)
-        df_filt = df_filtered_act[df_filtered_act['category'].isin(selected)]
-        
-        if not df_filt.empty:
-            df_filt['date_dt'] = pd.to_datetime(df_filt['start_date_local'])
-            df_filt['Month'] = df_filt['date_dt'].dt.strftime('%B %Y')
-            df_filt['Sort'] = df_filt['date_dt'].dt.strftime('%Y-%m')
-            
-            summary = df_filt.groupby(['Sort', 'Month']).agg({'id': 'count', 'icu_training_load': 'sum'}).reset_index().sort_values('Sort')
-            
-            st.subheader("🏆 Monthly Summary")
-            st.dataframe(summary.drop(columns=['Sort']), use_container_width=True, hide_index=True)
-        else:
-            st.info("Select a sport to see details.")
-else:
-    st.info("No activities found for this year.")
+        st.info("Select at least one sport to see data.")
