@@ -26,7 +26,6 @@ def get_strava_access_token():
     return res.json().get('access_token')
 
 def fetch_strava_activities(access_token):
-    """Fetch all activities from the start of the year."""
     after = int(datetime(datetime.now().year, 1, 1).timestamp())
     url = "https://www.strava.com/api/v3/athlete/activities"
     headers = {'Authorization': f"Bearer {access_token}"}
@@ -35,9 +34,15 @@ def fetch_strava_activities(access_token):
     page = 1
     while True:
         params = {'after': after, 'per_page': 100, 'page': page}
-        res = requests.get(url, headers=headers, params=params)
+        # Add a timeout of 10 seconds so it doesn't get stuck
+        res = requests.get(url, headers=headers, params=params, timeout=10)
+        
+        if res.status_code != 200:
+            st.error(f"Strava API Error: {res.json()}") # This will tell you why it's stuck
+            break
+            
         data = res.json()
-        if not data or len(data) == 0:
+        if not data: # Break if no more activities
             break
         activities.extend(data)
         page += 1
