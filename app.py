@@ -1,3 +1,4 @@
+import urllib.parse
 import streamlit as st
 import requests
 import pandas as pd
@@ -7,21 +8,40 @@ from datetime import datetime
 
 def show_login_screen():
     st.title("❤️ Fitness Command Center")
+    st.write("Securely sync your 2025 performance data with one click.")
     
     CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
     REDIRECT_URI = st.secrets["REDIRECT_URI"]
     
+    # Intervals.icu scopes must be Uppercase and comma-separated
     scopes = "ACTIVITY:READ,WELLNESS:READ"
     
-    auth_url = (
-        f"https://intervals.icu/oauth/authorize?"
-        f"client_id={CLIENT_ID}&"
-        f"redirect_uri={REDIRECT_URI}&"
-        f"response_type=code&"
-        f"scope={scopes}"
-    )
+    # We encode the redirect URI to ensure slashes and colons don't break the URL
+    encoded_redirect = urllib.parse.quote(REDIRECT_URI, safe='')
     
-    st.link_button("🚀 Connect with Intervals.icu", auth_url)
+    auth_url = (
+        f"https://intervals.icu/oauth/authorize"
+        f"?client_id={CLIENT_ID}"
+        f"&redirect_uri={encoded_redirect}"
+        f"&response_type=code"
+        f"&scope={scopes}"
+    )
+
+    # Custom HTML to create a button that opens in the SAME TAB
+    button_html = f"""
+        <a href="{auth_url}" target="_self" style="
+            text-decoration: none;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #FF4B4B;
+            color: white;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            border: none;
+            text-align: center;
+        ">🚀 Connect with Intervals.icu</a>
+    """
+    st.markdown(button_html, unsafe_allow_html=True)
 
 # --- INITIALIZATION (DO THIS FIRST) ---
 if "athlete_id" not in st.session_state:
