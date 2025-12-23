@@ -1,3 +1,4 @@
+import streamlit.components.v1 as components
 import urllib.parse
 import streamlit as st
 import requests
@@ -22,20 +23,22 @@ def show_login_screen():
     }
     auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(params)}"
     
-    button_html = f'''
-        <a href="{auth_url}" target="_self" style="
-            text-decoration: none;
-            display: inline-block;
-            padding: 10px 20px;
+    login_button_html = f"""
+    <div style="display: flex; justify-content: left;">
+        <a href="{auth_url}" target="_top" style="
             background-color: #FF4B4B;
             color: white;
-            border-radius: 8px;
+            padding: 10px 24px;
+            text-decoration: none;
+            font-family: sans-serif;
             font-weight: bold;
-            border: none;
+            border-radius: 8px;
+            display: inline-block;
         ">🚀 Connect with Intervals.icu</a>
-    '''
-    
-    st.markdown(button_html, unsafe_allow_html=True)
+    </div>
+    """
+    # target="_top" is key here to break out of the Streamlit frame
+    components.html(login_button_html, height=60)
 
 # --- INITIALIZATION (DO THIS FIRST) ---
 if "athlete_id" not in st.session_state:
