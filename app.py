@@ -11,8 +11,7 @@ def show_login_screen():
     CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
     REDIRECT_URI = st.secrets["REDIRECT_URI"]
     
-    # Intervals.icu specific scopes
-    scopes = "wellness:read,activity:read"
+    scopes = "athlete:read,wellness:read,activity:read"
     
     auth_url = (
         f"https://intervals.icu/oauth/authorize?"
@@ -144,7 +143,7 @@ if not st.session_state.authenticated:
     st.stop()
     
     # SCOPES: We need wellness and activity read access
-    scopes = "wellness:read,activity:read"
+    scopes = "athlete:read,wellness:read,activity:read"
     auth_url = (
         f"https://intervals.icu/oauth/authorize?"
         f"client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&"
@@ -155,7 +154,6 @@ if not st.session_state.authenticated:
     st.stop()
 
 # --- 4. MAIN DASHBOARD ---
-st.title(f"📊 Performance Dashboard")
 
 if st.sidebar.button("Logout / Switch Athlete"):
     st.session_state.authenticated = False
