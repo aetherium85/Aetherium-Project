@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 def show_login_screen():
-    st.write("Welcome! Connect your Intervals.icu account to see your 2025 progress.")
+    st.write("Welcome! Connect your Intervals.icu account to see your progress.")
     
     # These must match your secrets
     CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
