@@ -95,9 +95,28 @@ if "code" in query_params and not st.session_state.authenticated:
 well_json = None
 act_json = None
 
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+    st.session_state.athlete_id = ""
+
+# ONLY show this if NOT authenticated
 if not st.session_state.authenticated:
     st.title("❤️ Fitness Command Center")
-    st.write("Welcome! Connect your Intervals.icu account to see your progress.")
+    col1, _ = st.columns([1, 2])
+    with col1:
+        st.subheader("🔑 Access")
+        # Ensure this is NOT inside an 'if well_json' block
+        entered_id = st.text_input("Enter Athlete ID (e.g., i123456):")
+        
+        if st.button("Log In"):
+            if entered_id:
+                st.session_state.authenticated = True
+                st.session_state.athlete_id = entered_id
+                st.rerun() # Forces the app to restart and see the new 'True' state
+            else:
+                st.error("Athlete ID is required.")
+    
+    # STOP the rest of the script from running if not logged in
     st.stop()
     
     # SCOPES: We need wellness and activity read access
