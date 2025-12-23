@@ -5,6 +5,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
+# --- INITIALIZATION (DO THIS FIRST) ---
+if "athlete_id" not in st.session_state:
+    st.session_state.athlete_id = "" # Initialized as an empty string
+
 # --- 1. CONFIGURATION & GLOBALS ---
 st.set_page_config(page_title="Yearly Fitness Dashboard", layout="wide")
 
@@ -27,30 +31,27 @@ TYPE_MAPPING = {
 }
 
 # --- 2. DATA FETCHING FUNCTION ---
-def get_ytd_data(athlete_id):
-    # API key from st.secrets
-    API_KEY = st.secrets["INTERVALS_API_KEY"]
+def get_ytd_data():
+    # Use the token we saved during login
+    token = st.session_state.token_data['access_token']
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Intervals.icu lets you use '0' as the ID for the 'current authenticated user'
+    base_url = "https://intervals.icu/api/v1/athlete/0" 
     
     first_day = datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d')
     today = datetime.now().strftime('%Y-%m-%d')
     params = {'oldest': first_day, 'newest': today}
-    
-    wellness_url = f"https://intervals.icu/api/v1/athlete/{athlete_id}/wellness"
-    activities_url = f"https://intervals.icu/api/v1/athlete/{athlete_id}/activities"
 
     try:
-        # Note: Intervals.icu uses 'API_KEY' as the username for Basic Auth
-        well_res = requests.get(wellness_url, auth=('API_KEY', API_KEY), params=params)
-        act_res = requests.get(activities_url, auth=('API_KEY', API_KEY), params=params)
+        well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
+        act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
+        ath_res = requests.get(base_url, headers=headers) # For the user's name
         
-        # Check for HTTP errors
-        well_res.raise_for_status()
-        act_res.raise_for_status()
-        
-        return well_res.json(), act_res.json()
+        return well_res.json(), act_res.json(), ath_res.json()
     except Exception as e:
-        st.error(f"Connection failed: {e}")
-        return None, None
+        st.error(f"Fetch failed: {e}")
+        return None, None, None
 
 # --- 3. AUTHENTICATION & SESSION STATE ---
 # --- NEW OAUTH CONSTANTS ---
@@ -91,9 +92,13 @@ if "code" in query_params and not st.session_state.authenticated:
         else:
             st.error("Authentication failed. Please try again.")
 
+well_json = None
+act_json = None
+
 if not st.session_state.authenticated:
     st.title("❤️ Fitness Command Center")
-    st.write("Welcome! Connect your Intervals.icu account to see your 2025 progress.")
+    st.write("Welcome! Connect your Intervals.icu account to see your progress.")
+    st.stop()
     
     # SCOPES: We need wellness and activity read access
     scopes = "wellness:read,activity:read"
@@ -114,7 +119,10 @@ if st.sidebar.button("Logout / Switch Athlete"):
     st.rerun()
 
 # Fetch data
-well_json, act_json = get_ytd_data(st.session_state.athlete_id)
+if st.session_state.athlete_id:
+    well_json, act_json = get_ytd_data(st.session_state.athlete_id)
+else:
+    st.info("Please log in to see your data.")
 
 # --- WELLNESS SECTION ---
 if well_json is not None:
