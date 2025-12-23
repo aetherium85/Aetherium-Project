@@ -9,37 +9,26 @@ from datetime import datetime
 
 def show_login_screen():
     st.title("❤️ Fitness Command Center")
+    st.write("Securely sync your 2025 performance data.")
     
+    # 1. Prepare your credentials
     CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
     REDIRECT_URI = st.secrets["REDIRECT_URI"]
     scopes = "ACTIVITY:READ,WELLNESS:READ"
     
-    # Use urlencode to ensure the URL is formatted perfectly
+    # 2. Build the URL parameters
     params = {
         "client_id": CLIENT_ID,
         "redirect_uri": REDIRECT_URI,
         "response_type": "code",
         "scope": scopes
     }
-    auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(params)}"
-
-    # We style an <a> tag to look like a button. 
-    # target="_self" tells the browser to stay in the current tab.
-    button_style = f"""
-        <a href="{auth_url}" target="_self" style="
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #FF4B4B;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-family: sans-serif;
-            text-align: center;
-        ">🚀 Connect with Intervals.icu</a>
-    """
     
-    st.markdown(button_style, unsafe_allow_html=True)
+    # 3. Encode and build the clean URL
+    auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(params)}"
+    
+    # 4. Use the reliable standard button
+    st.link_button("🚀 Connect with Intervals.icu", auth_url, type="primary")
 
 # --- INITIALIZATION (DO THIS FIRST) ---
 if "athlete_id" not in st.session_state:
@@ -181,7 +170,8 @@ if st.sidebar.button("Logout / Switch Athlete"):
     st.rerun()
 
 # Fetch data
-if st.session_state.get("authenticated") and st.session_state.get("token_data"):
+if st.session_state.get("authenticated"):
+    st.success("✅ Connection Active! You can close the login tab.")
     well_json, act_json, ath_json = get_ytd_data()
 else:
     show_login_screen() # This should contain your "Connect with Intervals" button
