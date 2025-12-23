@@ -21,7 +21,20 @@ def show_login_screen():
         f"scope={scopes}"
     )
     
-    st.link_button("🚀 Connect with Intervals.icu", auth_url)
+    button_html = f"""
+        <a href="{auth_url}" target="_self" style="
+            text-decoration: none;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #FF4B4B;
+            color: white;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            border: none;
+            text-align: center;
+        ">🚀 Connect with Intervals.icu</a>
+    """
+    st.markdown(button_html, unsafe_allow_html=True)
 
 # --- INITIALIZATION (DO THIS FIRST) ---
 if "athlete_id" not in st.session_state:
