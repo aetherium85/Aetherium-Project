@@ -23,22 +23,30 @@ def show_login_screen():
     }
     auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(params)}"
     
-    login_button_html = f"""
-    <div style="display: flex; justify-content: left;">
-        <a href="{auth_url}" target="_top" style="
-            background-color: #FF4B4B;
-            color: white;
-            padding: 10px 24px;
-            text-decoration: none;
-            font-family: sans-serif;
-            font-weight: bold;
-            border-radius: 8px;
-            display: inline-block;
-        ">🚀 Connect with Intervals.icu</a>
-    </div>
+    login_js = f"""
+    <button id="loginBtn" style="
+        background-color: #FF4B4B;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        width: 100%;
+    ">
+        🚀 Connect with Intervals.icu
+    </button>
+
+    <script>
+        document.getElementById('loginBtn').onclick = function() {{
+            window.parent.location.href = "{auth_url}";
+        }};
+    </script>
     """
-    # target="_top" is key here to break out of the Streamlit frame
-    components.html(login_button_html, height=60)
+    
+    # We display this in a small component box
+    components.html(login_js, height=70)
 
 # --- INITIALIZATION (DO THIS FIRST) ---
 if "athlete_id" not in st.session_state:
