@@ -1,3 +1,4 @@
+import urllib.parse
 import streamlit as st
 import requests
 import pandas as pd
@@ -13,27 +14,27 @@ def show_login_screen():
     
     scopes = "ACTIVITY:READ,WELLNESS:READ"
     
-    auth_url = (
-        f"https://intervals.icu/oauth/authorize?"
-        f"client_id={CLIENT_ID}&"
-        f"redirect_uri={REDIRECT_URI}&"
-        f"response_type=code&"
-        f"scope={scopes}"
-    )
+    params = {
+        "client_id": CLIENT_ID,
+        "redirect_uri": REDIRECT_URI,
+        "response_type": "code",
+        "scope": scopes
+    }
+    auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(params)}"
     
-    button_html = f"""
+    button_html = f'''
         <a href="{auth_url}" target="_self" style="
             text-decoration: none;
             display: inline-block;
-            padding: 0.5rem 1rem;
+            padding: 10px 20px;
             background-color: #FF4B4B;
             color: white;
-            border-radius: 0.5rem;
-            font-weight: 500;
+            border-radius: 8px;
+            font-weight: bold;
             border: none;
-            text-align: center;
         ">🚀 Connect with Intervals.icu</a>
-    """
+    '''
+    
     st.markdown(button_html, unsafe_allow_html=True)
 
 # --- INITIALIZATION (DO THIS FIRST) ---
