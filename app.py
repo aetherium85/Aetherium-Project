@@ -5,6 +5,23 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
+def show_login_screen():
+    st.title("❤️ Fitness Command Center")
+    st.write("Welcome! Connect your Intervals.icu account to see your 2025 progress.")
+    
+    # These must match your secrets
+    CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
+    REDIRECT_URI = st.secrets["REDIRECT_URI"]
+    scopes = "wellness:read,activity:read"
+    
+    auth_url = (
+        f"https://intervals.icu/oauth/authorize?"
+        f"client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&"
+        f"response_type=code&scope={scopes}"
+    )
+    
+    st.link_button("🚀 Connect with Intervals.icu", auth_url)
+
 # --- INITIALIZATION (DO THIS FIRST) ---
 if "athlete_id" not in st.session_state:
     st.session_state.athlete_id = "" # Initialized as an empty string
@@ -32,8 +49,14 @@ TYPE_MAPPING = {
 
 # --- 2. DATA FETCHING FUNCTION ---
 def get_ytd_data():
-    # Use the token we saved during login
-    token = st.session_state.token_data['access_token']
+    # Safety Check: If there's no token, return None instead of crashing
+    if "token_data" not in st.session_state or st.session_state.token_data is None:
+        return None, None, None
+
+    token = st.session_state.token_data.get('access_token')
+    if not token:
+        return None, None, None
+
     headers = {"Authorization": f"Bearer {token}"}
     
     # Intervals.icu lets you use '0' as the ID for the 'current authenticated user'
@@ -73,7 +96,6 @@ def get_access_token(auth_code):
     response = requests.post(token_url, data=data)
     return response.json()
 
-# --- 3. AUTHENTICATION LOGIC ---
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
     st.session_state.token_data = None
@@ -138,11 +160,11 @@ if st.sidebar.button("Logout / Switch Athlete"):
     st.rerun()
 
 # Fetch data
-if st.session_state.athlete_id:
+if st.session_state.get("authenticated") and st.session_state.get("token_data"):
     well_json, act_json = get_ytd_data(st.session_state.athlete_id)
 else:
-    st.info("Please log in to see your data.")
-
+    show_login_screen() # This should contain your "Connect with Intervals" button
+    st.stop()
 # --- WELLNESS SECTION ---
 if well_json is not None:
     # Handle single dictionary vs list of dictionaries
