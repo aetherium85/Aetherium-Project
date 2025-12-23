@@ -86,15 +86,18 @@ REDIRECT_URI = st.secrets["REDIRECT_URI"]
 # --- OAUTH FUNCTIONS ---
 def get_access_token(auth_code):
     """Swaps the one-time code for a reusable access token."""
-    token_url = "https://intervals.icu/oauth/token"
-    data = {
+    token_url = "https://intervals.icu/api/oauth/token"
+    payload = {
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
         "code": auth_code,
         "redirect_uri": REDIRECT_URI,
         "grant_type": "authorization_code",
     }
-    response = requests.post(token_url, data=data)
+    response = requests.post(token_url, data=payload)
+    if response.status_code != 200:
+        st.error(f"Token Error {response.status_code}: {response.text}")
+        return {}
     return response.json()
 
 if "authenticated" not in st.session_state:
