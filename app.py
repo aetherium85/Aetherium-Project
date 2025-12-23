@@ -1,6 +1,4 @@
-import urllib.parse
 import streamlit as st
-import base64
 import requests
 import pandas as pd
 import plotly.express as px
@@ -9,37 +7,20 @@ from datetime import datetime
 
 def show_login_screen():
     st.title("❤️ Fitness Command Center")
-    st.write("Click below to securely sync your fitness data.")
+    st.write("Welcome! Connect your Intervals.icu account to see your 2025 progress.")
     
+    # These must match your secrets
     CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
-    # 2. Encode the URI so characters like ':' and '/' are safe
-    raw_redirect = st.secrets["REDIRECT_URI"]
-    encoded_redirect = urllib.parse.quote(raw_redirect, safe='')
+    REDIRECT_URI = st.secrets["REDIRECT_URI"]
+    scopes = "wellness:read,activity:read"
     
-    scopes = "ACTIVITY:READ,WELLNESS:READ"
-    
-    # 3. Use the encoded version in the URL
     auth_url = (
-        f"https://intervals.icu/oauth/authorize"
-        f"?client_id={CLIENT_ID}"
-        f"&redirect_uri={encoded_redirect}"
-        f"&response_type=code"
-        f"&scope={scopes}"
+        f"https://intervals.icu/oauth/authorize?"
+        f"client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&"
+        f"response_type=code&scope={scopes}"
     )
-
-    button_style = """
-        <a href="{url}" target="_self" style="
-            display: inline-block;
-            padding: 0.5em 1em;
-            color: white;
-            background-color: #FF4B4B;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            text-align: center;
-        ">🚀 Connect with Intervals.icu</a>
-    """
-    st.markdown(button_style.format(url=auth_url), unsafe_allow_html=True)
+    
+    st.link_button("🚀 Connect with Intervals.icu", auth_url)
 
 # --- INITIALIZATION (DO THIS FIRST) ---
 if "athlete_id" not in st.session_state:
@@ -68,17 +49,32 @@ TYPE_MAPPING = {
 
 # --- 2. DATA FETCHING FUNCTION ---
 def get_ytd_data():
-    token = st.session_state.token_data['access_token']
+    # Safety Check: If there's no token, return None instead of crashing
+    if "token_data" not in st.session_state or st.session_state.token_data is None:
+        return None, None, None
+
+    token = st.session_state.token_data.get('access_token')
+    if not token:
+        return None, None, None
+
     headers = {"Authorization": f"Bearer {token}"}
     
-    # We use '0' so we don't need to know the athlete's ID number
+    # Intervals.icu lets you use '0' as the ID for the 'current authenticated user'
     base_url = "https://intervals.icu/api/v1/athlete/0" 
     
-    well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
-    act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
-    ath_res = requests.get(base_url, headers=headers) 
-    
-    return well_res.json(), act_res.json(), ath_res.json()
+    first_day = datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d')
+    today = datetime.now().strftime('%Y-%m-%d')
+    params = {'oldest': first_day, 'newest': today}
+
+    try:
+        well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
+        act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
+        ath_res = requests.get(base_url, headers=headers) # For the user's name
+        
+        return well_res.json(), act_res.json(), ath_res.json()
+    except Exception as e:
+        st.error(f"Fetch failed: {e}")
+        return None, None, None
 
 # --- 3. AUTHENTICATION & SESSION STATE ---
 # --- NEW OAUTH CONSTANTS ---
@@ -88,32 +84,16 @@ REDIRECT_URI = st.secrets["REDIRECT_URI"]
 
 # --- OAUTH FUNCTIONS ---
 def get_access_token(auth_code):
-    token_url = "https://intervals.icu/api/oauth/token"
-    
-    # 1. Create the Basic Auth Header
-    # Format is "client_id:client_secret" encoded in base64
-    auth_str = f"{CLIENT_ID}:{CLIENT_SECRET}"
-    encoded_auth = base64.b64encode(auth_str.encode()).decode()
-    
-    headers = {
-        "Authorization": f"Basic {encoded_auth}",
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-    
-    # 2. Body only needs the code and redirect_uri now
-    payload = {
+    """Swaps the one-time code for a reusable access token."""
+    token_url = "https://intervals.icu/oauth/token"
+    data = {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
         "code": auth_code,
         "redirect_uri": REDIRECT_URI,
         "grant_type": "authorization_code",
     }
-    
-    response = requests.post(token_url, headers=headers, data=payload)
-    
-    if response.status_code != 200:
-        # This will show you exactly what is wrong in the Streamlit UI
-        st.error(f"⚠️ Exchange Failed ({response.status_code}): {response.text}")
-        return {}
-        
+    response = requests.post(token_url, data=data)
     return response.json()
 
 if "authenticated" not in st.session_state:
@@ -162,7 +142,7 @@ if not st.session_state.authenticated:
     st.stop()
     
     # SCOPES: We need wellness and activity read access
-    scopes = "ACTIVITY:READ,WELLNESS:READ"
+    scopes = "wellness:read,activity:read"
     auth_url = (
         f"https://intervals.icu/oauth/authorize?"
         f"client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&"
@@ -173,6 +153,7 @@ if not st.session_state.authenticated:
     st.stop()
 
 # --- 4. MAIN DASHBOARD ---
+st.title(f"📊 Performance Dashboard")
 
 if st.sidebar.button("Logout / Switch Athlete"):
     st.session_state.authenticated = False
@@ -180,7 +161,7 @@ if st.sidebar.button("Logout / Switch Athlete"):
 
 # Fetch data
 if st.session_state.get("authenticated") and st.session_state.get("token_data"):
-    well_json, act_json, ath_json = get_ytd_data()
+    well_json, act_json = get_ytd_data(st.session_state.athlete_id)
 else:
     show_login_screen() # This should contain your "Connect with Intervals" button
     st.stop()
