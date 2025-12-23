@@ -164,7 +164,7 @@ if st.sidebar.button("Logout / Switch Athlete"):
 
 # Fetch data
 if st.session_state.get("authenticated") and st.session_state.get("token_data"):
-    well_json, act_json = get_ytd_data(st.session_state.athlete_id)
+    well_json, act_json, ath_json = get_ytd_data()
 else:
     show_login_screen() # This should contain your "Connect with Intervals" button
     st.stop()
