@@ -53,23 +53,57 @@ def get_ytd_data(athlete_id):
         return None, None
 
 # --- 3. AUTHENTICATION & SESSION STATE ---
+# --- NEW OAUTH CONSTANTS ---
+CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
+CLIENT_SECRET = st.secrets["INTERVALS_CLIENT_SECRET"]
+REDIRECT_URI = st.secrets["REDIRECT_URI"]
+
+# --- OAUTH FUNCTIONS ---
+def get_access_token(auth_code):
+    """Swaps the one-time code for a reusable access token."""
+    token_url = "https://intervals.icu/oauth/token"
+    data = {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "code": auth_code,
+        "redirect_uri": REDIRECT_URI,
+        "grant_type": "authorization_code",
+    }
+    response = requests.post(token_url, data=data)
+    return response.json()
+
+# --- 3. AUTHENTICATION LOGIC ---
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
-    st.session_state.athlete_id = ""
+    st.session_state.token_data = None
+
+# Check if we are returning from Intervals.icu with a 'code'
+query_params = st.query_params
+if "code" in query_params and not st.session_state.authenticated:
+    with st.spinner("Finalizing secure connection..."):
+        token_response = get_access_token(query_params["code"])
+        if "access_token" in token_response:
+            st.session_state.authenticated = True
+            st.session_state.token_data = token_response
+            # Clear the URL parameters so the 'code' doesn't stay in the address bar
+            st.query_params.clear()
+            st.rerun()
+        else:
+            st.error("Authentication failed. Please try again.")
 
 if not st.session_state.authenticated:
     st.title("❤️ Fitness Command Center")
-    col1, _ = st.columns([1, 2])
-    with col1:
-        st.subheader("🔑 Access")
-        entered_id = st.text_input("Enter Athlete ID (e.g., i123456):", value=st.session_state.athlete_id)
-        if st.button("Log In"):
-            if entered_id:
-                st.session_state.authenticated = True
-                st.session_state.athlete_id = entered_id
-                st.rerun()
-            else:
-                st.error("Athlete ID is required.")
+    st.write("Welcome! Connect your Intervals.icu account to see your 2025 progress.")
+    
+    # SCOPES: We need wellness and activity read access
+    scopes = "wellness:read,activity:read"
+    auth_url = (
+        f"https://intervals.icu/oauth/authorize?"
+        f"client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&"
+        f"response_type=code&scope={scopes}"
+    )
+    
+    st.link_button("🚀 Connect with Intervals.icu", auth_url)
     st.stop()
 
 # --- 4. MAIN DASHBOARD ---
