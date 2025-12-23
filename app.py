@@ -6,7 +6,6 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 def show_login_screen():
-    st.title("❤️ Fitness Command Center")
     st.write("Welcome! Connect your Intervals.icu account to see your 2025 progress.")
     
     # These must match your secrets
