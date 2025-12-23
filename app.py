@@ -1,3 +1,4 @@
+import urllib.parse
 import streamlit as st
 import base64
 import requests
@@ -10,19 +11,21 @@ def show_login_screen():
     st.title("❤️ Fitness Command Center")
     
     CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
-    REDIRECT_URI = st.secrets["REDIRECT_URI"]
+    # 2. Encode the URI so characters like ':' and '/' are safe
+    raw_redirect = st.secrets["REDIRECT_URI"]
+    encoded_redirect = urllib.parse.quote(raw_redirect, safe='')
     
     scopes = "ACTIVITY:READ,WELLNESS:READ"
     
+    # 3. Use the encoded version in the URL
     auth_url = (
         f"https://intervals.icu/oauth/authorize"
         f"?client_id={CLIENT_ID}"
-        f"&redirect_uri={REDIRECT_URI}"
+        f"&redirect_uri={encoded_redirect}"
         f"&response_type=code"
         f"&scope={scopes}"
     )
 
-    # 3. DEFINE the style variable (Crucial step!)
     button_style = """
         <a href="{url}" target="_self" style="
             display: inline-block;
@@ -35,8 +38,6 @@ def show_login_screen():
             text-align: center;
         ">🚀 Connect with Intervals.icu</a>
     """
-    
-    # 4. USE the variable to display the button
     st.markdown(button_style.format(url=auth_url), unsafe_allow_html=True)
 
 # --- INITIALIZATION (DO THIS FIRST) ---
