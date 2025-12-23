@@ -1,4 +1,5 @@
 import streamlit as st
+import base64
 import requests
 import pandas as pd
 import plotly.express as px
@@ -100,19 +101,32 @@ REDIRECT_URI = st.secrets["REDIRECT_URI"]
 
 # --- OAUTH FUNCTIONS ---
 def get_access_token(auth_code):
-    """Swaps the one-time code for a reusable access token."""
     token_url = "https://intervals.icu/api/oauth/token"
+    
+    # 1. Create the Basic Auth Header
+    # Format is "client_id:client_secret" encoded in base64
+    auth_str = f"{CLIENT_ID}:{CLIENT_SECRET}"
+    encoded_auth = base64.b64encode(auth_str.encode()).decode()
+    
+    headers = {
+        "Authorization": f"Basic {encoded_auth}",
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    
+    # 2. Body only needs the code and redirect_uri now
     payload = {
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
         "code": auth_code,
         "redirect_uri": REDIRECT_URI,
         "grant_type": "authorization_code",
     }
-    response = requests.post(token_url, data=payload)
+    
+    response = requests.post(token_url, headers=headers, data=payload)
+    
     if response.status_code != 200:
-        st.error(f"Token Error {response.status_code}: {response.text}")
+        # This will show you exactly what is wrong in the Streamlit UI
+        st.error(f"⚠️ Exchange Failed ({response.status_code}): {response.text}")
         return {}
+        
     return response.json()
 
 if "authenticated" not in st.session_state:
