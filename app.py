@@ -11,7 +11,7 @@ def show_login_screen():
     CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
     REDIRECT_URI = st.secrets["REDIRECT_URI"]
     
-    scopes = "ATHLETE:READ,ACTIVITY:READ,WELLNESS:READ"
+    scopes = "ACTIVITY:READ,WELLNESS:READ"
     
     auth_url = (
         f"https://intervals.icu/oauth/authorize?"
@@ -143,7 +143,7 @@ if not st.session_state.authenticated:
     st.stop()
     
     # SCOPES: We need wellness and activity read access
-    scopes = "ATHLETE:READ,ACTIVITY:READ,WELLNESS:READ"
+    scopes = "ACTIVITY:READ,WELLNESS:READ"
     auth_url = (
         f"https://intervals.icu/oauth/authorize?"
         f"client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&"
