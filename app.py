@@ -6,17 +6,20 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 def show_login_screen():
-    st.write("Welcome! Connect your Intervals.icu account to see your progress.")
+    st.title("❤️ Fitness Command Center")
     
-    # These must match your secrets
     CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
     REDIRECT_URI = st.secrets["REDIRECT_URI"]
+    
+    # Intervals.icu specific scopes
     scopes = "wellness:read,activity:read"
     
     auth_url = (
         f"https://intervals.icu/oauth/authorize?"
-        f"client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&"
-        f"response_type=code&scope={scopes}"
+        f"client_id={CLIENT_ID}&"
+        f"redirect_uri={REDIRECT_URI}&"
+        f"response_type=code&"
+        f"scope={scopes}"
     )
     
     st.link_button("🚀 Connect with Intervals.icu", auth_url)
