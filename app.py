@@ -170,7 +170,7 @@ if st.sidebar.button("Logout / Switch Athlete"):
     st.rerun()
 
 # Fetch data
-if st.session_state.get("authenticated"):
+if st.session_state.get("authenticated") and st.session_state.get("token_data"):
     st.success("✅ Connection Active! You can close the login tab.")
     well_json, act_json, ath_json = get_ytd_data()
 else:
