@@ -14,14 +14,29 @@ def show_login_screen():
     scopes = "ACTIVITY:READ,WELLNESS:READ"
     
     auth_url = (
-        f"https://intervals.icu/oauth/authorize?"
-        f"client_id={CLIENT_ID}&"
-        f"redirect_uri={REDIRECT_URI}&"
-        f"response_type=code&"
-        f"scope={scopes}"
+        f"https://intervals.icu/oauth/authorize"
+        f"?client_id={CLIENT_ID}"
+        f"&redirect_uri={REDIRECT_URI}"
+        f"&response_type=code"
+        f"&scope={scopes}"
     )
+
+    # 3. DEFINE the style variable (Crucial step!)
+    button_style = """
+        <a href="{url}" target="_self" style="
+            display: inline-block;
+            padding: 0.5em 1em;
+            color: white;
+            background-color: #FF4B4B;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            text-align: center;
+        ">🚀 Connect with Intervals.icu</a>
+    """
     
-    st.link_button("🚀 Connect with Intervals.icu", auth_url)
+    # 4. USE the variable to display the button
+    st.markdown(button_style.format(url=auth_url), unsafe_allow_html=True)
 
 # --- INITIALIZATION (DO THIS FIRST) ---
 if "athlete_id" not in st.session_state:
