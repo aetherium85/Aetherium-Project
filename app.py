@@ -12,9 +12,9 @@ def show_login_screen():
     
     CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
     REDIRECT_URI = st.secrets["REDIRECT_URI"]
-    
     scopes = "ACTIVITY:READ,WELLNESS:READ"
     
+    # Use urlencode to ensure the URL is formatted perfectly
     params = {
         "client_id": CLIENT_ID,
         "redirect_uri": REDIRECT_URI,
@@ -22,31 +22,24 @@ def show_login_screen():
         "scope": scopes
     }
     auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(params)}"
-    
-    login_js = f"""
-    <button id="loginBtn" style="
-        background-color: #FF4B4B;
-        color: white;
-        padding: 12px 24px;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        width: 100%;
-    ">
-        🚀 Connect with Intervals.icu
-    </button>
 
-    <script>
-        document.getElementById('loginBtn').onclick = function() {{
-            window.parent.location.href = "{auth_url}";
-        }};
-    </script>
+    # We style an <a> tag to look like a button. 
+    # target="_self" tells the browser to stay in the current tab.
+    button_style = f"""
+        <a href="{auth_url}" target="_self" style="
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #FF4B4B;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-family: sans-serif;
+            text-align: center;
+        ">🚀 Connect with Intervals.icu</a>
     """
     
-    # We display this in a small component box
-    components.html(login_js, height=70)
+    st.markdown(button_style, unsafe_allow_html=True)
 
 # --- INITIALIZATION (DO THIS FIRST) ---
 if "athlete_id" not in st.session_state:
