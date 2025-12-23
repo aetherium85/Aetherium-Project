@@ -9,6 +9,7 @@ from datetime import datetime
 
 def show_login_screen():
     st.title("❤️ Fitness Command Center")
+    st.write("Click below to securely sync your fitness data.")
     
     CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
     # 2. Encode the URI so characters like ':' and '/' are safe
@@ -67,32 +68,17 @@ TYPE_MAPPING = {
 
 # --- 2. DATA FETCHING FUNCTION ---
 def get_ytd_data():
-    # Safety Check: If there's no token, return None instead of crashing
-    if "token_data" not in st.session_state or st.session_state.token_data is None:
-        return None, None, None
-
-    token = st.session_state.token_data.get('access_token')
-    if not token:
-        return None, None, None
-
+    token = st.session_state.token_data['access_token']
     headers = {"Authorization": f"Bearer {token}"}
     
-    # Intervals.icu lets you use '0' as the ID for the 'current authenticated user'
+    # We use '0' so we don't need to know the athlete's ID number
     base_url = "https://intervals.icu/api/v1/athlete/0" 
     
-    first_day = datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d')
-    today = datetime.now().strftime('%Y-%m-%d')
-    params = {'oldest': first_day, 'newest': today}
-
-    try:
-        well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
-        act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
-        ath_res = requests.get(base_url, headers=headers) # For the user's name
-        
-        return well_res.json(), act_res.json(), ath_res.json()
-    except Exception as e:
-        st.error(f"Fetch failed: {e}")
-        return None, None, None
+    well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
+    act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
+    ath_res = requests.get(base_url, headers=headers) 
+    
+    return well_res.json(), act_res.json(), ath_res.json()
 
 # --- 3. AUTHENTICATION & SESSION STATE ---
 # --- NEW OAUTH CONSTANTS ---
