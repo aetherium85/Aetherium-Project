@@ -7,17 +7,18 @@ from datetime import datetime
 
 def show_login_screen():
     st.title("❤️ Fitness Command Center")
-    st.write("Welcome! Connect your Intervals.icu account to see your 2025 progress.")
     
-    # These must match your secrets
     CLIENT_ID = st.secrets["INTERVALS_CLIENT_ID"]
     REDIRECT_URI = st.secrets["REDIRECT_URI"]
-    scopes = "wellness:read,activity:read"
+    
+    scopes = "ACTIVITY:READ,WELLNESS:READ"
     
     auth_url = (
         f"https://intervals.icu/oauth/authorize?"
-        f"client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&"
-        f"response_type=code&scope={scopes}"
+        f"client_id={CLIENT_ID}&"
+        f"redirect_uri={REDIRECT_URI}&"
+        f"response_type=code&"
+        f"scope={scopes}"
     )
     
     st.link_button("🚀 Connect with Intervals.icu", auth_url)
@@ -85,15 +86,18 @@ REDIRECT_URI = st.secrets["REDIRECT_URI"]
 # --- OAUTH FUNCTIONS ---
 def get_access_token(auth_code):
     """Swaps the one-time code for a reusable access token."""
-    token_url = "https://intervals.icu/oauth/token"
-    data = {
+    token_url = "https://intervals.icu/api/oauth/token"
+    payload = {
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
         "code": auth_code,
         "redirect_uri": REDIRECT_URI,
         "grant_type": "authorization_code",
     }
-    response = requests.post(token_url, data=data)
+    response = requests.post(token_url, data=payload)
+    if response.status_code != 200:
+        st.error(f"Token Error {response.status_code}: {response.text}")
+        return {}
     return response.json()
 
 if "authenticated" not in st.session_state:
@@ -142,7 +146,7 @@ if not st.session_state.authenticated:
     st.stop()
     
     # SCOPES: We need wellness and activity read access
-    scopes = "wellness:read,activity:read"
+    scopes = "ACTIVITY:READ,WELLNESS:READ"
     auth_url = (
         f"https://intervals.icu/oauth/authorize?"
         f"client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&"
@@ -153,7 +157,6 @@ if not st.session_state.authenticated:
     st.stop()
 
 # --- 4. MAIN DASHBOARD ---
-st.title(f"📊 Performance Dashboard")
 
 if st.sidebar.button("Logout / Switch Athlete"):
     st.session_state.authenticated = False
@@ -161,7 +164,7 @@ if st.sidebar.button("Logout / Switch Athlete"):
 
 # Fetch data
 if st.session_state.get("authenticated") and st.session_state.get("token_data"):
-    well_json, act_json = get_ytd_data(st.session_state.athlete_id)
+    well_json, act_json, ath_json = get_ytd_data()
 else:
     show_login_screen() # This should contain your "Connect with Intervals" button
     st.stop()
