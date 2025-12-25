@@ -28,7 +28,7 @@ TYPE_MAPPING = {
     "WeightTraining": "Strength", "Yoga": "Mobility", "Pilates": "Mobility"
 }
 
-# --- 2. THE FINAL CSS FIX (Background + Elegant Typography) ---
+# --- 2. THE FINAL CSS FIX (Background + Elegant Typography + Icon Fix) ---
 st.markdown(
     """
     <style>
@@ -66,6 +66,16 @@ st.markdown(
         font-weight: 200 !important;
         letter-spacing: 1.5px !important;
         color: white !important;
+    }
+
+    /* --- ICON RECOVERY FIX --- */
+    /* This excludes the sidebar icons from the font override so they render correctly */
+    [data-testid="stSidebarCollapseIcon"] span, 
+    [data-testid="stIcon"], 
+    button[kind="header"] span {
+        font-family: "Material Symbols Rounded", sans-serif !important;
+        letter-spacing: normal !important;
+        font-weight: normal !important;
     }
 
     /* Make headers feel more 'Architectural' */
@@ -122,21 +132,21 @@ st.markdown(
         box-shadow: none !important;
     }
     /* Prevent global font rules from blowing up the Hero containers */
-[data-testid="stHorizontalBlock"] {
-    gap: 10px !important;
-}
+    [data-testid="stHorizontalBlock"] {
+        gap: 10px !important;
+    }
 
-/* Adjusting the subheaders to be smaller and cleaner */
-h3 {
-    font-size: 0.9rem !important;
-    margin-bottom: 1rem !important;
-    opacity: 0.8;
-}
+    /* Adjusting the subheaders to be smaller and cleaner */
+    h3 {
+        font-size: 0.9rem !important;
+        margin-bottom: 1rem !important;
+        opacity: 0.8;
+    }
 
-/* Ensure metrics don't overflow if you still use them elsewhere */
-[data-testid="stMetricValue"] {
-    font-size: 1.8rem !important; /* Scaled down from 2.8rem */
-}
+    /* Ensure metrics don't overflow if you still use them elsewhere */
+    [data-testid="stMetricValue"] {
+        font-size: 1.8rem !important; /* Scaled down from 2.8rem */
+    }
     </style>
     """,
     unsafe_allow_html=True
