@@ -174,19 +174,19 @@ if well_json is not None:
         # Call the create_gauge function for each metric
         g1.plotly_chart(create_gauge(
             latest.get('ctl', 0), "Fitness (CTL)", 
-            [{'range': [0, 100], 'color': "#70B3C4"}], 0, 100
+            [{'range': [0, 100], 'color': "#70C4B0"}], 0, 100
         ), use_container_width=True)
         
         g2.plotly_chart(create_gauge(
             latest.get('atl', 0), "Fatigue (ATL)", 
-            [{'range': [0, 120], 'color': "#F35555"}], 0, 120
+            [{'range': [0, 120], 'color': "#E16C45"}], 0, 120
         ), use_container_width=True)
         
         form_steps = [
-            {'range': [-60, -30], 'color': "#F35555"}, 
+            {'range': [-60, -30], 'color': "#E16C45"}, 
             {'range': [-30, -10], 'color': "#4BD4B0"}, 
-            {'range': [-10, 10], 'color': "#C69C49"}, 
-            {'range': [10, 60], 'color': "#F35555"}
+            {'range': [-10, 10], 'color': "#D4AA57"}, 
+            {'range': [10, 60], 'color': "#E16C45"}
         ]
         g3.plotly_chart(create_gauge(
             latest.get('tsb', 0), "Form (TSB)", 
