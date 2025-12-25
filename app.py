@@ -199,7 +199,15 @@ if well_json is not None:
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
         fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
         fig.update_traces(stackgroup=None, fill='tozeroy', opacity=1,
-    hovertemplate="<b>%{fullData.name} Score:</b> %{y:.1f}<extra></extra>"
+    hovertemplate="<b>%{fullData.name} Score:</b> %{y:.1f}<extra></extra>",
+    legend=dict(
+        font=dict(color="white", size=12),
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    ),
 )
         fig.update_layout(hovermode="x unified",hoverlabel=dict(bgcolor="white", font_size=14),
     xaxis=dict(
