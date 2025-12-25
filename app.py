@@ -196,20 +196,41 @@ if well_json is not None:
         # --- 5. YEARLY AREA CHART ---
         st.divider()
         st.subheader("📈 Yearly Training Load Progression")
+        
+        # 1. Create the figure
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
         
+        # 2. Fix the Stacking: Disable stacking so TSB is relative to 0
+        fig.update_traces(stackgroup=None, fill='tozeroy')
+        
+        # 3. Fix the Legend Labels: Map technical names to pretty labels
+        fig.for_each_trace(lambda t: t.update(name=pretty_labels.get(t.name, t.name)))
+        
+        # 4. Apply the Glassmorphism layout
         fig.update_layout(
             hovermode="x unified",
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="white"),
-            xaxis=dict(gridcolor="rgba(255,255,255,0.1)"),
-            yaxis=dict(gridcolor="rgba(255,255,255,0.1)"),
-            legend=dict(font=dict(color="white"), orientation="h", y=1.1)
+            xaxis=dict(
+                gridcolor="rgba(255,255,255,0.1)",
+                zerolinecolor="rgba(255,255,255,0.2)" # Subtle zero line
+            ),
+            yaxis=dict(
+                gridcolor="rgba(255,255,255,0.1)",
+                zerolinecolor="rgba(255,255,255,0.2)" # Subtle zero line
+            ),
+            legend=dict(
+                font=dict(color="white"), 
+                orientation="h", 
+                yanchor="bottom", 
+                y=1.02, 
+                xanchor="right", 
+                x=1
+            )
         )
+        
         st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.warning("No wellness records found for this period.")
 
 # --- ACTIVITIES SECTION ---
 st.divider()
