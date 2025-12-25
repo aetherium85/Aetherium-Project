@@ -40,7 +40,7 @@ st.markdown(
         position: fixed;
         top: 0; left: 0; width: 100vw; height: 100vh;
         background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
-                    url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
+                    url("https://images.unsplash.com/photo-1597773179486-8af5ca939ddb") !important;
         background-size: cover !important;
         background-position: center !important;
         background-attachment: fixed !important;
