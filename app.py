@@ -304,7 +304,6 @@ if well_json is not None:
         elegant_stat(s3, "Form (TSB)", tsb_val, tsb_color)
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         # --- FEATURE: YEARLY AREA CHART ---
-        st.markdown("<div style='margin-top: 3rem;'></div>", unsafe_allow_html=True)
         st.markdown("📈 Yearly Training Load Progression")
         
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
