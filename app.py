@@ -156,22 +156,46 @@ if well_json is not None:
             df = df.rename(columns={date_col: 'date'})
             df['date'] = pd.to_datetime(df['date'])
 
-        # 2. Safety Check: Ensure the required columns exist for Plotly
-        # If the API didn't return them, we create them as 0.0 to prevent the ValueError
+        # 2. Safety Check: Ensure the required columns exist (Fixes the ValueError)
         required_cols = ['ctl', 'atl', 'tsb']
         for col in required_cols:
             if col not in df.columns:
                 df[col] = 0.0
 
-        # 3. Handle Form (TSB) calculation if it's currently all zeros
+        # 3. Handle Form (TSB) calculation if missing
         if (df['tsb'] == 0).all() and 'ctl' in df.columns and 'atl' in df.columns:
              df['tsb'] = df['ctl'] - df['atl']
 
-        # --- Yearly Chart (The part that was crashing) ---
+        # --- 4. DISPLAY GAUGES ---
+        st.subheader("⚡ Current Training Status")
+        latest = df.iloc[-1]
+        g1, g2, g3 = st.columns(3)
+
+        # Call the create_gauge function for each metric
+        g1.plotly_chart(create_gauge(
+            latest.get('ctl', 0), "Fitness (CTL)", 
+            [{'range': [0, 100], 'color': "#70B3C4"}], 0, 100
+        ), use_container_width=True)
+        
+        g2.plotly_chart(create_gauge(
+            latest.get('atl', 0), "Fatigue (ATL)", 
+            [{'range': [0, 120], 'color': "#F35555"}], 0, 120
+        ), use_container_width=True)
+        
+        form_steps = [
+            {'range': [-60, -30], 'color': "#F35555"}, 
+            {'range': [-30, -10], 'color': "#4BD4B0"}, 
+            {'range': [-10, 10], 'color': "#C69C49"}, 
+            {'range': [10, 60], 'color': "#F35555"}
+        ]
+        g3.plotly_chart(create_gauge(
+            latest.get('tsb', 0), "Form (TSB)", 
+            form_steps, -60, 60
+        ), use_container_width=True)
+
+        # --- 5. YEARLY AREA CHART ---
         st.divider()
         st.subheader("📈 Yearly Training Load Progression")
-        
-        # Now px.area is guaranteed to find these columns
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
         
         fig.update_layout(
@@ -180,7 +204,8 @@ if well_json is not None:
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="white"),
             xaxis=dict(gridcolor="rgba(255,255,255,0.1)"),
-            yaxis=dict(gridcolor="rgba(255,255,255,0.1)")
+            yaxis=dict(gridcolor="rgba(255,255,255,0.1)"),
+            legend=dict(font=dict(color="white"), orientation="h", y=1.1)
         )
         st.plotly_chart(fig, use_container_width=True)
     else:
