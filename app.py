@@ -274,7 +274,7 @@ if well_json is not None:
         form_steps = [{'range': [-60, -30], 'color': "#E16C45"}, {'range': [-30, -10], 'color': "#4BD4B0"}, 
                       {'range': [-10, 10], 'color': "#D4AA57"}, {'range': [10, 60], 'color': "#E16C45"}]
         g3.plotly_chart(create_gauge(latest.get('tsb', 0), "Form (TSB)", form_steps, -60, 60), use_container_width=True)
-
+        st.markdown("<hr style='border-top: 2px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         # --- YEARLY AREA CHART ---
         st.subheader("📈 Yearly Training Load Progression")
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
