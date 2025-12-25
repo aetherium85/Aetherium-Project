@@ -282,7 +282,7 @@ if well_json is not None:
              df['tsb'] = df['ctl'] - df['atl']
 
                 # --- FEATURE: FLOATING STATS (Current Status) ---
-        st.markdown("### ⚡ Current Training Status")
+        st.markdown("### ⚡ Your Current Training Status")
         latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
 
