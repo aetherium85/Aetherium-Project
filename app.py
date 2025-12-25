@@ -193,7 +193,6 @@ if not st.session_state.authenticated:
     st.stop()
 
 # --- 6. DASHBOARD (Only runs if authenticated) ---
-st.success("✅ Connection Active!")
 well_json, act_json, ath_json = get_ytd_data()
 
 # --- MAIN DASHBOARD ---
@@ -257,18 +256,48 @@ if well_json is not None:
 
         # --- GAUGES ---
         st.subheader("⚡ Current Training Status")
-        latest = df.iloc[-1]
-        g1, g2, g3 = st.columns(3)
 
-        g1.plotly_chart(create_gauge(latest.get('ctl', 0), "Fitness (CTL)", 
-                        [{'range': [0, 100], 'color': "#70C4B0"}], 0, 100), use_container_width=True)
-        g2.plotly_chart(create_gauge(latest.get('atl', 0), "Fatigue (ATL)", 
-                        [{'range': [0, 120], 'color': "#E16C45"}], 0, 120), use_container_width=True)
-        
-        form_steps = [{'range': [-60, -30], 'color': "#E16C45"}, {'range': [-30, -10], 'color': "#4BD4B0"}, 
-                      {'range': [-10, 10], 'color': "#D4AA57"}, {'range': [10, 60], 'color': "#E16C45"}]
-        g3.plotly_chart(create_gauge(latest.get('tsb', 0), "Form (TSB)", form_steps, -60, 60), use_container_width=True)
-        st.markdown("<hr style='border-top: 2px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
+# Helper function for the elegant stat look
+def elegant_stat(col, label, value, color):
+    with col:
+        st.markdown(f"""
+            <div style="
+                text-align: center; 
+                padding: 25px 10px; 
+                background: rgba(255, 255, 255, 0.03); 
+                border-radius: 20px; 
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(10px);
+            ">
+                <p style="
+                    color: rgba(255,255,255,0.5); 
+                    font-size: 0.8rem; 
+                    text-transform: uppercase; 
+                    letter-spacing: 3px; 
+                    margin-bottom: 0;
+                ">{label}</p>
+                <h1 style="
+                    color: white; 
+                    font-size: 4rem; 
+                    font-weight: 200; 
+                    margin: 0; 
+                    line-height: 1.2;
+                    text-shadow: 0 0 30px {color}66;
+                ">{int(value)}</h1>
+            </div>
+        """, unsafe_allow_html=True)
+
+        latest = df.iloc[-1]
+        s1, s2, s3 = st.columns(3)
+
+# Mapping colors to your metrics
+        elegant_stat(s1, "Fitness (CTL)", latest.get('ctl', 0), "#70C4B0") # Teal Glow
+        elegant_stat(s2, "Fatigue (ATL)", latest.get('atl', 0), "#E16C45") # Orange/Red Glow
+
+        # Dynamic color for Form (TSB) - Green if fresh, Red if tired
+        tsb_val = latest.get('tsb', 0)
+        tsb_color = "#4BD4B0" if tsb_val > -10 else "#E16C45"
+        elegant_stat(s3, "Form (TSB)", tsb_val, tsb_color)
         # --- YEARLY AREA CHART ---
         st.subheader("📈 Yearly Training Load Progression")
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
@@ -299,8 +328,6 @@ if well_json is not None:
         
         # Solid White Divider
         st.markdown("<hr style='border-top: 2px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
-else:
-    st.error("Could not load wellness data.")
         
 # --- ACTIVITIES SECTION ---
 if act_json:
