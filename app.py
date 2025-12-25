@@ -225,14 +225,7 @@ if well_json is not None:
             latest_act = act_json[0]
             secs = latest_act.get('moving_time', 0)
             duration_str = f"{secs // 3600}h {(secs % 3600) // 60}m"
-            
-            st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')}")
-            h1, h2, h3, h4 = st.columns(4)
-            h1.metric("Duration", duration_str)
-            h2.metric("Load", f"{latest_act.get('icu_training_load', 0)}")
-            h3.metric("Distance", f"{(latest_act.get('distance', 0)/1000):.2f} km")
-            h4.metric("Avg HR", f"{latest_act.get('average_heartrate', 0)} bpm")
-            st.divider()
+
 
         # --- GAUGES ---
         st.subheader("⚡ Current Training Status")
