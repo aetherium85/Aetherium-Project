@@ -215,27 +215,22 @@ if act_json:
 
     st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')}")
     
-    # Main 4 columns for the metrics
     h1, h2, h3, h4 = st.columns(4)
     
-    # Helper to render a large icon + text
     def icon_metric(col, icon, label, value):
         with col:
-            # Create sub-columns: small for icon, larger for text
-            inner_icon, inner_text = st.columns([1, 2.5])
+            # Use vertical_alignment="center" to keep them on the same line
+            inner_icon, inner_text = st.columns([1, 2.5], vertical_alignment="center")
             with inner_icon:
-                # Use a larger font size for the emoji to match the metric value
-                st.markdown(f"<div style='font-size: 3rem; line-height: 1;'>{icon}</div>", unsafe_allow_html=True)
+                # 2.5rem - 3rem usually matches the height of a metric value perfectly
+                st.markdown(f"<div style='font-size: 2.8rem; text-align: center;'>{icon}</div>", unsafe_allow_html=True)
             with inner_text:
                 st.metric(label, value)
 
-    # Populate the columns
     icon_metric(h1, "⏱️", "Duration", duration_str)
     icon_metric(h2, "💥", "Impact", f"{load} pts")
     icon_metric(h3, "📍", "Distance", f"{dist:.2f} km" if dist > 0 else "N/A")
     icon_metric(h4, "💓", "Avg. HR", f"{hr:.0f} bpm" if hr > 0 else "N/A")
-
-    st.divider()
 
     st.markdown("<hr style='border-top: 2px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
