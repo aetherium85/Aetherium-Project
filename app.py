@@ -203,7 +203,9 @@ if well_json is not None:
 )
         fig.update_layout(hovermode="x unified",hoverlabel=dict(bgcolor="white", font_size=14),
     xaxis=dict(hoverformat="%b %d, %Y"),
-    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    paper_bgcolor="rgba(0,0,0,0)", # Transparent outer background
+    plot_bgcolor="rgba(0,0,0,0)",  # Transparent chart area background
+    font=dict(color="white")
 )
         st.plotly_chart(fig, use_container_width=True)
     else:
