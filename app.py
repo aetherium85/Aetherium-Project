@@ -39,7 +39,7 @@ st.markdown(
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: linear-gradient(rgba(135,135,135,0), rgba(135,135,135,0)), 
+        background: linear-gradient(rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.07)), 
                     url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
         background-size: cover !important;
         background-attachment: fixed !important;
