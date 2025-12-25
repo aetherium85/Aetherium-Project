@@ -81,7 +81,7 @@ st.markdown(
         background-color: transparent !important;
     }
 
-    /* 5. GLASSMORPHISM FOR CONTAINERS */
+    /* 1. Glassmorphism for Chart Containers */
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart) {
         background-color: rgba(255, 255, 255, 0.05) !important;
         backdrop-filter: blur(10px) !important;
@@ -91,6 +91,7 @@ st.markdown(
         margin-bottom: 10px !important;
     }
 
+    /* 2. Glassmorphism for Performance Rows */
     .performance-row {
         background-color: rgba(255, 255, 255, 0.05) !important;
         backdrop-filter: blur(10px) !important;
