@@ -44,7 +44,7 @@ st.markdown(
         width: 100vw !important;
         height: 100vh !important;
         background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-                    url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
+                    url("https://images.unsplash.com/photo-1616361743371-c19895461140") !important;
         background-size: cover !important;
         background-position: center !important;
         background-repeat: no-repeat !important;
@@ -66,7 +66,17 @@ st.markdown(
         letter-spacing: 1px !important;
         color: white !important;
     }
+    .performance-row div, .performance-row b, .performance-row span {
+    color: white !important;
+}
 
+/* Force the performance row to use the full container width */
+.performance-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
     /* 5. THE ICON REPAIR (Fixes keyboard_double_arrow_right) */
     /* We target the specific Material Icon class used by Streamlit */
     .st-emotion-cache-15ec60u, 
@@ -207,14 +217,14 @@ if act_json:
     def elegant_hero_item(col, icon, label, value):
         with col:
             st.markdown(f"""
-                <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 2rem; line-height: 1;">{icon}</div>
-                    <div>
-                        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5);">{label}</div>
-                        <div style="font-size: 1.4rem; font-weight: 200; line-height: 1.1;">{value}</div>
-                    </div>
+            <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="font-size: 1.8rem; line-height: 1;">{icon}</div>
+                <div>
+                    <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5) !important;">{label}</div>
+                    <div style="font-size: 1.4rem; font-weight: 200; color: white !important; line-height: 1.1;">{value}</div>
                 </div>
-            """, unsafe_allow_html=True)
+            </div>
+        """, unsafe_allow_html=True)
 
     elegant_hero_item(h1, "⏱️", "Duration", duration_str)
     elegant_hero_item(h2, "⚡", "Impact", f"{load} pts")
@@ -306,11 +316,18 @@ if act_json:
     st.markdown("### 📅 Monthly Performance History")
 
     for index, row in monthly.iterrows():
-        # Using a custom div class 'performance-row' for total control
-        st.markdown(f"""
-            <div class="performance-row">
-                <div style="flex: 2; font-weight: bold; font-size: 1.1rem;">{row['Month']}</div>
-                <div style="flex: 1; text-align: center;">🏃 <b>{row['Sessions']}</b> Sessions</div>
-                <div style="flex: 1; text-align: right;">🔥 <b>{row['Total Load']:.0f}</b> Load</div>
+     st.markdown(f"""
+        <div class="performance-row">
+            <div style="width: 40%; font-weight: 200; font-size: 1.1rem; color: white !important;">{row['Month']}</div>
+            
+            <div style="width: 30%; text-align: left; color: white !important;">
+                <span style="opacity: 0.6; font-size: 0.8rem; letter-spacing: 1px;">SESSIONS</span> 
+                <b style="font-size: 1.1rem; margin-left: 5px;">{row['Sessions']}</b>
             </div>
-        """, unsafe_allow_html=True)
+            
+            <div style="width: 30%; text-align: right; color: white !important;">
+                <span style="opacity: 0.6; font-size: 0.8rem; letter-spacing: 1px;">TOTAL LOAD</span> 
+                <b style="font-size: 1.1rem; margin-left: 5px;">{row['Total Load']:.0f}</b>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
