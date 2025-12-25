@@ -28,71 +28,115 @@ TYPE_MAPPING = {
     "WeightTraining": "Strength", "Yoga": "Mobility", "Pilates": "Mobility"
 }
 
+# --- 2. THE FINAL CSS FIX (Background + Elegant Typography) ---
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400&display=swap');
+    /* 1. IMPORT ELEGANT FONT */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
 
-    /* 1. FORCE THE ENTIRE APP TO DARK/TRANSPARENT */
-    .stApp, [data-testid="stAppViewRoot"], .stAppViewContainer {
-        background: #0E1117 !important; /* Fallback Dark Color */
-        color: white !important;
-    }
-
-    /* 2. BACKGROUND IMAGE PINNED TO THE ROOT */
-    [data-testid="stAppViewRoot"]::before {
-        content: "" !important;
-        position: fixed !important;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-                    url("https://images.unsplash.com/photo-1616361743371-c19895461140") !important;
+    /* 2. BACKGROUND LAYER */
+    .stApp::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+                    url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
         background-size: cover !important;
         background-position: center !important;
         background-attachment: fixed !important;
-        filter: blur(8px) !important;
+        filter: blur(4px); 
+        -webkit-filter: blur(4px);
         transform: scale(1.1);
-        z-index: -1 !important;
+        z-index: -1;
     }
 
-    /* 3. FIX HERO VALUE COLORS */
-    /* This specifically targets the nested text inside your custom HTML boxes */
-    .stApp div, .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp span, .stApp b {
-        color: white !important;
+    .stApp {
+        background: transparent !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    /* 3. GLOBAL ELEGANT TYPOGRAPHY */
+    /* This forces ALL text to be thin and spaced out */
+    h1, h2, h3, p, span, label, div, b, .stMetric label, [data-testid="stMetricValue"] {
         font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
+        letter-spacing: 1.5px !important;
+        color: white !important;
     }
 
-    /* 4. THE ICON REPAIR */
-    [data-testid="stSidebarCollapseIcon"] svg, .notranslate {
-        font-family: "Material Symbols Outlined" !important;
-        font-weight: normal !important;
-        font-size: 24px !important;
+    /* Make headers feel more 'Architectural' */
+    h1, h2, h3 {
+        text-transform: uppercase !important;
+        letter-spacing: 4px !important;
     }
 
-    /* 5. GLASS CONTAINERS */
+    /* 4. SIDEBAR & HEADER RESET (Keep them readable but elegant) */
+    [data-testid="stSidebar"] {
+        background-color: rgba(0, 0, 0, 0.4) !important;
+        backdrop-filter: blur(15px);
+    }
+    
+    /* Make sidebar text white to match the elegant theme */
+    [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
+        color: white !important;
+        font-weight: 300 !important;
+    }
+
+    header[data-testid="stHeader"] {
+        background-color: transparent !important;
+    }
+
+    /* 5. GLASSMORPHISM FOR CONTAINERS */
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
-    .performance-row, .stMetric {
-        background: rgba(255, 255, 255, 0.05) !important;
+    .performance-row {
+        background-color: rgba(255, 255, 255, 0.05) !important;
         backdrop-filter: blur(10px) !important;
         border-radius: 15px !important;
-        padding: 15px !important;
+        padding: 20px !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        margin-bottom: 10px !important;
     }
 
-    /* 6. PERFORMANCE ROW ALIGNMENT */
+    /* PERFORMANCE ROWS SPECIFIC LAYOUT */
     .performance-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        width: 100%;
-        margin-bottom: 10px;
+        padding: 12px 25px !important;
     }
-    
-    /* Make headers architectural */
-    h3 {
-        text-transform: uppercase !important;
-        letter-spacing: 4px !important;
+
+    /* 6. CLEANING UP METRIC BOXES */
+    [data-testid="stMetricValue"] {
+        font-size: 2.8rem !important;
+        line-height: 1 !important;
     }
+
+    /* Ensure the elegant stats stay transparent */
+    [data-testid="stVerticalBlock"] > div:has(div[style*="text-shadow"]) {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    /* Prevent global font rules from blowing up the Hero containers */
+[data-testid="stHorizontalBlock"] {
+    gap: 10px !important;
+}
+
+/* Adjusting the subheaders to be smaller and cleaner */
+h3 {
+    font-size: 0.9rem !important;
+    margin-bottom: 1rem !important;
+    opacity: 0.8;
+}
+
+/* Ensure metrics don't overflow if you still use them elsewhere */
+[data-testid="stMetricValue"] {
+    font-size: 1.8rem !important; /* Scaled down from 2.8rem */
+}
     </style>
     """,
     unsafe_allow_html=True
@@ -200,14 +244,14 @@ if act_json:
     def elegant_hero_item(col, icon, label, value):
         with col:
             st.markdown(f"""
-            <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                <div style="font-size: 1.8rem; line-height: 1;">{icon}</div>
-                <div>
-                    <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5) !important;">{label}</div>
-                    <div style="font-size: 1.4rem; font-weight: 200; color: white !important; line-height: 1.1;">{value}</div>
+                <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 2rem; line-height: 1;">{icon}</div>
+                    <div>
+                        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5);">{label}</div>
+                        <div style="font-size: 1.4rem; font-weight: 200; line-height: 1.1;">{value}</div>
+                    </div>
                 </div>
-            </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
     elegant_hero_item(h1, "⏱️", "Duration", duration_str)
     elegant_hero_item(h2, "⚡", "Impact", f"{load} pts")
@@ -299,18 +343,11 @@ if act_json:
     st.markdown("### 📅 Monthly Performance History")
 
     for index, row in monthly.iterrows():
+        # Using a custom div class 'performance-row' for total control
         st.markdown(f"""
             <div class="performance-row">
-                <div style="width: 40%; font-weight: 200; font-size: 1.1rem; color: white !important;">{row['Month']}</div>
-            
-                <div style="width: 30%; text-align: left; color: white !important;">
-                    <span style="opacity: 0.6; font-size: 0.8rem; letter-spacing: 1px;">SESSIONS</span> 
-                    <b style="font-size: 1.1rem; margin-left: 5px;">{row['Sessions']}</b>
-                </div>
-            
-                <div style="width: 30%; text-align: right; color: white !important;">
-                    <span style="opacity: 0.6; font-size: 0.8rem; letter-spacing: 1px;">TOTAL LOAD</span> 
-                    <b style="font-size: 1.1rem; margin-left: 5px;">{row['Total Load']:.0f}</b>
-                </div>
+                <div style="flex: 2; font-weight: bold; font-size: 1.1rem;">{row['Month']}</div>
+                <div style="flex: 1; text-align: center;">🏃 <b>{row['Sessions']}</b> Sessions</div>
+                <div style="flex: 1; text-align: right;">🔥 <b>{row['Total Load']:.0f}</b> Load</div>
             </div>
         """, unsafe_allow_html=True)
