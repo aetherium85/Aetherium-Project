@@ -33,7 +33,7 @@ st.markdown(
     """
     <style>
     .stApp {
-        background: linear-gradient(rgba(135,135,135,1), rgba(135,135,135,1)), 
+        background: linear-gradient(rgba(135,135,135,0), rgba(135,135,135,0)), 
                     url("https://images.unsplash.com/photo-1517167685284-96a27681ad75") !important;
         background-size: cover !important;
         background-attachment: fixed !important;
