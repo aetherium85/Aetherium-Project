@@ -89,18 +89,20 @@ st.markdown(
         padding: 20px !important;
         border: 1px solid rgba(135,135,135, 0.1) !important;
     }
-    /* Glassmorphism for the Dataframe/Table container */
-[data-testid="stElementContainer"]:has(div[data-testid="stDataFrame"]) {
-    background-color: rgba(135, 135, 135, 0.3) !important;
-    backdrop-filter: blur(10px) !important;
-    border-radius: 15px !important;
-    padding: 10px !important;
+div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stMetric"]) {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(15px) !important;
+    border-radius: 12px !important;
+    padding: 15px 25px !important;
+    margin-bottom: 15px !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    transition: transform 0.2s ease;
 }
 
-/* Force the internal table background to be transparent */
-[data-testid="stDataFrame"] div {
-    background-color: transparent !important;
+/* Optional: Subtle hover effect for the rows */
+div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stMetric"]):hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    transform: translateY(-2px);
 }
     </style>
     """,
@@ -297,29 +299,33 @@ if well_json is not None:
 else:
     st.error("Could not load wellness data.")
         
-# --- ACTIVITIES SECTION (Monthly Summary) ---
+# --- ACTIVITIES SECTION ---
 if act_json:
-    # 1. Prepare the Data FIRST
+    # 1. Prepare Data
     df_act = pd.DataFrame(act_json)
-    df_act['category'] = df_act['type'].map(lambda x: TYPE_MAPPING.get(x, x))
     df_act['date_dt'] = pd.to_datetime(df_act['start_date_local'])
     df_act['Month'] = df_act['date_dt'].dt.strftime('%B %Y')
     
-    # 2. Define 'monthly' safely here
-    monthly = df_act.groupby('Month').agg({'id':'count', 'icu_training_load':'sum'}).reset_index()
+    monthly = df_act.groupby('Month', sort=False).agg({'id':'count', 'icu_training_load':'sum'}).reset_index()
     monthly.columns = ['Month', 'Sessions', 'Total Load']
 
-    # 3. Display the Section
-    st.subheader("📅 Monthly Performance Summary")
-    
-    # Glassy container for the monthly metrics and table
-    with st.container():
-        m1, m2 = st.columns(2)
-        m1.metric("Avg. Monthly Sessions", f"{monthly['Sessions'].mean():.1f}")
-        m2.metric("Avg. Monthly Load", f"{monthly['Total Load'].mean():.0f}")
-        
-        # This will now pick up the CSS blur we discussed earlier
-        st.dataframe(monthly, use_container_width=True, hide_index=True)
+    st.subheader("📅 Monthly Performance History")
 
-else:
-    st.info("No activity data found for the current year.")
+    # 2. Generate Rows instead of a Table
+    for index, row in monthly.iterrows():
+        # This container creates the 'Glass' box for each row
+        with st.container():
+            col1, col2, col3 = st.columns([2, 1, 1])
+            
+            with col1:
+                st.markdown(f"#### {row['Month']}")
+            
+            with col2:
+                st.metric("Sessions", f"count: {row['Sessions']}")
+                
+            with col3:
+                # Calculate average load per session for extra insight
+                avg_load = row['Total Load'] / row['Sessions'] if row['Sessions'] > 0 else 0
+                st.metric("Total Load", f"{row['Total Load']:.0f}", f"Avg: {avg_load:.1f}")
+            
+            st.markdown("<div style='margin-bottom: 10px;'></div>", unsafe_allow_html=True)
