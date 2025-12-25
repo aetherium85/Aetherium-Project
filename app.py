@@ -9,29 +9,29 @@ from datetime import datetime
 
 def add_bg_from_url():
     st.markdown(
-         f"""
-         <style>
-         .stApp {{
-             background-image: url("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070");
-             background-attachment: fixed;
-             background-size: cover;
-         }}
-         
-         /* Optional: Adds a dark overlay to make text more readable */
-         .stApp::before {{
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4); /* Adjust 0.4 for darkness */
-            z-index: -1;
-         }}
-         </style>
-         """,
-         unsafe_allow_html=True
-     )
+        f"""
+        <style>
+        /* Target the main container specifically */
+        [data-testid="stAppViewContainer"] {{
+            background-image: url("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070");
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }}
+
+        /* This makes the top header transparent so it doesn't block the image */
+        [data-testid="stHeader"] {{
+            background: rgba(0,0,0,0);
+        }}
+
+        /* This ensures the content area background is transparent so the image shows through */
+        [data-testid="stVerticalBlock"] {{
+            background-color: transparent;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 add_bg_from_url()
 
