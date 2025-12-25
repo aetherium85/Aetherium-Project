@@ -31,71 +31,67 @@ TYPE_MAPPING = {
 st.markdown(
     """
     <style>
-    /* 1. IMPORT FONT */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400&display=swap');
 
-    /* 2. BACKGROUND (Pinned to the Root) */
-    [data-testid="stAppViewRoot"] {
-        background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-                          url("https://images.unsplash.com/photo-1616361743371-c19895461140");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-    }
-
-    /* 3. TRANSPARENCY & BLUR */
-    .stApp {
-        background: transparent !important;
-    }
-
-    /* 4. THE ICON REPAIR (The "Nuclear" Fix) */
-    /* This hides the leaking text and forces the SVG icon to show */
-    button[title="Open sidebar"], 
-    button[title="Close sidebar"], 
-    [data-testid="stSidebarCollapseIcon"] {
+    /* 1. FORCE THE ENTIRE APP TO DARK/TRANSPARENT */
+    .stApp, [data-testid="stAppViewRoot"], .stAppViewContainer {
+        background: #0E1117 !important; /* Fallback Dark Color */
         color: white !important;
     }
-    
-    /* If the text 'keyboard_...' is visible, this shrinks it to zero */
-    .st-emotion-cache-15ec60u, .notranslate {
-        font-family: "Material Symbols Outlined" !important;
-        font-size: 0px !important; 
-    }
-    
-    /* Injects the icon graphic back if it was replaced by text */
-    [data-testid="stSidebarCollapseIcon"]::before {
-        content: "menu"; 
-        font-family: "Material Symbols Outlined";
-        font-size: 24px !important;
-        color: white;
-        visibility: visible;
+
+    /* 2. BACKGROUND IMAGE PINNED TO THE ROOT */
+    [data-testid="stAppViewRoot"]::before {
+        content: "" !important;
+        position: fixed !important;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                    url("https://images.unsplash.com/photo-1616361743371-c19895461140") !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-attachment: fixed !important;
+        filter: blur(8px) !important;
+        transform: scale(1.1);
+        z-index: -1 !important;
     }
 
-    /* 5. GLOBAL ELEGANT TYPOGRAPHY */
-    h1, h2, h3, p, label, [data-testid="stMetricValue"], .performance-row * {
+    /* 3. FIX HERO VALUE COLORS */
+    /* This specifically targets the nested text inside your custom HTML boxes */
+    .stApp div, .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp span, .stApp b {
+        color: white !important;
         font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
-        color: white !important;
-        letter-spacing: 1px;
     }
 
-    /* 6. GLASS CONTAINERS */
-    [data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
+    /* 4. THE ICON REPAIR */
+    [data-testid="stSidebarCollapseIcon"] svg, .notranslate {
+        font-family: "Material Symbols Outlined" !important;
+        font-weight: normal !important;
+        font-size: 24px !important;
+    }
+
+    /* 5. GLASS CONTAINERS */
+    div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
     .performance-row, .stMetric {
         background: rgba(255, 255, 255, 0.05) !important;
-        backdrop-filter: blur(10px);
-        border-radius: 15px;
+        backdrop-filter: blur(10px) !important;
+        border-radius: 15px !important;
         padding: 15px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
 
-    /* 7. ALIGNMENT FOR PERFORMANCE ROWS */
+    /* 6. PERFORMANCE ROW ALIGNMENT */
     .performance-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
         width: 100%;
         margin-bottom: 10px;
+    }
+    
+    /* Make headers architectural */
+    h3 {
+        text-transform: uppercase !important;
+        letter-spacing: 4px !important;
     }
     </style>
     """,
