@@ -28,12 +28,34 @@ TYPE_MAPPING = {
     "WeightTraining": "Strength", "Yoga": "Mobility", "Pilates": "Mobility"
 }
 
-# --- 2. THE FINAL CSS FIX (Background + Elegant Typography) ---
+# --- 2. THE ULTIMATE CSS FIX ---
 st.markdown(
     """
     <style>
     /* 1. IMPORT ELEGANT FONT */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
+
+    /* 2. BACKGROUND LAYER */
+    .stApp::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                    url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
+        background-size: cover !important;
+        background-position: center !important;
+        filter: blur(8px); /* Increased blur for better text readability */
+        transform: scale(1.1);
+        z-index: -1;
+    }
+
+    /* 3. GLOBAL FONT (Applied to content only) */
+    .stApp, .stApp p, .stApp span, .stApp label, .stApp h1, .stApp h2, .stApp h3, .stApp div {
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 200 !important;
+        letter-spacing: 1px;
+        color: white !important;
+    }
 
     /* 4. THE ICON RECOVERY (Fixes keyboard_double_arrow_right) */
     /* This targets Streamlit's internal icon system and resets the font */
@@ -45,62 +67,20 @@ st.markdown(
         text-transform: none !important;
         letter-spacing: normal !important;
     }
-    /* 2. BACKGROUND LAYER */
-    .stApp::before {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
-                    url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
-        background-size: cover !important;
-        background-position: center !important;
-        background-attachment: fixed !important;
-        filter: blur(4px); 
-        -webkit-filter: blur(4px);
-        transform: scale(1.1);
-        z-index: -1;
-    }
 
-    .stApp {
-        background: transparent !important;
-        font-family: 'Inter', sans-serif !important;
-    }
-
-    /* 3. GLOBAL ELEGANT TYPOGRAPHY */
-    /* This forces ALL text to be thin and spaced out */
-    h1, h2, h3, p, span, label, div, b, .stMetric label, [data-testid="stMetricValue"] {
-        font-family: 'Inter', sans-serif !important;
-        font-weight: 200 !important;
-        letter-spacing: 1.5px !important;
-        color: white !important;
-    }
-
-    /* Make headers feel more 'Architectural' */
+    /* 5. HEADER STYLING */
     h1, h2, h3 {
         text-transform: uppercase !important;
         letter-spacing: 4px !important;
+        margin-top: 2rem !important;
     }
 
-    /* 4. SIDEBAR & HEADER RESET (Keep them readable but elegant) */
+    /* 6. SIDEBAR & GLASSMISM */
     [data-testid="stSidebar"] {
-        background-color: rgba(0, 0, 0, 0.4) !important;
+        background-color: rgba(0, 0, 0, 0.7) !important;
         backdrop-filter: blur(15px);
     }
     
-    /* Make sidebar text white to match the elegant theme */
-    [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
-        color: white !important;
-        font-weight: 300 !important;
-    }
-
-    header[data-testid="stHeader"] {
-        background-color: transparent !important;
-    }
-
-    /* 5. GLASSMORPHISM FOR CONTAINERS */
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
     .performance-row {
         background-color: rgba(255, 255, 255, 0.05) !important;
@@ -108,45 +88,7 @@ st.markdown(
         border-radius: 15px !important;
         padding: 20px !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        margin-bottom: 10px !important;
     }
-
-    /* PERFORMANCE ROWS SPECIFIC LAYOUT */
-    .performance-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 25px !important;
-    }
-
-    /* 6. CLEANING UP METRIC BOXES */
-    [data-testid="stMetricValue"] {
-        font-size: 2.8rem !important;
-        line-height: 1 !important;
-    }
-
-    /* Ensure the elegant stats stay transparent */
-    [data-testid="stVerticalBlock"] > div:has(div[style*="text-shadow"]) {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-    /* Prevent global font rules from blowing up the Hero containers */
-[data-testid="stHorizontalBlock"] {
-    gap: 10px !important;
-}
-
-/* Adjusting the subheaders to be smaller and cleaner */
-h3 {
-    font-size: 0.9rem !important;
-    margin-bottom: 1rem !important;
-    opacity: 0.8;
-}
-
-/* Ensure metrics don't overflow if you still use them elsewhere */
-[data-testid="stMetricValue"] {
-    font-size: 1.8rem !important; /* Scaled down from 2.8rem */
-}
     </style>
     """,
     unsafe_allow_html=True
