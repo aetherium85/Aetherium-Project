@@ -40,12 +40,12 @@ st.markdown(
         width: 100vw;
         height: 100vh;
         background: linear-gradient(rgba(135,135,135,0), rgba(135,135,135,0)), 
-                    url("https://images.unsplash.com/photo-1556139954-ec19cce61d61") !important;
+                    url("https://images.unsplash.com/photo-1619359209643-20df6a2465") !important;
         background-size: cover !important;
         background-attachment: fixed !important;
         /* THE BLUR EFFECT */
-        filter: blur(8px); 
-        -webkit-filter: blur(8px);
+        filter: blur(4px); 
+        -webkit-filter: blur(4px);
         
         /* Scale it slightly (1.1) so the blurred edges don't show white bleed */
         transform: scale(1.1);
