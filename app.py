@@ -200,6 +200,7 @@ if act_json:
 
 # --- WELLNESS SECTION ---
 if well_json is not None:
+    # Standardize the data into a DataFrame
     df = pd.DataFrame([well_json]) if isinstance(well_json, dict) else pd.DataFrame(well_json)
 
     if not df.empty:
@@ -209,7 +210,7 @@ if well_json is not None:
             df = df.rename(columns={date_col: 'date'})
             df['date'] = pd.to_datetime(df['date'])
 
-        # 2. Safety Check: Ensure the required columns exist (Fixes the ValueError)
+        # 2. Safety Check: Ensure the required columns exist
         required_cols = ['ctl', 'atl', 'tsb']
         for col in required_cols:
             if col not in df.columns:
@@ -219,112 +220,74 @@ if well_json is not None:
         if (df['tsb'] == 0).all() and 'ctl' in df.columns and 'atl' in df.columns:
              df['tsb'] = df['ctl'] - df['atl']
 
-        # --- 4. DISPLAY GAUGES ---
+        # --- NEW: LAST WORKOUT SUMMARY (The feature you requested) ---
+        if act_json:
+            latest_act = act_json[0]
+            secs = latest_act.get('moving_time', 0)
+            duration_str = f"{secs // 3600}h {(secs % 3600) // 60}m"
+            
+            st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')}")
+            h1, h2, h3, h4 = st.columns(4)
+            h1.metric("Duration", duration_str)
+            h2.metric("Load", f"{latest_act.get('icu_training_load', 0)}")
+            h3.metric("Distance", f"{(latest_act.get('distance', 0)/1000):.2f} km")
+            h4.metric("Avg HR", f"{latest_act.get('average_heartrate', 0)} bpm")
+            st.divider()
+
+        # --- GAUGES ---
         st.subheader("⚡ Current Training Status")
         latest = df.iloc[-1]
         g1, g2, g3 = st.columns(3)
 
-        # Call the create_gauge function for each metric
-        g1.plotly_chart(create_gauge(
-            latest.get('ctl', 0), "Fitness (CTL)", 
-            [{'range': [0, 100], 'color': "#70C4B0"}], 0, 100
-        ), use_container_width=True)
+        g1.plotly_chart(create_gauge(latest.get('ctl', 0), "Fitness (CTL)", 
+                        [{'range': [0, 100], 'color': "#70C4B0"}], 0, 100), use_container_width=True)
         
-        g2.plotly_chart(create_gauge(
-            latest.get('atl', 0), "Fatigue (ATL)", 
-            [{'range': [0, 120], 'color': "#E16C45"}], 0, 120
-        ), use_container_width=True)
+        g2.plotly_chart(create_gauge(latest.get('atl', 0), "Fatigue (ATL)", 
+                        [{'range': [0, 120], 'color': "#E16C45"}], 0, 120), use_container_width=True)
         
-        form_steps = [
-            {'range': [-60, -30], 'color': "#E16C45"}, 
-            {'range': [-30, -10], 'color': "#4BD4B0"}, 
-            {'range': [-10, 10], 'color': "#D4AA57"}, 
-            {'range': [10, 60], 'color': "#E16C45"}
-        ]
-        g3.plotly_chart(create_gauge(
-            latest.get('tsb', 0), "Form (TSB)", 
-            form_steps, -60, 60
-        ), use_container_width=True)
+        form_steps = [{'range': [-60, -30], 'color': "#E16C45"}, {'range': [-30, -10], 'color': "#4BD4B0"}, 
+                      {'range': [-10, 10], 'color': "#D4AA57"}, {'range': [10, 60], 'color': "#E16C45"}]
+        g3.plotly_chart(create_gauge(latest.get('tsb', 0), "Form (TSB)", form_steps, -60, 60), use_container_width=True)
 
-        # --- 5. YEARLY AREA CHART ---
-        Since the error persists, the issue isn't just the text within the template—it's that you are passing Layout arguments (like legend) inside a Trace function (update_traces).
+        # --- YEARLY AREA CHART ---
+        st.subheader("📈 Yearly Training Load Progression")
+        fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
+        
+        fig.update_traces(
+            stackgroup=None, 
+            fill='tozeroy', 
+            opacity=0.5,
+            hovertemplate="<b>%{name}</b>: %{y:.1f}<extra></extra>"
+        )
 
-In Plotly, update_traces only accepts settings for the data lines/areas themselves. The legend and hovermode settings must go inside update_layout.
+        fig.update_layout(
+            hovermode="x unified",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="white"),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white")),
+            yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white"))
+        )
+        
+        # Apply labels to legend
+        fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
+        st.plotly_chart(fig, use_container_width=True)
 
-The Corrected Plot Code
-Replace your entire Plotly section (from fig = px.area down to st.plotly_chart) with this cleaned-up version:
+else:
+    st.error("Could not load wellness data.")
 
-Python
-
-# --- 5. YEARLY AREA CHART ---
-st.divider()
-st.subheader("📈 Yearly Training Load Progression")
-
-# Create the base plot
-fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
-
-# 1. Update the TRACES (The lines and fills)
-fig.update_traces(
-    stackgroup=None, 
-    fill='tozeroy', 
-    opacity=0.6, # Slightly transparent looks better for overlapping areas
-    hovertemplate="<b>%{name}</b>: %{y:.1f}<extra></extra>"
-)
-
-# 2. Update the LAYOUT (Legend, Axes, Backgrounds)
-fig.update_layout(
-    hovermode="x unified",
-    hoverlabel=dict(bgcolor="rgba(30, 30, 30, 0.8)", font_size=14, font_color="white"),
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(color="white"),
-    legend=dict(
-        font=dict(color="white", size=12),
-        orientation="h",
-        yanchor="bottom",
-        y=1.02,
-        xanchor="right",
-        x=1
-    ),
-    xaxis=dict(
-        hoverformat="%b %d, %Y",
-        gridcolor="rgba(255, 255, 255, 0.1)",
-        zerolinecolor="rgba(255, 255, 255, 0.3)",
-        tickfont=dict(color="white"),
-        title=dict(text="Date", font=dict(color="white"))
-    ),
-    yaxis=dict(
-        gridcolor="rgba(255, 255, 255, 0.1)",
-        zerolinecolor="rgba(255, 255, 255, 0.3)",
-        tickfont=dict(color="white"),
-        title=dict(text="Score", font=dict(color="white"))
-    ),
-        # Background transparency
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        # Global font fallback
-        font=dict(color="white")
-    )
-
-fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
-
-st.plotly_chart(fig, use_container_width=True)
-
-# --- ACTIVITIES SECTION ---
-st.divider()
-st.subheader("📅 Monthly Performance Summary")
+# --- ACTIVITIES SECTION (Monthly Summary) ---
 if act_json:
+    st.divider()
+    st.subheader("📅 Monthly Performance Summary")
     df_act = pd.DataFrame(act_json)
     df_act['category'] = df_act['type'].map(lambda x: TYPE_MAPPING.get(x, x))
-    
-    # Metrics with Glass Background
     df_act['date_dt'] = pd.to_datetime(df_act['start_date_local'])
     df_act['Month'] = df_act['date_dt'].dt.strftime('%B %Y')
     
     monthly = df_act.groupby('Month').agg({'id':'count', 'icu_training_load':'sum'}).reset_index()
-    
     m1, m2 = st.columns(2)
     m1.metric("Avg. Monthly Sessions", f"{monthly['id'].mean():.1f}")
     m2.metric("Avg. Monthly Load", f"{monthly['icu_training_load'].mean():.0f}")
-    
     st.dataframe(monthly, use_container_width=True, hide_index=True)
