@@ -199,24 +199,23 @@ if act_json:
     st.divider()
 
 # --- WELLNESS SECTION ---
+# --- WELLNESS & DATA PREP ---
 if well_json is not None:
-    # Standardize the data into a DataFrame
+    # 1. Create the DataFrame
     df = pd.DataFrame([well_json]) if isinstance(well_json, dict) else pd.DataFrame(well_json)
 
     if not df.empty:
-        # 1. Standardize date column
+        # Standardize date and columns
         date_col = next((c for c in ['timestamp', 'id', 'date'] if c in df.columns), None)
         if date_col:
             df = df.rename(columns={date_col: 'date'})
             df['date'] = pd.to_datetime(df['date'])
 
-        # 2. Safety Check: Ensure the required columns exist
-        required_cols = ['ctl', 'atl', 'tsb']
-        for col in required_cols:
+        # Safety Check: Ensure metrics exist
+        for col in ['ctl', 'atl', 'tsb']:
             if col not in df.columns:
                 df[col] = 0.0
 
-        # 3. Handle Form (TSB) calculation if missing
         if (df['tsb'] == 0).all() and 'ctl' in df.columns and 'atl' in df.columns:
              df['tsb'] = df['ctl'] - df['atl']
 
@@ -227,61 +226,46 @@ if well_json is not None:
 
         g1.plotly_chart(create_gauge(latest.get('ctl', 0), "Fitness (CTL)", 
                         [{'range': [0, 100], 'color': "#70C4B0"}], 0, 100), use_container_width=True)
-        
         g2.plotly_chart(create_gauge(latest.get('atl', 0), "Fatigue (ATL)", 
                         [{'range': [0, 120], 'color': "#E16C45"}], 0, 120), use_container_width=True)
         
         form_steps = [{'range': [-60, -30], 'color': "#E16C45"}, {'range': [-30, -10], 'color': "#4BD4B0"}, 
                       {'range': [-10, 10], 'color': "#D4AA57"}, {'range': [10, 60], 'color': "#E16C45"}]
         g3.plotly_chart(create_gauge(latest.get('tsb', 0), "Form (TSB)", form_steps, -60, 60), use_container_width=True)
-        st.divider()
+
         # --- YEARLY AREA CHART ---
-        
         st.subheader("📈 Yearly Training Load Progression")
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
         
+        # FIX: Rename FIRST so the hover box picks up the pretty labels
+        fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
+
+        # FIX: Use fullData.name for unified hover mode
         fig.update_traces(
             stackgroup=None, 
             fill='tozeroy', 
             opacity=0.5,
-            hovertemplate="<b>%{name}</b>: %{y:.1f}<extra></extra>"
+            hovertemplate="<b>%{fullData.name}</b>: %{y:.1f}<extra></extra>"
         )
 
         fig.update_layout(
-            hovermode="x unified",hoverlabel=dict(bgcolor="white", font_size=14),
-        xaxis=dict(
-        hoverformat="%b %d, %Y",
-        gridcolor="rgba(255, 255, 255, 0.1)",
-        zerolinecolor="rgba(255, 255, 255, 0.3)",
-        tickfont=dict(color="white", size=12),  # Labels like "Jan 2025"
-        title=dict(text="Date", font=dict(color="white", size=14)) # Proper Title syntax
-    ),# Y-Axis visibility settings
-        yaxis=dict(
-        gridcolor="rgba(255, 255, 255, 0.1)",
-        zerolinecolor="rgba(255, 255, 255, 0.3)",
-        tickfont=dict(color="white", size=12),  # Scores
-        title=dict(text="Score", font=dict(color="white", size=14)) # Proper Title syntax
-    ),
+            hovermode="x unified",
+            hoverlabel=dict(bgcolor="white", font_size=14, font_color="black"),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="white"),
-            legend=dict(
-        orientation="h", 
-        yanchor="bottom", 
-        y=1.02, 
-        xanchor="right", 
-        x=1,
-        font=dict(color="white")
-    ),
-)
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white")),
+            yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white"))
+        )
         
-        # Apply labels to legend
-        fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
         st.plotly_chart(fig, use_container_width=True)
-        st.divider()
+        
+        # Solid White Divider
+        st.markdown("<hr style='border-top: 2px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 else:
     st.error("Could not load wellness data.")
-
+        
 # --- ACTIVITIES SECTION (Monthly Summary) ---
 if act_json:
     st.subheader("📅 Monthly Performance Summary")
