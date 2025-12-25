@@ -54,14 +54,18 @@ st.markdown(
         background: transparent !important;
     }
 
-    /* 3. TARGETED TYPOGRAPHY ONLY */
-    /* REMOVED: generic 'div', 'span', 'b', and '.notranslate' selectors 
-       which were hijacking the icon font family */
-    h1, h2, h3, p, label, [data-testid="stMetricValue"] {
+    /* 3. Targeted Typography (Safe for Icons) */
+    h1, h2, h3, p, label {
         font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
         letter-spacing: 1.5px !important;
         color: white !important;
+    }
+
+    /* Architectural Headers */
+    h1, h2, h3 {
+        text-transform: uppercase !important;
+        letter-spacing: 4px !important;
     }
 
     /* 4. SIDEBAR & HEADER RESET */
