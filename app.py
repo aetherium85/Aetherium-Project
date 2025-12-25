@@ -242,17 +242,17 @@ if act_json:
 # --- WELLNESS SECTION ---
 # --- WELLNESS & DATA PREP ---
 if well_json is not None:
-    # 1. Create the DataFrame
+    # 1. Standardize the data into a DataFrame
     df = pd.DataFrame([well_json]) if isinstance(well_json, dict) else pd.DataFrame(well_json)
 
     if not df.empty:
-        # Standardize date and columns
+        # Standardize date column
         date_col = next((c for c in ['timestamp', 'id', 'date'] if c in df.columns), None)
         if date_col:
             df = df.rename(columns={date_col: 'date'})
             df['date'] = pd.to_datetime(df['date'])
 
-        # Safety Check: Ensure metrics exist
+        # Safety Check for metrics
         for col in ['ctl', 'atl', 'tsb']:
             if col not in df.columns:
                 df[col] = 0.0
@@ -260,62 +260,61 @@ if well_json is not None:
         if (df['tsb'] == 0).all() and 'ctl' in df.columns and 'atl' in df.columns:
              df['tsb'] = df['ctl'] - df['atl']
 
-        # --- GAUGES ---
+        # --- FEATURE: LAST WORKOUT HERO (At the top) ---
+        if act_json:
+            latest_act = act_json[0]
+            secs = latest_act.get('moving_time', 0)
+            duration_str = f"{secs // 3600}h {(secs % 3600) // 60}m"
+            
+            st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')}")
+            h1, h2, h3, h4 = st.columns(4)
+            
+            def icon_metric(col, icon, label, value):
+                with col:
+                    inner_icon, inner_text = st.columns([1, 2.5], vertical_alignment="center")
+                    with inner_icon:
+                        st.markdown(f"<div style='font-size: 2.8rem;'>{icon}</div>", unsafe_allow_html=True)
+                    with inner_text:
+                        st.metric(label, value)
+
+            icon_metric(h1, "⏱️", "Duration", duration_str)
+            icon_metric(h2, "🔥", "Impact", f"{latest_act.get('icu_training_load', 0)}")
+            icon_metric(h3, "📍", "Distance", f"{(latest_act.get('distance', 0)/1000):.2f} km")
+            icon_metric(h4, "💓", "Avg HR", f"{latest_act.get('average_heartrate', 0)} bpm")
+            
+            st.markdown("<hr style='border-top: 2px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
+
+        # --- FEATURE: FLOATING STATS (Current Status) ---
         st.subheader("⚡ Current Training Status")
-
-# Helper function for the elegant stat look
-def elegant_stat(col, label, value, color):
-    with col:
-        st.markdown(f"""
-            <div style="
-                text-align: center; 
-                padding: 25px 10px; 
-                background: rgba(255, 255, 255, 0.03); 
-                border-radius: 20px; 
-                border: 1px solid rgba(255, 255, 255, 0.05);
-                backdrop-filter: blur(10px);
-            ">
-                <p style="
-                    color: rgba(255,255,255,0.5); 
-                    font-size: 0.8rem; 
-                    text-transform: uppercase; 
-                    letter-spacing: 3px; 
-                    margin-bottom: 0;
-                ">{label}</p>
-                <h1 style="
-                    color: white; 
-                    font-size: 4rem; 
-                    font-weight: 200; 
-                    margin: 0; 
-                    line-height: 1.2;
-                    text-shadow: 0 0 30px {color}66;
-                ">{int(value)}</h1>
-            </div>
-        """, unsafe_allow_html=True)
-
         latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
 
-# Mapping colors to your metrics
-        elegant_stat(s1, "Fitness (CTL)", latest.get('ctl', 0), "#70C4B0") # Teal Glow
-        elegant_stat(s2, "Fatigue (ATL)", latest.get('atl', 0), "#E16C45") # Orange/Red Glow
+        def elegant_stat(col, label, value, color):
+            with col:
+                st.markdown(f"""
+                    <div style="text-align: center; padding: 25px 10px; background: rgba(255, 255, 255, 0.03); 
+                                border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
+                        <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 0;">{label}</p>
+                        <h1 style="color: white; font-size: 4rem; font-weight: 200; margin: 0; line-height: 1.2; text-shadow: 0 0 30px {color}66;">{int(value)}</h1>
+                    </div>
+                """, unsafe_allow_html=True)
 
-        # Dynamic color for Form (TSB) - Green if fresh, Red if tired
+        elegant_stat(s1, "Fitness (CTL)", latest.get('ctl', 0), "#70C4B0")
+        elegant_stat(s2, "Fatigue (ATL)", latest.get('atl', 0), "#E16C45")
+        
         tsb_val = latest.get('tsb', 0)
         tsb_color = "#4BD4B0" if tsb_val > -10 else "#E16C45"
         elegant_stat(s3, "Form (TSB)", tsb_val, tsb_color)
-        # --- YEARLY AREA CHART ---
-        st.subheader("📈 Yearly Training Load Progression")
-        fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
-        
-        # FIX: Rename FIRST so the hover box picks up the pretty labels
-        fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
 
-        # FIX: Use fullData.name for unified hover mode
+        # --- FEATURE: YEARLY AREA CHART ---
+        st.markdown("<div style='margin-top: 3rem;'></div>", unsafe_allow_html=True)
+        st.subheader("📈 Yearly Training Load Progression")
+        
+        fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
+        fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
+        
         fig.update_traces(
-            stackgroup=None, 
-            fill='tozeroy', 
-            opacity=0.5,
+            stackgroup=None, fill='tozeroy', opacity=0.5,
             hovertemplate="<b>%{fullData.name}</b>: %{y:.1f}<extra></extra>"
         )
 
@@ -329,12 +328,11 @@ def elegant_stat(col, label, value, color):
             xaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white")),
             yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white"))
         )
-        
         st.plotly_chart(fig, use_container_width=True)
-        
-        # Solid White Divider
         st.markdown("<hr style='border-top: 2px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
-        
+
+else:
+    st.error("Could not load wellness data.")
 # --- ACTIVITIES SECTION ---
 if act_json:
     # Prepare Data
