@@ -259,10 +259,10 @@ if well_json is not None:
         # Apply labels to legend
         fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
         st.plotly_chart(fig, use_container_width=True)
-
+        st.divider()
 else:
     st.error("Could not load wellness data.")
-st.divider()
+
 # --- ACTIVITIES SECTION (Monthly Summary) ---
 if act_json:
     st.subheader("📅 Monthly Performance Summary")
