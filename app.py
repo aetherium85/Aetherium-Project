@@ -7,6 +7,34 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
+def add_bg_from_url():
+    st.markdown(
+         f"""
+         <style>
+         .stApp {{
+             background-image: url("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070");
+             background-attachment: fixed;
+             background-size: cover;
+         }}
+         
+         /* Optional: Adds a dark overlay to make text more readable */
+         .stApp::before {{
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Adjust 0.4 for darkness */
+            z-index: -1;
+         }}
+         </style>
+         """,
+         unsafe_allow_html=True
+     )
+
+add_bg_from_url()
+
 def show_login_screen():
     st.title("❤️ Fitness Command Center")
     st.write("Securely sync your 2025 performance data.")
