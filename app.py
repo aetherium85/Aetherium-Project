@@ -52,24 +52,16 @@ st.markdown(
 
     .stApp {
         background: transparent !important;
-        font-family: 'Inter', sans-serif !important;
     }
 
-    /* 3. GLOBAL ELEGANT TYPOGRAPHY */
-    h1, h2, h3, p, span, label, div, b, .stMetric label, [data-testid="stMetricValue"] {
+    /* 3. TARGETED TYPOGRAPHY ONLY */
+    /* REMOVED: generic 'div', 'span', 'b', and '.notranslate' selectors 
+       which were hijacking the icon font family */
+    h1, h2, h3, p, label, [data-testid="stMetricValue"] {
         font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
         letter-spacing: 1.5px !important;
         color: white !important;
-    }
-
-    /* --- ICON RECOVERY: FIXES KEYBOARD_DOUBLE_ARROW --- */
-    .notranslate, [data-testid="stIcon"], [data-testid="stSidebarCollapseIcon"] span, [class*="StyledIcon"] {
-        font-family: "Material Symbols Outlined" !important;
-        font-weight: normal !important;
-        font-size: 24px !important;
-        letter-spacing: normal !important;
-        text-transform: none !important;
     }
 
     /* 4. SIDEBAR & HEADER RESET */
@@ -78,9 +70,11 @@ st.markdown(
         backdrop-filter: blur(15px);
     }
     
-    [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
+    /* Specific targeting for sidebar labels to avoid icons */
+    [data-testid="stSidebar"] label, [data-testid="stSidebar"] .stMarkdown p {
         color: white !important;
         font-weight: 300 !important;
+        font-family: 'Inter', sans-serif !important;
     }
 
     header[data-testid="stHeader"] {
