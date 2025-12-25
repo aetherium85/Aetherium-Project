@@ -34,7 +34,7 @@ st.markdown(
     <style>
     /* Target the main container and the blurred overlay Streamlit uses */
     .stApp, .stMainBlockContainer, [data-testid="stAppViewBlockContainer"] {
-        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), 
+        background: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.5)), 
                     url("https://images.unsplash.com/photo-1754980004850-3c93f91c6052") !important;
         background-size: cover !important;
         background-position: center !important;
@@ -44,7 +44,7 @@ st.markdown(
 
     /* Glassmorphism for containers */
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart) {
-        background-color: rgba(255, 255, 255, 0.05) !important;
+        background-color: rgba(255, 255, 255, 0.02) !important;
         backdrop-filter: blur(10px) !important;
         border-radius: 15px !important;
         padding: 20px !important;
