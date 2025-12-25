@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 # --- 1. CONFIGURATION (MUST BE FIRST) ---
-st.set_page_config(page_title="Yearly Fitness Dashboard", layout="wide")
+st.set_page_config(page_title="Aetherium Project", layout="wide")
 
 pretty_labels = {
     "ctl": "Fitness (CTL)",
