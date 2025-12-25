@@ -325,7 +325,7 @@ if well_json is not None:
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="white"),
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white")),
+            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.2)", tickfont=dict(color="white")),
             yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white"))
         )
         st.plotly_chart(fig, use_container_width=True)
