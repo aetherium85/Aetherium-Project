@@ -223,6 +223,26 @@ if act_json:
 
     st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
+# --- ACTIVITIES SECTION ---
+if act_json:
+    df_act = pd.DataFrame(act_json)
+    df_act['date_dt'] = pd.to_datetime(df_act['start_date_local'])
+    df_act['Month'] = df_act['date_dt'].dt.strftime('%B %Y')
+    
+    monthly = df_act.groupby('Month', sort=False).agg({'id':'count', 'icu_training_load':'sum'}).reset_index()
+    monthly.columns = ['Month', 'Sessions', 'Total Load']
+
+    st.markdown("### 📅 Monthly Performance History")
+
+    for index, row in monthly.iterrows():
+        st.markdown(f"""
+            <div class="performance-row">
+                <div style="flex: 1; font-weight: bold; font-size: 1rem;">{row['Month']}</div>
+                <div style="flex: 1; text-align: left;">🏃 <b>{row['Sessions']}</b> Sessions</div>
+                <div style="flex: 1; text-align: left;">🔥 <b>{row['Total Load']:.0f}</b> Load</div>
+            </div>
+        """, unsafe_allow_html=True)
+
 # --- WELLNESS SECTION ---
 if well_json is not None:
     df = pd.DataFrame([well_json]) if isinstance(well_json, dict) else pd.DataFrame(well_json)
@@ -288,23 +308,3 @@ if well_json is not None:
 
 else:
     st.error("Could not load wellness data.")
-
-# --- ACTIVITIES SECTION ---
-if act_json:
-    df_act = pd.DataFrame(act_json)
-    df_act['date_dt'] = pd.to_datetime(df_act['start_date_local'])
-    df_act['Month'] = df_act['date_dt'].dt.strftime('%B %Y')
-    
-    monthly = df_act.groupby('Month', sort=False).agg({'id':'count', 'icu_training_load':'sum'}).reset_index()
-    monthly.columns = ['Month', 'Sessions', 'Total Load']
-
-    st.markdown("### 📅 Monthly Performance History")
-
-    for index, row in monthly.iterrows():
-        st.markdown(f"""
-            <div class="performance-row">
-                <div style="flex: 1; font-weight: bold; font-size: 1rem;">{row['Month']}</div>
-                <div style="flex: 1; text-align: left;">🏃 <b>{row['Sessions']}</b> Sessions</div>
-                <div style="flex: 1; text-align: left;">🔥 <b>{row['Total Load']:.0f}</b> Load</div>
-            </div>
-        """, unsafe_allow_html=True)
