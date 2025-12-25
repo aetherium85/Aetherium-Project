@@ -260,31 +260,7 @@ if well_json is not None:
         if (df['tsb'] == 0).all() and 'ctl' in df.columns and 'atl' in df.columns:
              df['tsb'] = df['ctl'] - df['atl']
 
-        # --- FEATURE: LAST WORKOUT HERO (At the top) ---
-        if act_json:
-            latest_act = act_json[0]
-            secs = latest_act.get('moving_time', 0)
-            duration_str = f"{secs // 3600}h {(secs % 3600) // 60}m"
-            
-            st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')}")
-            h1, h2, h3, h4 = st.columns(4)
-            
-            def icon_metric(col, icon, label, value):
-                with col:
-                    inner_icon, inner_text = st.columns([1, 2.5], vertical_alignment="center")
-                    with inner_icon:
-                        st.markdown(f"<div style='font-size: 2.8rem;'>{icon}</div>", unsafe_allow_html=True)
-                    with inner_text:
-                        st.metric(label, value)
-
-            icon_metric(h1, "⏱️", "Duration", duration_str)
-            icon_metric(h2, "🔥", "Impact", f"{latest_act.get('icu_training_load', 0)}")
-            icon_metric(h3, "📍", "Distance", f"{(latest_act.get('distance', 0)/1000):.2f} km")
-            icon_metric(h4, "💓", "Avg HR", f"{latest_act.get('average_heartrate', 0)} bpm")
-            
-            st.markdown("<hr style='border-top: 2px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
-
-        # --- FEATURE: FLOATING STATS (Current Status) ---
+                # --- FEATURE: FLOATING STATS (Current Status) ---
         st.subheader("⚡ Current Training Status")
         latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
