@@ -220,7 +220,7 @@ if act_json:
     hr = latest_act.get('average_heartrate', 0)
     load = latest_act.get('icu_training_load', 0)
 
-    st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')}")
+    st.markdown(f" 🚀 Last Session: {latest_act.get('name', 'Workout')}")
     
     h1, h2, h3, h4 = st.columns(4)
     
@@ -263,7 +263,7 @@ if well_json is not None:
              df['tsb'] = df['ctl'] - df['atl']
 
                 # --- FEATURE: FLOATING STATS (Current Status) ---
-        st.markdown("###⚡ Current Training Status")
+        st.markdown("⚡ Current Training Status")
         latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
 
@@ -286,7 +286,7 @@ if well_json is not None:
 
         # --- FEATURE: YEARLY AREA CHART ---
         st.markdown("<div style='margin-top: 3rem;'></div>", unsafe_allow_html=True)
-        st.markdown("###📈 Yearly Training Load Progression")
+        st.markdown("📈 Yearly Training Load Progression")
         
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
         fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
@@ -322,7 +322,7 @@ if act_json:
     monthly = df_act.groupby('Month', sort=False).agg({'id':'count', 'icu_training_load':'sum'}).reset_index()
     monthly.columns = ['Month', 'Sessions', 'Total Load']
 
-    st.markdown("###📅 Monthly Performance History")
+    st.markdown("📅 Monthly Performance History")
 
     for index, row in monthly.iterrows():
         # Using a custom div class 'performance-row' for total control
