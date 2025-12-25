@@ -28,7 +28,6 @@ TYPE_MAPPING = {
     "WeightTraining": "Strength", "Yoga": "Mobility", "Pilates": "Mobility"
 }
 
-# --- 2. THE ULTIMATE CSS FIX ---
 st.markdown(
     """
     <style>
@@ -44,54 +43,51 @@ st.markdown(
                     url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
         background-size: cover !important;
         background-position: center !important;
-        filter: blur(8px); /* Increased blur for better text readability */
+        filter: blur(8px);
         transform: scale(1.1);
         z-index: -1;
     }
 
-    /* 3. GLOBAL FONT (Applied to content only) */
-    .stApp, .stApp p, .stApp span, .stApp label, .stApp h1, .stApp h2, .stApp h3, .stApp div {
+    /* 3. TARGETED ELEGANT FONT (Avoids breaking Icons) */
+    /* Instead of targeting every div/span, we target text-heavy tags only */
+    .stApp, p, h1, h2, h3, .stMetric label, [data-testid="stMetricValue"] {
         font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
         letter-spacing: 1px;
         color: white !important;
     }
 
-    /* 1. Hide the literal text if it's leaking out */
-[data-testid="stSidebarCollapseIcon"], 
-[data-testid="collapsedControl"],
-button[title*="sidebar"] {
-    font-size: 0px !important;
-    color: transparent !important;
-}
-
-/* 2. Force the Icon back using a pseudo-element */
-[data-testid="stSidebarCollapseIcon"]::before, 
-[data-testid="collapsedControl"]::before {
-    content: "chevron_right"; /* or "menu" */
-    font-family: 'Material Icons' !important;
-    font-size: 24px !important;
-    color: white !important;
-    visibility: visible !important;
-}
-
-/* 3. Broad reset for any element that might be holding that text */
-span:contains("keyboard_double_arrow"), 
-div:contains("keyboard_double_arrow") {
-    display: none !important;
-}
+    /* 4. THE ICON REPAIR (Specific fix for keyboard_double_arrow) */
+    /* This ensures Streamlit's icons use the correct internal font */
+    [data-testid="stSidebarCollapseIcon"], 
+    [data-testid="collapsedControl"],
+    .st-emotion-cache-15ec60u, 
+    [class*="StyledIcon"] {
+        font-family: "Material Symbols Outlined" !important;
+        font-weight: normal !important;
+        font-size: 24px !important;
+        letter-spacing: normal !important;
+        text-transform: none !important;
+    }
 
     /* 5. HEADER STYLING */
     h1, h2, h3 {
         text-transform: uppercase !important;
         letter-spacing: 4px !important;
         margin-top: 2rem !important;
+        font-family: 'Inter', sans-serif !important;
     }
 
-    /* 6. SIDEBAR & GLASSMISM */
+    /* 6. SIDEBAR & GLASSMORPHISM */
     [data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.7) !important;
         backdrop-filter: blur(15px);
+    }
+
+    /* Ensure sidebar text stays white and thin */
+    [data-testid="stSidebarNav"] span {
+        color: white !important;
+        font-weight: 200 !important;
     }
     
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
