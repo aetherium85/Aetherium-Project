@@ -8,26 +8,28 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 def add_bg_from_url():
+    # Note: No 'f' before the quotes here!
     st.markdown(
-        f"""
+        """
         <style>
-        /* Target the main container specifically */
-        [data-testid="stAppViewContainer"] {{
+        [data-testid="stAppViewContainer"] {
             background-image: url("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070");
             background-attachment: fixed;
             background-size: cover;
-            background-position: center;
-        }}
+        }
 
-        /* This makes the top header transparent so it doesn't block the image */
-        [data-testid="stHeader"] {{
-            background: rgba(0,0,0,0);
-        }}
-
-        /* This ensures the content area background is transparent so the image shows through */
-        [data-testid="stVerticalBlock"] {{
-            background-color: transparent;
-        }}
+        /* Glassmorphism effect */
+        [data-testid="stMetric"], 
+        [data-testid="stMetricWidget"],
+        [data-testid="stElementContainer"] .stPlotlyChart,
+        [data-testid="stDataFrame"],
+        .stTable {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
         </style>
         """,
         unsafe_allow_html=True
