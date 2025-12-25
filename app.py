@@ -57,16 +57,29 @@ st.markdown(
         color: white !important;
     }
 
-    /* 4. THE ICON RECOVERY (Fixes keyboard_double_arrow_right) */
-    /* This targets Streamlit's internal icon system and resets the font */
-    [data-testid="stSidebarCollapseIcon"] span, 
-    [data-testid="collapsedControl"] span,
-    .notranslate, [class*="StyledIcon"] {
-        font-family: 'Material Symbols Outlined' !important;
-        font-weight: normal !important;
-        text-transform: none !important;
-        letter-spacing: normal !important;
-    }
+    /* 1. Hide the literal text if it's leaking out */
+[data-testid="stSidebarCollapseIcon"], 
+[data-testid="collapsedControl"],
+button[title*="sidebar"] {
+    font-size: 0px !important;
+    color: transparent !important;
+}
+
+/* 2. Force the Icon back using a pseudo-element */
+[data-testid="stSidebarCollapseIcon"]::before, 
+[data-testid="collapsedControl"]::before {
+    content: "chevron_right"; /* or "menu" */
+    font-family: 'Material Icons' !important;
+    font-size: 24px !important;
+    color: white !important;
+    visibility: visible !important;
+}
+
+/* 3. Broad reset for any element that might be holding that text */
+span:contains("keyboard_double_arrow"), 
+div:contains("keyboard_double_arrow") {
+    display: none !important;
+}
 
     /* 5. HEADER STYLING */
     h1, h2, h3 {
