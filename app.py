@@ -31,10 +31,10 @@ TYPE_MAPPING = {
 st.markdown(
     """
     <style>
-    /* 1. IMPORT ELEGANT FONT */
+    /* 1. IMPORT FONT */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
 
-    /* 2. BACKGROUND LAYER */
+    /* 2. BACKGROUND & GLOBAL SETUP */
     .stApp::before {
         content: "";
         position: fixed;
@@ -45,48 +45,32 @@ st.markdown(
         background-position: center !important;
         background-attachment: fixed !important;
         filter: blur(4px); 
-        -webkit-filter: blur(4px);
         transform: scale(1.1);
         z-index: -1;
     }
 
-    .stApp {
-        background: transparent !important;
-    }
+    .stApp { background: transparent !important; }
 
-    /* 3. Targeted Typography (Safe for Icons) */
-    h1, h2, h3, p, label {
+    /* 3. TARGETED WHITE TEXT (Safe for Icons) */
+    /* We target headers, paragraphs, and our custom classes specifically */
+    h1, h2, h3, p, label, .performance-row, .performance-row div, .performance-row b {
         font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
-        letter-spacing: 1.5px !important;
+        color: white !important;
+        letter-spacing: 1px;
+    }
+
+    /* 4. LAST SESSION (Hero) & METRIC FIX */
+    /* This ensures the values inside your h1-h4 columns stay white */
+    [data-testid="stHorizontalBlock"] div, 
+    [data-testid="stMetricValue"], 
+    [data-testid="stMetricLabel"] {
         color: white !important;
     }
 
-    /* Architectural Headers */
-    h1, h2, h3 {
-        text-transform: uppercase !important;
-        letter-spacing: 4px !important;
-    }
-
-    /* 4. SIDEBAR & HEADER RESET */
-    [data-testid="stSidebar"] {
-        background-color: rgba(0, 0, 0, 0.4) !important;
-        backdrop-filter: blur(15px);
-    }
-    
-    /* Specific targeting for sidebar labels to avoid icons */
-    [data-testid="stSidebar"] label, [data-testid="stSidebar"] .stMarkdown p {
-        color: white !important;
-        font-weight: 300 !important;
-        font-family: 'Inter', sans-serif !important;
-    }
-
-    header[data-testid="stHeader"] {
-        background-color: transparent !important;
-    }
-
-    /* 1. Glassmorphism for Chart Containers */
-    div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart) {
+    /* 5. GLASSMORPHISM CONTAINERS */
+    div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
+    .performance-row {
         background-color: rgba(255, 255, 255, 0.05) !important;
         backdrop-filter: blur(10px) !important;
         border-radius: 15px !important;
@@ -95,39 +79,26 @@ st.markdown(
         margin-bottom: 10px !important;
     }
 
-    /* 2. Glassmorphism for Performance Rows */
     .performance-row {
-        background-color: rgba(255, 255, 255, 0.05) !important;
-        backdrop-filter: blur(10px) !important;
-        border-radius: 10px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 12px 25px !important;
-        margin-bottom: 8px;
     }
-    /* 4. Training Status Glow */
+
+    /* 6. TRAINING STATUS GLOW (The Floating Stats) */
     [data-testid="stVerticalBlock"] > div:has(div[style*="text-shadow"]) {
         background-color: transparent !important;
         border: none !important;
         box-shadow: none !important;
     }
 
-    /* Make the large numbers in the status section extra thin */
-    .stApp h1 {
-        font-weight: 200 !important;
-    }
-    /* 6. CLEANING UP METRIC BOXES & HEADERS */
-    h1, h2, h3 { text-transform: uppercase !important; letter-spacing: 4px !important; }
-    h3 { font-size: 0.9rem !important; margin-bottom: 1rem !important; opacity: 0.8; }
-    
-    [data-testid="stMetricValue"] { font-size: 1.8rem !important; line-height: 1 !important; }
-
-    [data-testid="stVerticalBlock"] > div:has(div[style*="text-shadow"]) {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
+    /* Architectural Header Styling */
+    h3 {
+        text-transform: uppercase !important;
+        letter-spacing: 4px !important;
+        font-size: 0.9rem !important;
+        opacity: 0.8;
     }
     </style>
     """,
