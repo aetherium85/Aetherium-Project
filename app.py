@@ -56,7 +56,38 @@ st.markdown(
     .stApp {
         background: transparent !important;
     }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
 
+    html, body, [class*="css"], .stApp {
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    /* Target all headers and body text */
+    h1, h2, h3, p, span, label {
+        font-weight: 200 !important;
+        letter-spacing: 1px !important;
+        color: white !important;
+    }
+
+    /* Make Subheaders (Section Titles) feel more technical */
+    h2, h3 {
+        text-transform: uppercase !important;
+        letter-spacing: 4px !important;
+        font-size: 1rem !important;
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    /* Adjust Metrics to be lighter */
+    [data-testid="stMetricValue"] {
+        font-weight: 200 !important;
+        font-size: 2.5rem !important;
+    }
+
+    [data-testid="stMetricLabel"] {
+        letter-spacing: 2px !important;
+        text-transform: uppercase !important;
+        font-size: 0.7rem !important;
+    }
     /* Target ONLY the main content area for white text */
     [data-testid="stMainBlockContainer"] h1, 
     [data-testid="stMainBlockContainer"] h2, 
@@ -261,7 +292,7 @@ if well_json is not None:
              df['tsb'] = df['ctl'] - df['atl']
 
                 # --- FEATURE: FLOATING STATS (Current Status) ---
-        st.subheader("⚡ Current Training Status")
+        st.markdown("###⚡ Current Training Status")
         latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
 
@@ -284,7 +315,7 @@ if well_json is not None:
 
         # --- FEATURE: YEARLY AREA CHART ---
         st.markdown("<div style='margin-top: 3rem;'></div>", unsafe_allow_html=True)
-        st.subheader("📈 Yearly Training Load Progression")
+        st.markdown("###📈 Yearly Training Load Progression")
         
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
         fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
@@ -320,7 +351,7 @@ if act_json:
     monthly = df_act.groupby('Month', sort=False).agg({'id':'count', 'icu_training_load':'sum'}).reset_index()
     monthly.columns = ['Month', 'Sessions', 'Total Load']
 
-    st.subheader("📅 Monthly Performance History")
+    st.markdown("###📅 Monthly Performance History")
 
     for index, row in monthly.iterrows():
         # Using a custom div class 'performance-row' for total control
