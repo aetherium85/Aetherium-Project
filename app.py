@@ -303,7 +303,7 @@ if act_json:
     for index, row in monthly.iterrows():
         st.markdown(f"""
             <div class="performance-row">
-                <div style="flex: 1; font-weight: bold; font-size: 1.1rem;">{row['Month']}</div>
+                <div style="flex: 1.5; font-weight: bold; font-size: 1.1rem;">{row['Month']}</div>
                 <div style="flex: 1; text-align: center;">🏃 <b>{row['Sessions']}</b> Sessions</div>
                 <div style="flex: 1; text-align: right;">🔥 <b>{row['Total Load']:.0f}</b> Load</div>
             </div>
