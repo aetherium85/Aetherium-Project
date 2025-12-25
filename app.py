@@ -89,6 +89,19 @@ st.markdown(
         padding: 20px !important;
         border: 1px solid rgba(135,135,135, 0.1) !important;
     }
+    /* Glassmorphism for the Dataframe/Table container */
+[data-testid="stElementContainer"]:has(div[data-testid="stDataFrame"]) {
+    background-color: rgba(135, 135, 135, 0.3) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 15px !important;
+    padding: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Force the internal table background to be transparent */
+[data-testid="stDataFrame"] div {
+    background-color: transparent !important;
+}
     </style>
     """,
     unsafe_allow_html=True
