@@ -299,18 +299,18 @@ if act_json:
     st.markdown("### 📅 Monthly Performance History")
 
     for index, row in monthly.iterrows():
-     st.markdown(f"""
-        <div class="performance-row">
-            <div style="width: 40%; font-weight: 200; font-size: 1.1rem; color: white !important;">{row['Month']}</div>
+        st.markdown(f"""
+            <div class="performance-row">
+                <div style="width: 40%; font-weight: 200; font-size: 1.1rem; color: white !important;">{row['Month']}</div>
             
-            <div style="width: 30%; text-align: left; color: white !important;">
-                <span style="opacity: 0.6; font-size: 0.8rem; letter-spacing: 1px;">SESSIONS</span> 
-                <b style="font-size: 1.1rem; margin-left: 5px;">{row['Sessions']}</b>
-            </div>
+                <div style="width: 30%; text-align: left; color: white !important;">
+                    <span style="opacity: 0.6; font-size: 0.8rem; letter-spacing: 1px;">SESSIONS</span> 
+                    <b style="font-size: 1.1rem; margin-left: 5px;">{row['Sessions']}</b>
+                </div>
             
-            <div style="width: 30%; text-align: right; color: white !important;">
-                <span style="opacity: 0.6; font-size: 0.8rem; letter-spacing: 1px;">TOTAL LOAD</span> 
-                <b style="font-size: 1.1rem; margin-left: 5px;">{row['Total Load']:.0f}</b>
+                <div style="width: 30%; text-align: right; color: white !important;">
+                    <span style="opacity: 0.6; font-size: 0.8rem; letter-spacing: 1px;">TOTAL LOAD</span> 
+                    <b style="font-size: 1.1rem; margin-left: 5px;">{row['Total Load']:.0f}</b>
+                </div>
             </div>
-        </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
