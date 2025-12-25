@@ -282,7 +282,7 @@ if well_json is not None:
              df['tsb'] = df['ctl'] - df['atl']
 
                 # --- FEATURE: FLOATING STATS (Current Status) ---
-        st.markdown(f"###⚡ Current Training Status")
+        st.markdown("###⚡ Current Training Status")
         latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
 
@@ -304,7 +304,7 @@ if well_json is not None:
         elegant_stat(s3, "Form (TSB)", tsb_val, tsb_color)
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         # --- FEATURE: YEARLY AREA CHART ---
-        st.markdown(f"### 📈 Yearly Training Load Progression")
+        st.markdown("### 📈 Yearly Training Load Progression")
         
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
         fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
@@ -340,7 +340,7 @@ if act_json:
     monthly = df_act.groupby('Month', sort=False).agg({'id':'count', 'icu_training_load':'sum'}).reset_index()
     monthly.columns = ['Month', 'Sessions', 'Total Load']
 
-    st.markdown(f"### 📅 Monthly Performance History")
+    st.markdown("### 📅 Monthly Performance History")
 
     for index, row in monthly.iterrows():
         # Using a custom div class 'performance-row' for total control
