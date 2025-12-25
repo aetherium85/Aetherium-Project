@@ -37,7 +37,7 @@ st.markdown(
     /* 2. BACKGROUND (Pinned to the Root) */
     [data-testid="stAppViewRoot"] {
         background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-                          url("https://images.unsplash.com/photo-1616361743371-c19895461140?v=1");
+                          url("https://images.unsplash.com/photo-1616361743371-c19895461140");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
