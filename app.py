@@ -265,7 +265,14 @@ if well_json is not None:
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="white"),
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            legend=dict(
+        orientation="h", 
+        yanchor="bottom", 
+        y=1.02, 
+        xanchor="right", 
+        x=1,
+        font=dict(color="white")
+    ),
 )
         
         # Apply labels to legend
