@@ -205,10 +205,15 @@ if well_json is not None:
     xaxis=dict(
         hoverformat="%b %d, %Y",
         gridcolor="rgba(255, 255, 255, 0.1)", # Subtle grid lines
-        zerolinecolor="rgba(255, 255, 255, 0.2)"),
+        zerolinecolor="rgba(255, 255, 255, 0.2)",
+        tickfont=dict(color="white", size=12),   # Ensures "Jan 2025" etc. are white
+        titlefont=dict(color="white", size=14)
+    ),
     yaxis=dict(
         gridcolor="rgba(255, 255, 255, 0.1)",
-        zerolinecolor="rgba(255, 255, 255, 0.2)"
+        zerolinecolor="rgba(255, 255, 255, 0.2)",
+        tickfont=dict(color="white", size=12),   # Ensures scores (0, 20, 40) are white
+        titlefont=dict(color="white", size=14)
     ),
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
