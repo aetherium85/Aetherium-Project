@@ -34,7 +34,25 @@ st.markdown(
     <style>
     /* 1. IMPORT ELEGANT FONT */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
+/* Target the specific container for Material Icons and reset the font */
+.st-emotion-cache-15ec60u, 
+[data-testid="stSidebarCollapseIcon"] i, 
+[data-testid="collapsedControl"] i,
+.material-icons,
+.notranslate {
+    font-family: "Material Symbols Outlined" !important;
+    font-weight: normal !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+    white-space: nowrap !important;
+    word-wrap: normal !important;
+    direction: ltr !important;
+    -webkit-font-smoothing: antialiased !important;
+}
 
+/* Ensure the button itself is visible but doesn't follow the '200' weight rule */
+button[data-testid="stHeaderSidebarLocate"] {
+    font-family: inherit !important;
     /* 2. BACKGROUND LAYER */
     .stApp::before {
         content: "";
