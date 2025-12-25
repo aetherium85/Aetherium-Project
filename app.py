@@ -238,7 +238,7 @@ if act_json:
         hr = latest_act.get('average_heartrate', 0)
         st.metric("Avg. HR", f"{hr:.0f} bpm" if hr > 0 else "N/A")
 
-    st.divider()
+    st.markdown("<hr style='border-top: 2px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 # --- WELLNESS SECTION ---
 # --- WELLNESS & DATA PREP ---
