@@ -66,7 +66,7 @@ st.markdown(
     /* Glassmorphism for containers */
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart) {
         background-color: rgba(135,135,135, 0.5) !important;
-        backdrop-filter: blur(10px) !important;
+        backdrop-filter: blur(5px) !important;
         border-radius: 15px !important;
         padding: 20px !important;
         border: 1px solid rgba(135,135,135, 0.1) !important;
