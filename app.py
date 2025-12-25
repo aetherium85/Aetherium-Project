@@ -82,8 +82,7 @@ st.markdown(
     }
 
     /* 5. GLASSMORPHISM FOR CONTAINERS */
-    div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
-    .performance-row {
+    div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart) {
         background-color: rgba(255, 255, 255, 0.05) !important;
         backdrop-filter: blur(10px) !important;
         border-radius: 15px !important;
@@ -93,10 +92,15 @@ st.markdown(
     }
 
     .performance-row {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(10px) !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 12px 25px !important;
+        margin-bottom: 8px;
     }
 
     /* 6. CLEANING UP METRIC BOXES & HEADERS */
