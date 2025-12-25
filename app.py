@@ -34,7 +34,7 @@ st.markdown(
     <style>
     /* Target the main container and the blurred overlay Streamlit uses */
     .stApp, .stMainBlockContainer, [data-testid="stAppViewBlockContainer"] {
-        background: linear-gradient(rgba(135,135,135,0.3), rgba(135,135,135,0.5)), 
+        background: linear-gradient(rgba(135,135,135,0.7), rgba(135,135,135,0.7)), 
                     url("https://images.unsplash.com/photo-1754980004850-3c93f91c6052") !important;
         background-size: cover !important;
         background-position: center !important;
