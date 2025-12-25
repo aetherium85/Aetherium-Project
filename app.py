@@ -34,9 +34,21 @@ st.markdown(
     <style>
     .stApp {
         background: linear-gradient(rgba(135,135,135,0), rgba(135,135,135,0)), 
-                    url("https://images.unsplash.com/photo-1517167685284-96a27681ad75") !important;
+                    url("https://images.unsplash.com/photo-1556139954-ec19cce61d61") !important;
         background-size: cover !important;
         background-attachment: fixed !important;
+        /* THE BLUR EFFECT */
+        filter: blur(8px); 
+        -webkit-filter: blur(8px);
+        
+        /* Scale it slightly (1.1) so the blurred edges don't show white bleed */
+        transform: scale(1.1);
+        z-index: -1;
+    }
+
+    /* 2. Ensure the main app container stays transparent so we see the layer behind it */
+    .stApp {
+        background: transparent !important;
     }
 
     /* Target ONLY the main content area for white text */
