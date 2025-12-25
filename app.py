@@ -247,16 +247,37 @@ if well_json is not None:
         ), use_container_width=True)
 
         # --- 5. YEARLY AREA CHART ---
-        st.divider()
-        st.subheader("📈 Yearly Training Load Progression")
-        fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
-        fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
-        fig.update_traces(
+        Since the error persists, the issue isn't just the text within the template—it's that you are passing Layout arguments (like legend) inside a Trace function (update_traces).
+
+In Plotly, update_traces only accepts settings for the data lines/areas themselves. The legend and hovermode settings must go inside update_layout.
+
+The Corrected Plot Code
+Replace your entire Plotly section (from fig = px.area down to st.plotly_chart) with this cleaned-up version:
+
+Python
+
+# --- 5. YEARLY AREA CHART ---
+st.divider()
+st.subheader("📈 Yearly Training Load Progression")
+
+# Create the base plot
+fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
+
+# 1. Update the TRACES (The lines and fills)
+fig.update_traces(
     stackgroup=None, 
     fill='tozeroy', 
-    opacity=1,
-    # Use %{pn} or %{name} to reference the trace name reliably
-    hovertemplate="<b>%{name} Score:</b> %{y:.1f}<extra></extra>",
+    opacity=0.6, # Slightly transparent looks better for overlapping areas
+    hovertemplate="<b>%{name}</b>: %{y:.1f}<extra></extra>"
+)
+
+# 2. Update the LAYOUT (Legend, Axes, Backgrounds)
+fig.update_layout(
+    hovermode="x unified",
+    hoverlabel=dict(bgcolor="rgba(30, 30, 30, 0.8)", font_size=14, font_color="white"),
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+    font=dict(color="white"),
     legend=dict(
         font=dict(color="white", size=12),
         orientation="h",
@@ -265,32 +286,29 @@ if well_json is not None:
         xanchor="right",
         x=1
     ),
-)
-        fig.update_layout(hovermode="x unified",hoverlabel=dict(bgcolor="white", font_size=14),
     xaxis=dict(
         hoverformat="%b %d, %Y",
         gridcolor="rgba(255, 255, 255, 0.1)",
         zerolinecolor="rgba(255, 255, 255, 0.3)",
-        tickfont=dict(color="white", size=12),  # Labels like "Jan 2025"
-        title=dict(text="Date", font=dict(color="white", size=14)) # Proper Title syntax
+        tickfont=dict(color="white"),
+        title=dict(text="Date", font=dict(color="white"))
     ),
-    # Y-Axis visibility settings
     yaxis=dict(
         gridcolor="rgba(255, 255, 255, 0.1)",
         zerolinecolor="rgba(255, 255, 255, 0.3)",
-        tickfont=dict(color="white", size=12),  # Scores
-        title=dict(text="Score", font=dict(color="white", size=14)) # Proper Title syntax
+        tickfont=dict(color="white"),
+        title=dict(text="Score", font=dict(color="white"))
     ),
-    # Background transparency
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)",
-    # Global font fallback
-    font=dict(color="white")
-)
+        # Background transparency
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        # Global font fallback
+        font=dict(color="white")
+    )
 
-    st.plotly_chart(fig, use_container_width=True)
-else:
-    st.error("Could not load wellness data.")
+fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
+
+st.plotly_chart(fig, use_container_width=True)
 
 # --- ACTIVITIES SECTION ---
 st.divider()
