@@ -113,6 +113,12 @@ st.markdown(
 div[data-testid="stVerticalBlock"] > div:has(.performance-row) {
     padding: 0px !important;
 }
+/* Ensure the column containers don't add extra gray backgrounds */
+[data-testid="stVerticalBlock"] > div:has(div[style*="text-shadow"]) {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
     </style>
     """,
     unsafe_allow_html=True
