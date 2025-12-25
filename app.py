@@ -32,7 +32,13 @@ TYPE_MAPPING = {
 st.markdown(
     """
     <style>
-    .stApp {
+    .stApp::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
         background: linear-gradient(rgba(135,135,135,0), rgba(135,135,135,0)), 
                     url("https://images.unsplash.com/photo-1556139954-ec19cce61d61") !important;
         background-size: cover !important;
