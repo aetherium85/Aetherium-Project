@@ -202,7 +202,14 @@ if well_json is not None:
     hovertemplate="<b>%{fullData.name} Score:</b> %{y:.1f}<extra></extra>"
 )
         fig.update_layout(hovermode="x unified",hoverlabel=dict(bgcolor="white", font_size=14),
-    xaxis=dict(hoverformat="%b %d, %Y"),
+    xaxis=dict(
+        hoverformat="%b %d, %Y",
+        gridcolor="rgba(255, 255, 255, 0.1)", # Subtle grid lines
+        zerolinecolor="rgba(255, 255, 255, 0.2)"),
+    yaxis=dict(
+        gridcolor="rgba(255, 255, 255, 0.1)",
+        zerolinecolor="rgba(255, 255, 255, 0.2)"
+    ),
     paper_bgcolor="rgba(0,0,0,0)", # Transparent outer background
     plot_bgcolor="rgba(0,0,0,0)",  # Transparent chart area background
     font=dict(color="black")
