@@ -13,7 +13,7 @@ def add_bg_from_url():
         """
         <style>
         [data-testid="stAppViewContainer"] {
-            background-image: url("https://images.unsplash.com/a-close-up-of-a-plant-with-frost-on-it-qVCHbW4agZk");
+            background-image: url("https://unsplash.com/photos/a-close-up-of-a-plant-with-frost-on-it-qVCHbW4agZk");
             background-attachment: fixed;
             background-size: cover;
         }
