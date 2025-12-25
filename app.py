@@ -28,10 +28,14 @@ TYPE_MAPPING = {
     "WeightTraining": "Strength", "Yoga": "Mobility", "Pilates": "Mobility"
 }
 
-# --- 2. THE FINAL CSS FIX (Background + Glassmorphism) ---
+# --- 2. THE FINAL CSS FIX (Background + Elegant Typography) ---
 st.markdown(
     """
     <style>
+    /* 1. IMPORT ELEGANT FONT */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
+
+    /* 2. BACKGROUND LAYER */
     .stApp::before {
         content: "";
         position: fixed;
@@ -39,117 +43,84 @@ st.markdown(
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: linear-gradient(rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.07)), 
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
                     url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
         background-size: cover !important;
+        background-position: center !important;
         background-attachment: fixed !important;
-        /* THE BLUR EFFECT */
         filter: blur(4px); 
         -webkit-filter: blur(4px);
-        
-        /* Scale it slightly (1.1) so the blurred edges don't show white bleed */
         transform: scale(1.1);
         z-index: -1;
     }
 
-    /* 2. Ensure the main app container stays transparent so we see the layer behind it */
     .stApp {
         background: transparent !important;
-    }
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
-
-    html, body, [class*="css"], .stApp {
         font-family: 'Inter', sans-serif !important;
     }
 
-    /* Target all headers and body text */
-    h1, h2, h3, p, span, label {
+    /* 3. GLOBAL ELEGANT TYPOGRAPHY */
+    /* This forces ALL text to be thin and spaced out */
+    h1, h2, h3, p, span, label, div, b, .stMetric label, [data-testid="stMetricValue"] {
+        font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
-        letter-spacing: 1px !important;
+        letter-spacing: 1.5px !important;
         color: white !important;
     }
 
-    /* Make Subheaders (Section Titles) feel more technical */
-    h2, h3 {
+    /* Make headers feel more 'Architectural' */
+    h1, h2, h3 {
         text-transform: uppercase !important;
         letter-spacing: 4px !important;
-        font-size: 1rem !important;
-        color: rgba(255, 255, 255, 0.7) !important;
     }
 
-    /* Adjust Metrics to be lighter */
-    [data-testid="stMetricValue"] {
-        font-weight: 200 !important;
-        font-size: 2.5rem !important;
+    /* 4. SIDEBAR & HEADER RESET (Keep them readable but elegant) */
+    [data-testid="stSidebar"] {
+        background-color: rgba(0, 0, 0, 0.4) !important;
+        backdrop-filter: blur(15px);
     }
-
-    [data-testid="stMetricLabel"] {
-        letter-spacing: 2px !important;
-        text-transform: uppercase !important;
-        font-size: 0.7rem !important;
-    }
-    /* Target ONLY the main content area for white text */
-    [data-testid="stMainBlockContainer"] h1, 
-    [data-testid="stMainBlockContainer"] h2, 
-    [data-testid="stMainBlockContainer"] h3, 
-    [data-testid="stMainBlockContainer"] p, 
-    [data-testid="stMainBlockContainer"] span, 
-    [data-testid="stMainBlockContainer"] label,
-    [data-testid="stMetricValue"] {
+    
+    /* Make sidebar text white to match the elegant theme */
+    [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
         color: white !important;
+        font-weight: 300 !important;
     }
 
-    /* Sidebar Fix: Force text to a dark color for visibility */
-    [data-testid="stSidebar"] span, 
-    [data-testid="stSidebar"] p, 
-    [data-testid="stSidebar"] label {
-        color: #31333F !important; /* Standard Streamlit Dark Gray */
-    }
-
-    /* Header/Toolbar Fix: Ensure icons and text are visible */
     header[data-testid="stHeader"] {
-        background-color: rgba(255, 255, 255, 0.8) !important;
-        color: #31333F !important;
+        background-color: transparent !important;
     }
 
-    /* Glassmorphism for containers */
-    div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart) {
-        background-color: rgba(255, 255, 255, 0.07) !important;
-        backdrop-filter: blur(5px) !important;
+    /* 5. GLASSMORPHISM FOR CONTAINERS */
+    div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
+    .performance-row {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(10px) !important;
         border-radius: 15px !important;
         padding: 20px !important;
-        border: 1px solid rgba255, 255, 255, 0.07) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        margin-bottom: 10px !important;
     }
-/* Slim Glass Rows */
-.performance-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.07);
-    backdrop-filter: blur(10px);
-    border-radius: 10px;
-    padding: 12px 25px;
-    margin-bottom: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-}
 
-/* Hover effect to make it feel interactive */
-.performance-row:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
+    /* PERFORMANCE ROWS SPECIFIC LAYOUT */
+    .performance-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 25px !important;
+    }
 
-/* Remove Streamlit's default padding for these specific rows */
-div[data-testid="stVerticalBlock"] > div:has(.performance-row) {
-    padding: 0px !important;
-}
-/* Ensure the column containers don't add extra gray backgrounds */
-[data-testid="stVerticalBlock"] > div:has(div[style*="text-shadow"]) {
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
+    /* 6. CLEANING UP METRIC BOXES */
+    [data-testid="stMetricValue"] {
+        font-size: 2.8rem !important;
+        line-height: 1 !important;
+    }
+
+    /* Ensure the elegant stats stay transparent */
+    [data-testid="stVerticalBlock"] > div:has(div[style*="text-shadow"]) {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
