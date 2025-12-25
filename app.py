@@ -35,17 +35,16 @@ st.markdown(
     /* 1. IMPORT ELEGANT FONT */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
 
-    .notranslate, [data-testid="stIcon"], [class*="inner-icon"], i, 
-    [class*="MaterialIcon"], [class*="StyledIcon"], .st-emotion-cache-15ec60u {
-        font-family: 'Material Icons' !important;
+    /* 4. THE ICON RECOVERY (Fixes keyboard_double_arrow_right) */
+    /* This targets Streamlit's internal icon system and resets the font */
+    [data-testid="stSidebarCollapseIcon"] span, 
+    [data-testid="collapsedControl"] span,
+    .notranslate, [class*="StyledIcon"] {
+        font-family: 'Material Symbols Outlined' !important;
         font-weight: normal !important;
         text-transform: none !important;
         letter-spacing: normal !important;
-        word-wrap: normal !important;
-        white-space: nowrap !important;
-        direction: ltr !important;
     }
-    
     /* 2. BACKGROUND LAYER */
     .stApp::before {
         content: "";
