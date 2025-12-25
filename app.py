@@ -145,6 +145,43 @@ if st.sidebar.button("Logout"):
 
 well_json, act_json, ath_json = get_ytd_data()
 
+if act_json:
+    # Get the most recent activity
+    latest_act = act_json[0] 
+    
+    # Helper to format duration
+    secs = latest_act.get('moving_time', 0)
+    duration_str = f"{secs // 3600}h {(secs % 3600) // 60}m"
+    
+    # Map emojis for the "Cool Icons"
+    icons = {
+        "Cycling": "🚴", "Running": "🏃", "Swimming": "🏊", 
+        "Strength": "💪", "Mobility": "🧘", "Walking": "🚶"
+    }
+    category = TYPE_MAPPING.get(latest_act.get('type'), "Workout")
+    icon = icons.get(category, "🔥")
+
+    st.markdown(f"### {icon} Last Session: {latest_act.get('name')}")
+    
+    # Create a nice 4-column highlight row
+    h1, h2, h3, h4 = st.columns(4)
+    
+    with h1:
+        st.metric("Duration", duration_str)
+    with h2:
+        # Load is usually 'icu_training_load' in Intervals.icu
+        st.metric("Impact (Load)", f"{latest_act.get('icu_training_load', 0)} pts")
+    with h3:
+        # Distance (converted from meters to km)
+        dist = latest_act.get('distance', 0) / 1000
+        st.metric("Distance", f"{dist:.2f} km" if dist > 0 else "N/A")
+    with h4:
+        # Average Heart Rate or Intensity
+        hr = latest_act.get('average_heartrate', 0)
+        st.metric("Avg. HR", f"{hr:.0f} bpm" if hr > 0 else "N/A")
+
+    st.divider()
+
 # --- WELLNESS SECTION ---
 if well_json is not None:
     df = pd.DataFrame([well_json]) if isinstance(well_json, dict) else pd.DataFrame(well_json)
