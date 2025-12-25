@@ -89,20 +89,29 @@ st.markdown(
         padding: 20px !important;
         border: 1px solid rgba(135,135,135, 0.1) !important;
     }
-div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stMetric"]) {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    backdrop-filter: blur(15px) !important;
-    border-radius: 12px !important;
-    padding: 15px 25px !important;
-    margin-bottom: 15px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    transition: transform 0.2s ease;
+/* Slim Glass Rows */
+.performance-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 12px 25px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
 }
 
-/* Optional: Subtle hover effect for the rows */
-div[data-testid="stVerticalBlock"] > div:has(div[data-testid="stMetric"]):hover {
-    background-color: rgba(255, 255, 255, 0.08) !important;
-    transform: translateY(-2px);
+/* Hover effect to make it feel interactive */
+.performance-row:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Remove Streamlit's default padding for these specific rows */
+div[data-testid="stVerticalBlock"] > div:has(.performance-row) {
+    padding: 0px !important;
 }
     </style>
     """,
@@ -301,31 +310,23 @@ else:
         
 # --- ACTIVITIES SECTION ---
 if act_json:
-    # 1. Prepare Data
+    # Prepare Data
     df_act = pd.DataFrame(act_json)
     df_act['date_dt'] = pd.to_datetime(df_act['start_date_local'])
     df_act['Month'] = df_act['date_dt'].dt.strftime('%B %Y')
     
+    # Ensure months are sorted newest to oldest
     monthly = df_act.groupby('Month', sort=False).agg({'id':'count', 'icu_training_load':'sum'}).reset_index()
     monthly.columns = ['Month', 'Sessions', 'Total Load']
 
     st.subheader("📅 Monthly Performance History")
 
-    # 2. Generate Rows instead of a Table
     for index, row in monthly.iterrows():
-        # This container creates the 'Glass' box for each row
-        with st.container():
-            col1, col2, col3 = st.columns([2, 1, 1])
-            
-            with col1:
-                st.markdown(f"#### {row['Month']}")
-            
-            with col2:
-                st.metric("Sessions", f"count: {row['Sessions']}")
-                
-            with col3:
-                # Calculate average load per session for extra insight
-                avg_load = row['Total Load'] / row['Sessions'] if row['Sessions'] > 0 else 0
-                st.metric("Total Load", f"{row['Total Load']:.0f}", f"Avg: {avg_load:.1f}")
-            
-            st.markdown("<div style='margin-bottom: 10px;'></div>", unsafe_allow_html=True)
+        # Using a custom div class 'performance-row' for total control
+        st.markdown(f"""
+            <div class="performance-row">
+                <div style="flex: 2; font-weight: bold; font-size: 1.1rem;">{row['Month']}</div>
+                <div style="flex: 1; text-align: center;">🏃 <b>{row['Sessions']}</b> Sessions</div>
+                <div style="flex: 1; text-align: right;">🔥 <b>{row['Total Load']:.0f}</b> Load</div>
+            </div>
+        """, unsafe_allow_html=True)
