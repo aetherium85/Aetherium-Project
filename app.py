@@ -8,39 +8,27 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 def add_bg_from_url():
+    # Note: No 'f' before the quotes here!
     st.markdown(
         """
         <style>
-        /* Target the main app container */
         [data-testid="stAppViewContainer"] {
-            /* Using the direct source link for the dark leaf image */
-            background-image: url("https://images.unsplash.com/photo-1533038590840-1cde6e668a91?q=80&w=2000&auto=format&fit=crop");
+            background-image: url("https://images.unsplash.com/photo-1754980004850-3c93f91c6052");
             background-attachment: fixed;
             background-size: cover;
-            background-position: center;
         }
 
-        /* Glassmorphism Effect for all main containers */
+        /* Glassmorphism effect */
         [data-testid="stMetric"], 
         [data-testid="stMetricWidget"],
         [data-testid="stElementContainer"] .stPlotlyChart,
         [data-testid="stDataFrame"],
         .stTable {
-            background-color: rgba(255, 255, 255, 0.15) !important;
-            backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(10px);
             border-radius: 15px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 10px;
-        }
-
-        /* Make Metric Text easier to read against dark green */
-        [data-testid="stMetricLabel"] {
-            color: #E0E0E0 !important;
-            font-size: 1.1rem !important;
-        }
-        [data-testid="stMetricValue"] {
-            color: #FFFFFF !important;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         </style>
         """,
