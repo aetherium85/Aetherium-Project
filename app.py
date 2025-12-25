@@ -44,7 +44,7 @@ st.markdown(
         width: 100vw;
         height: 100vh;
         background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
-                    url("https://images.unsplash.com/photo-1619359209643-20df6a2465adv1") !important;
+                    url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
         background-size: cover !important;
         background-position: center !important;
         background-attachment: fixed !important;
@@ -116,27 +116,16 @@ st.markdown(
     }
 
     /* Ensure the elegant stats stay transparent */
+    h1, h2, h3 { text-transform: uppercase !important; letter-spacing: 4px !important; }
+    h3 { font-size: 0.9rem !important; margin-bottom: 1rem !important; opacity: 0.8; }
+    
+    [data-testid="stMetricValue"] { font-size: 1.8rem !important; line-height: 1 !important; }
+
     [data-testid="stVerticalBlock"] > div:has(div[style*="text-shadow"]) {
         background-color: transparent !important;
         border: none !important;
         box-shadow: none !important;
     }
-    /* Prevent global font rules from blowing up the Hero containers */
-[data-testid="stHorizontalBlock"] {
-    gap: 10px !important;
-}
-
-/* Adjusting the subheaders to be smaller and cleaner */
-h3 {
-    font-size: 0.9rem !important;
-    margin-bottom: 1rem !important;
-    opacity: 0.8;
-}
-
-/* Ensure metrics don't overflow if you still use them elsewhere */
-[data-testid="stMetricValue"] {
-    font-size: 1.8rem !important; /* Scaled down from 2.8rem */
-}
     </style>
     """,
     unsafe_allow_html=True
