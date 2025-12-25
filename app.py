@@ -32,14 +32,35 @@ TYPE_MAPPING = {
 st.markdown(
     """
     <style>
-    /* Target the main container and the blurred overlay Streamlit uses */
-    .stApp, .stMainBlockContainer, [data-testid="stAppViewBlockContainer"] {
+    .stApp {
         background: linear-gradient(rgba(135,135,135,0.7), rgba(135,135,135,0.7)), 
                     url("https://images.unsplash.com/photo-1754980004850-3c93f91c6052") !important;
         background-size: cover !important;
-        background-position: center !important;
         background-attachment: fixed !important;
-        background-repeat: no-repeat !important;
+    }
+
+    /* Target ONLY the main content area for white text */
+    [data-testid="stMainBlockContainer"] h1, 
+    [data-testid="stMainBlockContainer"] h2, 
+    [data-testid="stMainBlockContainer"] h3, 
+    [data-testid="stMainBlockContainer"] p, 
+    [data-testid="stMainBlockContainer"] span, 
+    [data-testid="stMainBlockContainer"] label,
+    [data-testid="stMetricValue"] {
+        color: white !important;
+    }
+
+    /* Sidebar Fix: Force text to a dark color for visibility */
+    [data-testid="stSidebar"] span, 
+    [data-testid="stSidebar"] p, 
+    [data-testid="stSidebar"] label {
+        color: #31333F !important; /* Standard Streamlit Dark Gray */
+    }
+
+    /* Header/Toolbar Fix: Ensure icons and text are visible */
+    header[data-testid="stHeader"] {
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        color: #31333F !important;
     }
 
     /* Glassmorphism for containers */
@@ -49,11 +70,6 @@ st.markdown(
         border-radius: 15px !important;
         padding: 20px !important;
         border: 1px solid rgba(135,135,135, 0.1) !important;
-    }
-
-    /* Force all text to white */
-    h1, h2, h3, p, span, label, .stMetric label, [data-testid="stMetricValue"] {
-        color: white !important;
     }
     </style>
     """,
