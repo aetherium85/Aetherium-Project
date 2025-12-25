@@ -7,33 +7,39 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
-def add_bg_from_url():
-    st.markdown(
-         f"""
-         <style>
-         .stApp {{
-             background-image: url("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070");
-             background-attachment: fixed;
-             background-size: cover;
-         }}
-         
-         /* Optional: Adds a dark overlay to make text more readable */
-         .stApp::before {{
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4); /* Adjust 0.4 for darkness */
-            z-index: -1;
-         }}
-         </style>
-         """,
-         unsafe_allow_html=True
-     )
+st.set_page_config(page_title="Yearly Fitness Dashboard", layout="wide")
 
-add_bg_from_url()
+# Injection of Custom Design
+st.markdown(
+    """
+    <style>
+    /* 1. Sets the global background */
+    .stApp {
+        background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                    url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070");
+        background-size: cover;
+        background-attachment: fixed;
+    }
+
+    /* 2. Your Glassmorphism effect for Metrics */
+    [data-testid="stMetricBlock"] {
+        background-color: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        padding: 15px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* 3. Optional: Makes the Plotly charts blend in better */
+    .js-plotly-plot {
+        background-color: rgba(255, 255, 255, 0.02);
+        border-radius: 15px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 def show_login_screen():
     st.title("❤️ Fitness Command Center")
@@ -64,6 +70,19 @@ if "athlete_id" not in st.session_state:
 
 # --- 1. CONFIGURATION & GLOBALS ---
 st.set_page_config(page_title="Yearly Fitness Dashboard", layout="wide")
+
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                    url("https://your-image-url.com/image.jpg");
+        background-size: cover;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 pretty_labels = {
     "ctl": "Fitness (CTL)",
