@@ -210,9 +210,9 @@ if well_json is not None:
         gridcolor="rgba(255, 255, 255, 0.1)",
         zerolinecolor="rgba(255, 255, 255, 0.2)"
     ),
-    paper_bgcolor="rgba(0,0,0,0)", # Transparent outer background
-    plot_bgcolor="rgba(0,0,0,0)",  # Transparent chart area background
-    font=dict(color="black")
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+    font=dict(color="white") # Global fallback
 )
         st.plotly_chart(fig, use_container_width=True)
     else:
