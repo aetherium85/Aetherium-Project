@@ -44,7 +44,7 @@ st.markdown(
         width: 100vw;
         height: 100vh;
         background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
-                    url("https://images.unsplash.com/photo-1619359209643-20df6a2465adv1") !important;
+                    url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
         background-size: cover !important;
         background-position: center !important;
         background-attachment: fixed !important;
@@ -59,22 +59,23 @@ st.markdown(
         font-family: 'Inter', sans-serif !important;
     }
 
-    /* 3. GLOBAL ELEGANT TYPOGRAPHY */
-    /* This forces ALL text to be thin and spaced out */
-    h1, h2, h3, p, span, label, div, b, .stMetric label, [data-testid="stMetricValue"] {
+    /* 3. GLOBAL ELEGANT TYPOGRAPHY - SURGICAL VERSION */
+    /* Instead of hitting ALL divs/spans (which breaks icons), we hit specific text classes */
+    h1, h2, h3, h4, h5, h6, p, label, li, a, 
+    .stMarkdown, .stText, .stMetricLabel, [data-testid="stMetricValue"] {
         font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
         letter-spacing: 1.5px !important;
         color: white !important;
     }
 
-    /* --- ICON RECOVERY FIX --- */
-    /* This excludes the sidebar icons from the font override so they render correctly */
-    [data-testid="stSidebarCollapseIcon"] span, 
-    [data-testid="stIcon"], 
-    button[kind="header"] span {
-        font-family: "Material Symbols Rounded", sans-serif !important;
-        letter-spacing: normal !important;
+    /* 4. ICON PROTECTION ZONE */
+    /* Explicitly protect the sidebar button and other icon containers */
+    [data-testid="stSidebarCollapseButton"] *, 
+    [data-testid="stIcon"] *, 
+    button span {
+        font-family: inherit !important; /* Let the icon font load */
+        letter-spacing: normal !important; /* Icons look weird with letter spacing */
         font-weight: normal !important;
     }
 
@@ -84,14 +85,13 @@ st.markdown(
         letter-spacing: 4px !important;
     }
 
-    /* 4. SIDEBAR & HEADER RESET (Keep them readable but elegant) */
+    /* 5. SIDEBAR & HEADER RESET */
     [data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.4) !important;
         backdrop-filter: blur(15px);
     }
     
-    /* Make sidebar text white to match the elegant theme */
-    [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
+    [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] span {
         color: white !important;
         font-weight: 300 !important;
     }
@@ -100,7 +100,7 @@ st.markdown(
         background-color: transparent !important;
     }
 
-    /* 5. GLASSMORPHISM FOR CONTAINERS */
+    /* 6. GLASSMORPHISM FOR CONTAINERS */
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
     .performance-row {
         background-color: rgba(255, 255, 255, 0.05) !important;
@@ -111,7 +111,6 @@ st.markdown(
         margin-bottom: 10px !important;
     }
 
-    /* PERFORMANCE ROWS SPECIFIC LAYOUT */
     .performance-row {
         display: flex;
         justify-content: space-between;
@@ -119,40 +118,37 @@ st.markdown(
         padding: 12px 25px !important;
     }
 
-    /* 6. CLEANING UP METRIC BOXES */
+    /* 7. CLEANING UP METRIC BOXES */
     [data-testid="stMetricValue"] {
         font-size: 2.8rem !important;
         line-height: 1 !important;
     }
 
-    /* Ensure the elegant stats stay transparent */
     [data-testid="stVerticalBlock"] > div:has(div[style*="text-shadow"]) {
         background-color: transparent !important;
         border: none !important;
         box-shadow: none !important;
     }
-    /* Prevent global font rules from blowing up the Hero containers */
     [data-testid="stHorizontalBlock"] {
         gap: 10px !important;
     }
 
-    /* Adjusting the subheaders to be smaller and cleaner */
+    /* Adjusting the subheaders */
     h3 {
         font-size: 0.9rem !important;
         margin-bottom: 1rem !important;
         opacity: 0.8;
     }
 
-    /* Ensure metrics don't overflow if you still use them elsewhere */
     [data-testid="stMetricValue"] {
-        font-size: 1.8rem !important; /* Scaled down from 2.8rem */
+        font-size: 1.8rem !important; 
     }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# --- 3. FUNCTION DEFINITIONS (Defining everything BEFORE calling them) ---
+# --- 3. FUNCTION DEFINITIONS ---
 
 def show_login_screen():
     st.title("❤️ Fitness Command Center")
@@ -248,7 +244,7 @@ if act_json:
 
     st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')}")
     
-    # Using a container with custom CSS class for the Hero Row
+    # Hero Row
     h1, h2, h3, h4 = st.columns(4)
     
     def elegant_hero_item(col, icon, label, value):
@@ -271,19 +267,15 @@ if act_json:
     st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 # --- WELLNESS SECTION ---
-# --- WELLNESS & DATA PREP ---
 if well_json is not None:
-    # 1. Standardize the data into a DataFrame
     df = pd.DataFrame([well_json]) if isinstance(well_json, dict) else pd.DataFrame(well_json)
 
     if not df.empty:
-        # Standardize date column
         date_col = next((c for c in ['timestamp', 'id', 'date'] if c in df.columns), None)
         if date_col:
             df = df.rename(columns={date_col: 'date'})
             df['date'] = pd.to_datetime(df['date'])
 
-        # Safety Check for metrics
         for col in ['ctl', 'atl', 'tsb']:
             if col not in df.columns:
                 df[col] = 0.0
@@ -291,7 +283,7 @@ if well_json is not None:
         if (df['tsb'] == 0).all() and 'ctl' in df.columns and 'atl' in df.columns:
              df['tsb'] = df['ctl'] - df['atl']
 
-                # --- FEATURE: FLOATING STATS (Current Status) ---
+        # --- FEATURE: FLOATING STATS ---
         st.markdown("### ⚡ Your Current Training Status")
         latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
@@ -313,9 +305,9 @@ if well_json is not None:
         tsb_color = "#4BD4B0" if tsb_val > -10 else "#E16C45"
         elegant_stat(s3, "Form (TSB)", tsb_val, tsb_color)
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
+        
         # --- FEATURE: YEARLY AREA CHART ---
         st.markdown("### 📈 Yearly Training Load Progression")
-        
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
         fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
         
@@ -339,21 +331,19 @@ if well_json is not None:
 
 else:
     st.error("Could not load wellness data.")
+
 # --- ACTIVITIES SECTION ---
 if act_json:
-    # Prepare Data
     df_act = pd.DataFrame(act_json)
     df_act['date_dt'] = pd.to_datetime(df_act['start_date_local'])
     df_act['Month'] = df_act['date_dt'].dt.strftime('%B %Y')
     
-    # Ensure months are sorted newest to oldest
     monthly = df_act.groupby('Month', sort=False).agg({'id':'count', 'icu_training_load':'sum'}).reset_index()
     monthly.columns = ['Month', 'Sessions', 'Total Load']
 
     st.markdown("### 📅 Monthly Performance History")
 
     for index, row in monthly.iterrows():
-        # Using a custom div class 'performance-row' for total control
         st.markdown(f"""
             <div class="performance-row">
                 <div style="flex: 2; font-weight: bold; font-size: 1.1rem;">{row['Month']}</div>
