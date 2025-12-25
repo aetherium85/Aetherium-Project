@@ -220,13 +220,6 @@ if well_json is not None:
         if (df['tsb'] == 0).all() and 'ctl' in df.columns and 'atl' in df.columns:
              df['tsb'] = df['ctl'] - df['atl']
 
-        # --- NEW: LAST WORKOUT SUMMARY (The feature you requested) ---
-        if act_json:
-            latest_act = act_json[0]
-            secs = latest_act.get('moving_time', 0)
-            duration_str = f"{secs // 3600}h {(secs % 3600) // 60}m"
-
-
         # --- GAUGES ---
         st.subheader("⚡ Current Training Status")
         latest = df.iloc[-1]
