@@ -148,42 +148,32 @@ well_json, act_json, ath_json = get_ytd_data()
 # --- WELLNESS SECTION ---
 if well_json is not None:
     df = pd.DataFrame([well_json]) if isinstance(well_json, dict) else pd.DataFrame(well_json)
+
     if not df.empty:
+        # 1. Standardize date column
         date_col = next((c for c in ['timestamp', 'id', 'date'] if c in df.columns), None)
         if date_col:
             df = df.rename(columns={date_col: 'date'})
             df['date'] = pd.to_datetime(df['date'])
-        
-        # Latest stats for gauges
-        latest = df.iloc[-1]
-        st.subheader("⚡ Current Training Status")
-        g1, g2, g3 = st.columns(3)
 
-        def create_gauge(value, title, color_steps, min_val, max_val):
-            fig = go.Figure(go.Indicator(
-                mode="gauge+number",
-                value=value,
-                title={'text': title, 'font': {'size': 18, 'color': 'white'}},
-                number={'font': {'color': 'white'}},
-                gauge={
-                    'axis': {'range': [min_val, max_val], 'tickcolor': "white"},
-                    'bar': {'color': "rgba(255,255,255,0.5)"},
-                    'steps': color_steps,
-                }
-            ))
-            fig.update_layout(height=220, margin=dict(l=30, r=30, t=50, b=20),
-                              paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
-            return fig
+        # 2. Safety Check: Ensure the required columns exist for Plotly
+        # If the API didn't return them, we create them as 0.0 to prevent the ValueError
+        required_cols = ['ctl', 'atl', 'tsb']
+        for col in required_cols:
+            if col not in df.columns:
+                df[col] = 0.0
 
-        g1.plotly_chart(create_gauge(latest.get('ctl',0), "Fitness (CTL)", [{'range': [0, 100], 'color': "#70B3C4"}], 0, 100))
-        g2.plotly_chart(create_gauge(latest.get('atl',0), "Fatigue (ATL)", [{'range': [0, 120], 'color': "#F35555"}], 0, 120))
-        form_steps = [{'range': [-30, -10], 'color': "#4BD4B0"}, {'range': [-10, 10], 'color': "#C69C49"}]
-        g3.plotly_chart(create_gauge(latest.get('tsb',0), "Form (TSB)", form_steps, -60, 60))
+        # 3. Handle Form (TSB) calculation if it's currently all zeros
+        if (df['tsb'] == 0).all() and 'ctl' in df.columns and 'atl' in df.columns:
+             df['tsb'] = df['ctl'] - df['atl']
 
-        # Yearly Chart
+        # --- Yearly Chart (The part that was crashing) ---
         st.divider()
         st.subheader("📈 Yearly Training Load Progression")
+        
+        # Now px.area is guaranteed to find these columns
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
+        
         fig.update_layout(
             hovermode="x unified",
             paper_bgcolor="rgba(0,0,0,0)",
@@ -193,6 +183,8 @@ if well_json is not None:
             yaxis=dict(gridcolor="rgba(255,255,255,0.1)")
         )
         st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("No wellness records found for this period.")
 
 # --- ACTIVITIES SECTION ---
 st.divider()
