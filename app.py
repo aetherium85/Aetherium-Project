@@ -28,7 +28,7 @@ TYPE_MAPPING = {
     "WeightTraining": "Strength", "Yoga": "Mobility", "Pilates": "Mobility"
 }
 
-# --- 2. THE FINAL CSS FIX ---
+# --- 2. THE FINAL CSS FIX (Background + Glassmorphism) ---
 st.markdown(
     """
     <style>
