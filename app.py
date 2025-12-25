@@ -236,6 +236,7 @@ if well_json is not None:
         g3.plotly_chart(create_gauge(latest.get('tsb', 0), "Form (TSB)", form_steps, -60, 60), use_container_width=True)
         st.divider()
         # --- YEARLY AREA CHART ---
+        
         st.subheader("📈 Yearly Training Load Progression")
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
         
@@ -247,14 +248,25 @@ if well_json is not None:
         )
 
         fig.update_layout(
-            hovermode="x unified",
+            hovermode="x unified",hoverlabel=dict(bgcolor="white", font_size=14),
+        xaxis=dict(
+        hoverformat="%b %d, %Y",
+        gridcolor="rgba(255, 255, 255, 0.1)",
+        zerolinecolor="rgba(255, 255, 255, 0.3)",
+        tickfont=dict(color="white", size=12),  # Labels like "Jan 2025"
+        title=dict(text="Date", font=dict(color="white", size=14)) # Proper Title syntax
+    ),# Y-Axis visibility settings
+        yaxis=dict(
+        gridcolor="rgba(255, 255, 255, 0.1)",
+        zerolinecolor="rgba(255, 255, 255, 0.3)",
+        tickfont=dict(color="white", size=12),  # Scores
+        title=dict(text="Score", font=dict(color="white", size=14)) # Proper Title syntax
+    ),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="white"),
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white")),
-            yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white"))
-        )
+)
         
         # Apply labels to legend
         fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
