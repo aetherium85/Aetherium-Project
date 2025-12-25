@@ -262,10 +262,9 @@ if well_json is not None:
 
 else:
     st.error("Could not load wellness data.")
-
+st.divider()
 # --- ACTIVITIES SECTION (Monthly Summary) ---
 if act_json:
-    st.divider()
     st.subheader("📅 Monthly Performance Summary")
     df_act = pd.DataFrame(act_json)
     df_act['category'] = df_act['type'].map(lambda x: TYPE_MAPPING.get(x, x))
