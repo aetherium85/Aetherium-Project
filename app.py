@@ -107,7 +107,17 @@ st.markdown(
         padding: 12px 25px !important;
         margin-bottom: 8px;
     }
+    /* 4. Training Status Glow */
+    [data-testid="stVerticalBlock"] > div:has(div[style*="text-shadow"]) {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
 
+    /* Make the large numbers in the status section extra thin */
+    .stApp h1 {
+        font-weight: 200 !important;
+    }
     /* 6. CLEANING UP METRIC BOXES & HEADERS */
     h1, h2, h3 { text-transform: uppercase !important; letter-spacing: 4px !important; }
     h3 { font-size: 0.9rem !important; margin-bottom: 1rem !important; opacity: 0.8; }
