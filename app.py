@@ -205,7 +205,7 @@ if well_json is not None:
     xaxis=dict(hoverformat="%b %d, %Y"),
     paper_bgcolor="rgba(0,0,0,0)", # Transparent outer background
     plot_bgcolor="rgba(0,0,0,0)",  # Transparent chart area background
-    font=dict(color="white")
+    font=dict(color="black")
 )
         st.plotly_chart(fig, use_container_width=True)
     else:
