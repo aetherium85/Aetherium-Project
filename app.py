@@ -204,24 +204,26 @@ if well_json is not None:
         fig.update_layout(hovermode="x unified",hoverlabel=dict(bgcolor="white", font_size=14),
     xaxis=dict(
         hoverformat="%b %d, %Y",
-        gridcolor="rgba(255, 255, 255, 0.1)", # Subtle grid lines
-        zerolinecolor="rgba(255, 255, 255, 0.2)",
-        tickfont=dict(color="white", size=12),   # Ensures "Jan 2025" etc. are white
-        titlefont=dict(color="white", size=14)
+        gridcolor="rgba(255, 255, 255, 0.1)",
+        zerolinecolor="rgba(255, 255, 255, 0.3)",
+        tickfont=dict(color="white", size=12),  # Labels like "Jan 2025"
+        title=dict(text="Date", font=dict(color="white", size=14)) # Proper Title syntax
     ),
+    # Y-Axis visibility settings
     yaxis=dict(
         gridcolor="rgba(255, 255, 255, 0.1)",
-        zerolinecolor="rgba(255, 255, 255, 0.2)",
-        tickfont=dict(color="white", size=12),   # Ensures scores (0, 20, 40) are white
-        titlefont=dict(color="white", size=14)
+        zerolinecolor="rgba(255, 255, 255, 0.3)",
+        tickfont=dict(color="white", size=12),  # Scores
+        title=dict(text="Score", font=dict(color="white", size=14)) # Proper Title syntax
     ),
+    # Background transparency
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(color="white") # Global fallback
+    # Global font fallback
+    font=dict(color="white")
 )
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.warning("No wellness records found.")
+
+    st.plotly_chart(fig, use_container_width=True)
 else:
     st.error("Could not load wellness data.")
 
