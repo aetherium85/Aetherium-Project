@@ -251,8 +251,12 @@ if well_json is not None:
         st.subheader("📈 Yearly Training Load Progression")
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
         fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
-        fig.update_traces(stackgroup=None, fill='tozeroy', opacity=1,
-    hovertemplate="<b>%{fullData.name} Score:</b> %{y:.1f}<extra></extra>",
+        fig.update_traces(
+    stackgroup=None, 
+    fill='tozeroy', 
+    opacity=1,
+    # Use %{pn} or %{name} to reference the trace name reliably
+    hovertemplate="<b>%{name} Score:</b> %{y:.1f}<extra></extra>",
     legend=dict(
         font=dict(color="white", size=12),
         orientation="h",
