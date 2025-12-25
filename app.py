@@ -28,7 +28,7 @@ TYPE_MAPPING = {
     "WeightTraining": "Strength", "Yoga": "Mobility", "Pilates": "Mobility"
 }
 
-# --- 2. THE FINAL CSS FIX (Background + Elegant Typography) ---
+# --- 2. THE FINAL CSS FIX (Background + Elegant Typography + Icon Recovery) ---
 st.markdown(
     """
     <style>
@@ -39,10 +39,7 @@ st.markdown(
     .stApp::before {
         content: "";
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
+        top: 0; left: 0; width: 100vw; height: 100vh;
         background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
                     url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
         background-size: cover !important;
@@ -60,7 +57,6 @@ st.markdown(
     }
 
     /* 3. GLOBAL ELEGANT TYPOGRAPHY */
-    /* This forces ALL text to be thin and spaced out */
     h1, h2, h3, p, span, label, div, b, .stMetric label, [data-testid="stMetricValue"] {
         font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
@@ -68,19 +64,21 @@ st.markdown(
         color: white !important;
     }
 
-    /* Make headers feel more 'Architectural' */
-    h1, h2, h3 {
-        text-transform: uppercase !important;
-        letter-spacing: 4px !important;
+    /* --- ICON RECOVERY: FIXES KEYBOARD_DOUBLE_ARROW --- */
+    .notranslate, [data-testid="stIcon"], [data-testid="stSidebarCollapseIcon"] span, [class*="StyledIcon"] {
+        font-family: "Material Symbols Outlined" !important;
+        font-weight: normal !important;
+        font-size: 24px !important;
+        letter-spacing: normal !important;
+        text-transform: none !important;
     }
 
-    /* 4. SIDEBAR & HEADER RESET (Keep them readable but elegant) */
+    /* 4. SIDEBAR & HEADER RESET */
     [data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.4) !important;
         backdrop-filter: blur(15px);
     }
     
-    /* Make sidebar text white to match the elegant theme */
     [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
         color: white !important;
         font-weight: 300 !important;
@@ -101,7 +99,6 @@ st.markdown(
         margin-bottom: 10px !important;
     }
 
-    /* PERFORMANCE ROWS SPECIFIC LAYOUT */
     .performance-row {
         display: flex;
         justify-content: space-between;
@@ -109,13 +106,7 @@ st.markdown(
         padding: 12px 25px !important;
     }
 
-    /* 6. CLEANING UP METRIC BOXES */
-    [data-testid="stMetricValue"] {
-        font-size: 2.8rem !important;
-        line-height: 1 !important;
-    }
-
-    /* Ensure the elegant stats stay transparent */
+    /* 6. CLEANING UP METRIC BOXES & HEADERS */
     h1, h2, h3 { text-transform: uppercase !important; letter-spacing: 4px !important; }
     h3 { font-size: 0.9rem !important; margin-bottom: 1rem !important; opacity: 0.8; }
     
