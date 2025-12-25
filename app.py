@@ -299,14 +299,27 @@ else:
         
 # --- ACTIVITIES SECTION (Monthly Summary) ---
 if act_json:
-    st.subheader("📅 Monthly Performance Summary")
+    # 1. Prepare the Data FIRST
     df_act = pd.DataFrame(act_json)
     df_act['category'] = df_act['type'].map(lambda x: TYPE_MAPPING.get(x, x))
     df_act['date_dt'] = pd.to_datetime(df_act['start_date_local'])
     df_act['Month'] = df_act['date_dt'].dt.strftime('%B %Y')
     
+    # 2. Define 'monthly' safely here
     monthly = df_act.groupby('Month').agg({'id':'count', 'icu_training_load':'sum'}).reset_index()
-    m1, m2 = st.columns(2)
-    m1.metric("Avg. Monthly Sessions", f"{monthly['id'].mean():.1f}")
-    m2.metric("Avg. Monthly Load", f"{monthly['icu_training_load'].mean():.0f}")
-    st.dataframe(monthly, use_container_width=True, hide_index=True)
+    monthly.columns = ['Month', 'Sessions', 'Total Load']
+
+    # 3. Display the Section
+    st.subheader("📅 Monthly Performance Summary")
+    
+    # Glassy container for the monthly metrics and table
+    with st.container():
+        m1, m2 = st.columns(2)
+        m1.metric("Avg. Monthly Sessions", f"{monthly['Sessions'].mean():.1f}")
+        m2.metric("Avg. Monthly Load", f"{monthly['Total Load'].mean():.0f}")
+        
+        # This will now pick up the CSS blur we discussed earlier
+        st.dataframe(monthly, use_container_width=True, hide_index=True)
+
+else:
+    st.info("No activity data found for the current year.")
