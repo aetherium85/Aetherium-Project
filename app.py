@@ -121,6 +121,22 @@ st.markdown(
         border: none !important;
         box-shadow: none !important;
     }
+    /* Prevent global font rules from blowing up the Hero containers */
+[data-testid="stHorizontalBlock"] {
+    gap: 10px !important;
+}
+
+/* Adjusting the subheaders to be smaller and cleaner */
+h3 {
+    font-size: 0.9rem !important;
+    margin-bottom: 1rem !important;
+    opacity: 0.8;
+}
+
+/* Ensure metrics don't overflow if you still use them elsewhere */
+[data-testid="stMetricValue"] {
+    font-size: 1.8rem !important; /* Scaled down from 2.8rem */
+}
     </style>
     """,
     unsafe_allow_html=True
@@ -220,19 +236,22 @@ if act_json:
     hr = latest_act.get('average_heartrate', 0)
     load = latest_act.get('icu_training_load', 0)
 
-    st.markdown(f" 🚀 Last Session: {latest_act.get('name', 'Workout')}")
+    st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')}")
     
+    # Using a container with custom CSS class for the Hero Row
     h1, h2, h3, h4 = st.columns(4)
     
-    def icon_metric(col, icon, label, value):
+    def elegant_hero_item(col, icon, label, value):
         with col:
-            # Use vertical_alignment="center" to keep them on the same line
-            inner_icon, inner_text = st.columns([1, 2.5], vertical_alignment="center")
-            with inner_icon:
-                # 2.5rem - 3rem usually matches the height of a metric value perfectly
-                st.markdown(f"<div style='font-size: 2.8rem; text-align: center;'>{icon}</div>", unsafe_allow_html=True)
-            with inner_text:
-                st.metric(label, value)
+            st.markdown(f"""
+                <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 2rem; line-height: 1;">{icon}</div>
+                    <div>
+                        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5);">{label}</div>
+                        <div style="font-size: 1.4rem; font-weight: 200; line-height: 1.1;">{value}</div>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
 
     icon_metric(h1, "⏱️", "Duration", duration_str)
     icon_metric(h2, "⚡", "Impact", f"{load} pts")
