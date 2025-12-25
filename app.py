@@ -28,71 +28,93 @@ TYPE_MAPPING = {
     "WeightTraining": "Strength", "Yoga": "Mobility", "Pilates": "Mobility"
 }
 
-# --- 2. THE FINAL CSS FIX (Background + Elegant Typography + Icon Fix) ---
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400&display=swap');
+    /* 1. IMPORT ELEGANT FONT */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
 
-    /* 1. FORCE THE ENTIRE APP TO DARK/TRANSPARENT */
-    .stApp, [data-testid="stAppViewRoot"], .stAppViewContainer {
-        background: #0E1117 !important; /* Fallback Dark Color */
-        color: white !important;
-    }
-
-    /* 2. BACKGROUND IMAGE PINNED TO THE ROOT */
-    [data-testid="stAppViewRoot"]::before {
-        content: "" !important;
-        position: fixed !important;
+    /* 2. BACKGROUND LAYER */
+    .stApp::before {
+        content: "";
+        position: fixed;
         top: 0; left: 0; width: 100vw; height: 100vh;
-        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-                    url("https://images.unsplash.com/photo-1616361743371-c19895461140") !important;
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+                    url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
         background-size: cover !important;
         background-position: center !important;
         background-attachment: fixed !important;
-        filter: blur(8px) !important;
+        filter: blur(4px); 
+        -webkit-filter: blur(4px);
         transform: scale(1.1);
-        z-index: -1 !important;
+        z-index: -1;
     }
 
-    /* 3. FIX HERO VALUE COLORS */
-    /* This specifically targets the nested text inside your custom HTML boxes */
-    .stApp div, .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp span, .stApp b {
-        color: white !important;
+    .stApp {
+        background: transparent !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    /* 3. GLOBAL ELEGANT TYPOGRAPHY */
+    h1, h2, h3, p, span, label, div, b, .stMetric label, [data-testid="stMetricValue"] {
         font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
+        letter-spacing: 1.5px !important;
+        color: white !important;
     }
 
-    /* 4. THE ICON REPAIR */
-    [data-testid="stSidebarCollapseIcon"] svg, .notranslate {
+    /* --- ICON RECOVERY: FIXES KEYBOARD_DOUBLE_ARROW --- */
+    .notranslate, [data-testid="stIcon"], [data-testid="stSidebarCollapseIcon"] span, [class*="StyledIcon"] {
         font-family: "Material Symbols Outlined" !important;
         font-weight: normal !important;
         font-size: 24px !important;
+        letter-spacing: normal !important;
+        text-transform: none !important;
     }
 
-    /* 5. GLASS CONTAINERS */
+    /* 4. SIDEBAR & HEADER RESET */
+    [data-testid="stSidebar"] {
+        background-color: rgba(0, 0, 0, 0.4) !important;
+        backdrop-filter: blur(15px);
+    }
+    
+    [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
+        color: white !important;
+        font-weight: 300 !important;
+    }
+
+    header[data-testid="stHeader"] {
+        background-color: transparent !important;
+    }
+
+    /* 5. GLASSMORPHISM FOR CONTAINERS */
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
-    .performance-row, .stMetric {
-        background: rgba(255, 255, 255, 0.05) !important;
+    .performance-row {
+        background-color: rgba(255, 255, 255, 0.05) !important;
         backdrop-filter: blur(10px) !important;
         border-radius: 15px !important;
-        padding: 15px !important;
+        padding: 20px !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        margin-bottom: 10px !important;
     }
 
-    /* 6. PERFORMANCE ROW ALIGNMENT */
     .performance-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        width: 100%;
-        margin-bottom: 10px;
+        padding: 12px 25px !important;
     }
+
+    /* 6. CLEANING UP METRIC BOXES & HEADERS */
+    h1, h2, h3 { text-transform: uppercase !important; letter-spacing: 4px !important; }
+    h3 { font-size: 0.9rem !important; margin-bottom: 1rem !important; opacity: 0.8; }
     
-    /* Make headers architectural */
-    h3 {
-        text-transform: uppercase !important;
-        letter-spacing: 4px !important;
+    [data-testid="stMetricValue"] { font-size: 1.8rem !important; line-height: 1 !important; }
+
+    [data-testid="stVerticalBlock"] > div:has(div[style*="text-shadow"]) {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
     }
     </style>
     """,
