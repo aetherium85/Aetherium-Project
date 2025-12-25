@@ -31,84 +31,71 @@ TYPE_MAPPING = {
 st.markdown(
     """
     <style>
-    /* 1. IMPORT ELEGANT FONT */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
+    /* 1. IMPORT FONT */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400&display=swap');
 
-    /* 2. BACKGROUND LAYER - FIXED & FORCED */
-    /* We use !important on everything here to ensure the image stays visible */
-    .stApp::before {
-        content: "" !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-                    url("https://images.unsplash.com/photo-1616361743371-c19895461140") !important;
-        background-size: cover !important;
-        background-position: center !important;
-        background-repeat: no-repeat !important;
-        filter: blur(8px) !important;
-        transform: scale(1.1);
-        z-index: -1 !important;
+    /* 2. BACKGROUND (Pinned to the Root) */
+    [data-testid="stAppViewRoot"] {
+        background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                          url("https://images.unsplash.com/photo-1616361743371-c19895461140");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
     }
 
-    /* 3. APP TRANSPARENCY */
+    /* 3. TRANSPARENCY & BLUR */
     .stApp {
         background: transparent !important;
     }
 
-    /* 4. TARGETED ELEGANT FONT */
-    /* We avoid targeting generic 'div' and 'span' to prevent breaking icons */
-    p, h1, h2, h3, .stMetric label, [data-testid="stMetricValue"], .performance-row div {
-        font-family: 'Inter', sans-serif !important;
-        font-weight: 200 !important;
-        letter-spacing: 1px !important;
+    /* 4. THE ICON REPAIR (The "Nuclear" Fix) */
+    /* This hides the leaking text and forces the SVG icon to show */
+    button[title="Open sidebar"], 
+    button[title="Close sidebar"], 
+    [data-testid="stSidebarCollapseIcon"] {
         color: white !important;
     }
-    .performance-row div, .performance-row b, .performance-row span {
-    color: white !important;
-}
-
-/* Force the performance row to use the full container width */
-.performance-row {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-    /* 5. THE ICON REPAIR (Fixes keyboard_double_arrow_right) */
-    /* We target the specific Material Icon class used by Streamlit */
-    .st-emotion-cache-15ec60u, 
-    [data-testid="stSidebarCollapseIcon"] svg,
-    [data-testid="collapsedControl"] svg,
-    .notranslate {
+    
+    /* If the text 'keyboard_...' is visible, this shrinks it to zero */
+    .st-emotion-cache-15ec60u, .notranslate {
         font-family: "Material Symbols Outlined" !important;
-        font-size: 24px !important;
-        /* Reset font-weight so it doesn't try to render text as a thin font */
-        font-weight: normal !important; 
-    }
-
-    /* 6. SIDEBAR & GLASS EFFECT */
-    [data-testid="stSidebar"] {
-        background-color: rgba(0, 0, 0, 0.7) !important;
-        backdrop-filter: blur(15px) !important;
+        font-size: 0px !important; 
     }
     
-    div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
-    .performance-row {
-        background-color: rgba(255, 255, 255, 0.05) !important;
-        backdrop-filter: blur(10px) !important;
-        border-radius: 15px !important;
-        padding: 20px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    /* Injects the icon graphic back if it was replaced by text */
+    [data-testid="stSidebarCollapseIcon"]::before {
+        content: "menu"; 
+        font-family: "Material Symbols Outlined";
+        font-size: 24px !important;
+        color: white;
+        visibility: visible;
     }
 
-    /* Architectural Headings */
-    h1, h2, h3 {
-        text-transform: uppercase !important;
-        letter-spacing: 4px !important;
-        margin-top: 2rem !important;
+    /* 5. GLOBAL ELEGANT TYPOGRAPHY */
+    h1, h2, h3, p, label, [data-testid="stMetricValue"], .performance-row * {
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 200 !important;
+        color: white !important;
+        letter-spacing: 1px;
+    }
+
+    /* 6. GLASS CONTAINERS */
+    [data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
+    .performance-row, .stMetric {
+        background: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 15px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* 7. ALIGNMENT FOR PERFORMANCE ROWS */
+    .performance-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 10px;
     }
     </style>
     """,
