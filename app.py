@@ -288,13 +288,13 @@ if well_json is not None:
 
         def elegant_stat(col, label, value, color):
             with col:
-                st.markdown(f"""
-                    <div style="text-align: center; padding: 25px 10px; background: rgba(255, 255, 255, 0.03); 
-                                border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
-                        <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 0;">{label}</p>
-                        <h1 style="color: white; font-size: 4rem; font-weight: 200; margin: 0; line-height: 1; text-shadow: 0 0 30px {color}66;">{int(value)}</h1>
-                    </div>
-                """, unsafe_allow_html=True)
+             st.markdown(f"""
+            <div style="text-align: center; padding: 25px 10px; background: rgba(255, 255, 255, 0.03); 
+                        border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
+                <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 0; font-weight: 200;">{label}</p>
+                <h1 style="color: white; font-size: 4rem; font-weight: 200; margin: 0; line-height: 1.2; text-shadow: 0 0 30px {color}66; font-family: 'Inter', sans-serif;">{int(value)}</h1>
+            </div>
+        """, unsafe_allow_html=True)
 
         elegant_stat(s1, "Fitness (CTL)", latest.get('ctl', 0), "#70C4B0")
         elegant_stat(s2, "Fatigue (ATL)", latest.get('atl', 0), "#E16C45")
