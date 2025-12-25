@@ -34,60 +34,55 @@ st.markdown(
     /* 1. IMPORT ELEGANT FONT */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
 
-    /* 2. BACKGROUND LAYER */
+    /* 2. BACKGROUND LAYER - FIXED & FORCED */
+    /* We use !important on everything here to ensure the image stays visible */
     .stApp::before {
-        content: "";
-        position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
+        content: "" !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
         background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
                     url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad") !important;
         background-size: cover !important;
         background-position: center !important;
-        filter: blur(8px);
+        background-repeat: no-repeat !important;
+        filter: blur(8px) !important;
         transform: scale(1.1);
-        z-index: -1;
+        z-index: -1 !important;
     }
 
-    /* 3. TARGETED ELEGANT FONT (Avoids breaking Icons) */
-    /* Instead of targeting every div/span, we target text-heavy tags only */
-    .stApp, p, h1, h2, h3, .stMetric label, [data-testid="stMetricValue"] {
+    /* 3. APP TRANSPARENCY */
+    .stApp {
+        background: transparent !important;
+    }
+
+    /* 4. TARGETED ELEGANT FONT */
+    /* We avoid targeting generic 'div' and 'span' to prevent breaking icons */
+    p, h1, h2, h3, .stMetric label, [data-testid="stMetricValue"], .performance-row div {
         font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
-        letter-spacing: 1px;
+        letter-spacing: 1px !important;
         color: white !important;
     }
 
-    /* 4. THE ICON REPAIR (Specific fix for keyboard_double_arrow) */
-    /* This ensures Streamlit's icons use the correct internal font */
-    [data-testid="stSidebarCollapseIcon"], 
-    [data-testid="collapsedControl"],
+    /* 5. THE ICON REPAIR (Fixes keyboard_double_arrow_right) */
+    /* We target the specific Material Icon class used by Streamlit */
     .st-emotion-cache-15ec60u, 
-    [class*="StyledIcon"] {
+    [data-testid="stSidebarCollapseIcon"] svg,
+    [data-testid="collapsedControl"] svg,
+    .notranslate {
         font-family: "Material Symbols Outlined" !important;
-        font-weight: normal !important;
         font-size: 24px !important;
-        letter-spacing: normal !important;
-        text-transform: none !important;
+        /* Reset font-weight so it doesn't try to render text as a thin font */
+        font-weight: normal !important; 
     }
 
-    /* 5. HEADER STYLING */
-    h1, h2, h3 {
-        text-transform: uppercase !important;
-        letter-spacing: 4px !important;
-        margin-top: 2rem !important;
-        font-family: 'Inter', sans-serif !important;
-    }
-
-    /* 6. SIDEBAR & GLASSMORPHISM */
+    /* 6. SIDEBAR & GLASS EFFECT */
     [data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.7) !important;
-        backdrop-filter: blur(15px);
-    }
-
-    /* Ensure sidebar text stays white and thin */
-    [data-testid="stSidebarNav"] span {
-        color: white !important;
-        font-weight: 200 !important;
+        backdrop-filter: blur(15px) !important;
     }
     
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
@@ -97,6 +92,13 @@ st.markdown(
         border-radius: 15px !important;
         padding: 20px !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Architectural Headings */
+    h1, h2, h3 {
+        text-transform: uppercase !important;
+        letter-spacing: 4px !important;
+        margin-top: 2rem !important;
     }
     </style>
     """,
