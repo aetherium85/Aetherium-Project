@@ -228,8 +228,8 @@ if act_json:
                 st.metric(label, value)
 
     icon_metric(h1, "⏱️", "Duration", duration_str)
-    icon_metric(h2, "💥", "Impact", f"{load} pts")
-    icon_metric(h3, "📍", "Distance", f"{dist:.2f} km" if dist > 0 else "N/A")
+    icon_metric(h2, "⚡", "Impact", f"{load} pts")
+    icon_metric(h3, "🗺️", "Distance", f"{dist:.2f} km" if dist > 0 else "N/A")
     icon_metric(h4, "💓", "Avg. HR", f"{hr:.0f} bpm" if hr > 0 else "N/A")
 
     st.markdown("<hr style='border-top: 2px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
