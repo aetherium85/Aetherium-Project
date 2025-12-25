@@ -29,6 +29,7 @@ TYPE_MAPPING = {
 }
 
 # --- 2. THE FINAL CSS FIX (Background + Elegant Typography + Icon Fix) ---
+# --- 2. THE FINAL CSS FIX (Background + Elegant Typography + Icon Recovery) ---
 st.markdown(
     """
     <style>
@@ -39,12 +40,9 @@ st.markdown(
     .stApp::before {
         content: "";
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
+        top: 0; left: 0; width: 100vw; height: 100vh;
         background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
-                    url("https://images.unsplash.com/photo-1619359209643-20df6a2465ad?v1") !important;
+                    url("https://images.unsplash.com/photo-1597773179486-8af5ca939ddb") !important;
         background-size: cover !important;
         background-position: center !important;
         background-attachment: fixed !important;
@@ -59,39 +57,30 @@ st.markdown(
         font-family: 'Inter', sans-serif !important;
     }
 
-    /* 3. GLOBAL ELEGANT TYPOGRAPHY - SURGICAL VERSION */
-    /* Instead of hitting ALL divs/spans (which breaks icons), we hit specific text classes */
-    h1, h2, h3, h4, h5, h6, p, label, li, a, 
-    .stMarkdown, .stText, .stMetricLabel, [data-testid="stMetricValue"] {
+    /* 3. GLOBAL ELEGANT TYPOGRAPHY */
+    h1, h2, h3, p, span, label, div, b, .stMetric label, [data-testid="stMetricValue"] {
         font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
         letter-spacing: 1.5px !important;
         color: white !important;
     }
 
-    /* 4. ICON PROTECTION ZONE */
-    /* Explicitly protect the sidebar button and other icon containers */
-    [data-testid="stSidebarCollapseButton"] *, 
-    [data-testid="stIcon"] *, 
-    button span {
-        font-family: inherit !important; /* Let the icon font load */
-        letter-spacing: normal !important; /* Icons look weird with letter spacing */
+    /* --- ICON RECOVERY: FIXES KEYBOARD_DOUBLE_ARROW --- */
+    .notranslate, [data-testid="stIcon"], [data-testid="stSidebarCollapseIcon"] span, [class*="StyledIcon"] {
+        font-family: "Material Symbols Outlined" !important;
         font-weight: normal !important;
+        font-size: 24px !important;
+        letter-spacing: normal !important;
+        text-transform: none !important;
     }
 
-    /* Make headers feel more 'Architectural' */
-    h1, h2, h3 {
-        text-transform: uppercase !important;
-        letter-spacing: 4px !important;
-    }
-
-    /* 5. SIDEBAR & HEADER RESET */
+    /* 4. SIDEBAR & HEADER RESET */
     [data-testid="stSidebar"] {
         background-color: rgba(0, 0, 0, 0.4) !important;
         backdrop-filter: blur(15px);
     }
     
-    [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] span {
+    [data-testid="stSidebar"] span, [data-testid="stSidebar"] p, [data-testid="stSidebar"] label {
         color: white !important;
         font-weight: 300 !important;
     }
@@ -100,7 +89,7 @@ st.markdown(
         background-color: transparent !important;
     }
 
-    /* 6. GLASSMORPHISM FOR CONTAINERS */
+    /* 5. GLASSMORPHISM FOR CONTAINERS */
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart),
     .performance-row {
         background-color: rgba(255, 255, 255, 0.05) !important;
@@ -118,30 +107,16 @@ st.markdown(
         padding: 12px 25px !important;
     }
 
-    /* 7. CLEANING UP METRIC BOXES */
-    [data-testid="stMetricValue"] {
-        font-size: 2.8rem !important;
-        line-height: 1 !important;
-    }
+    /* 6. CLEANING UP METRIC BOXES & HEADERS */
+    h1, h2, h3 { text-transform: uppercase !important; letter-spacing: 4px !important; }
+    h3 { font-size: 0.9rem !important; margin-bottom: 1rem !important; opacity: 0.8; }
+    
+    [data-testid="stMetricValue"] { font-size: 1.8rem !important; line-height: 1 !important; }
 
     [data-testid="stVerticalBlock"] > div:has(div[style*="text-shadow"]) {
         background-color: transparent !important;
         border: none !important;
         box-shadow: none !important;
-    }
-    [data-testid="stHorizontalBlock"] {
-        gap: 10px !important;
-    }
-
-    /* Adjusting the subheaders */
-    h3 {
-        font-size: 0.9rem !important;
-        margin-bottom: 1rem !important;
-        opacity: 0.8;
-    }
-
-    [data-testid="stMetricValue"] {
-        font-size: 1.8rem !important; 
     }
     </style>
     """,
