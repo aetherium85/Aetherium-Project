@@ -83,11 +83,11 @@ st.markdown(
 
     /* Glassmorphism for containers */
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart) {
-        background-color: rgba(135,135,135, 0.5) !important;
+        background-color: rgba(255, 255, 255, 0.07) !important;
         backdrop-filter: blur(5px) !important;
         border-radius: 15px !important;
         padding: 20px !important;
-        border: 1px solid rgba(135,135,135, 0.1) !important;
+        border: 1px solid rgba255, 255, 255, 0.07) !important;
     }
 /* Slim Glass Rows */
 .performance-row {
@@ -271,7 +271,7 @@ if well_json is not None:
                     <div style="text-align: center; padding: 25px 10px; background: rgba(255, 255, 255, 0.03); 
                                 border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
                         <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 0;">{label}</p>
-                        <h1 style="color: white; font-size: 4rem; font-weight: 200; margin: 0; line-height: 1.2; text-shadow: 0 0 30px {color}66;">{int(value)}</h1>
+                        <h1 style="color: white; font-size: 4rem; font-weight: 200; margin: 0; line-height: 1; text-shadow: 0 0 30px {color}66;">{int(value)}</h1>
                     </div>
                 """, unsafe_allow_html=True)
 
