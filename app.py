@@ -92,6 +92,7 @@ MUSCLE_KEYWORDS = {
 # --- SECTION 3: UTILITY FUNCTIONS (Logic & Processing) ---
 # ==============================================================================
 def get_status_label(metric, value):
+    # Convert to lowercase and check if the keyword is IN the string
     m = metric.lower()
     
     if "fitness" in m:
@@ -105,12 +106,10 @@ def get_status_label(metric, value):
         return "Light"
         
     if "form" in m:
-        # Specific performance-based labels for TSB
-        if value < -30: return "High Risk"
+        if value < -30: return "Overload"
         if value < -10: return "Productive"
-        if value < 5:   return "Optimal"
-        if value < 15:  return "Fresh"
-        return "Recovery"
+        if value < 10: return "Optimal"
+        return "Fresh"
     
     return "Neutral"
 
@@ -285,33 +284,31 @@ if well_json:
         
     # --- 📈 Yearly Training Load Progression ---
         st.markdown("### 📈 Yearly Training Load Progression")
-        colors = {
-            "Fitness (CTL)": "#70C4B0",
-            "Fatigue (ATL)": "#E16C45",
-            "Form (TSB)": "#4BD4B0"
-        }
 
         fig = px.line(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
 
-        # Apply clean hover template and line styling
+        # 1. FIX: Clean up the hover template for each line
         fig.update_traces(
-            line=dict(width=3),
-            # <extra></extra> removes the redundant 'variable' box from the side
-            hovertemplate="<b>%{fullData.name}</b>: %{y:.1f}<extra></extra>"
-        )
+        line=dict(width=3),
+        # <extra></extra> removes the "variable=ctl" side box
+        # %{fullData.name} uses the human-readable name from pretty_labels
+        hovertemplate="<b>%{fullData.name}</b>: %{y:.1f}<extra></extra>"
+)
 
-        for trace in fig.data:
-            trace_name = pretty_labels.get(trace.name, trace.name)
-            if trace_name in colors:
-                trace.line.color = colors[trace_name]
+    # Apply colors if you are using the custom color mapping
+    for trace in fig.data:
+        trace_name = pretty_labels.get(trace.name, trace.name)
+        if trace_name in colors:
+            trace.line.color = colors[trace_name]
 
-        fig.update_layout(
-            hovermode="x unified",
-            hoverlabel=dict(
-                bgcolor="rgba(30, 30, 30, 0.9)", 
-                font_color="white",
-                font_family="Inter"
-            ),
+    fig.update_layout(
+    hovermode="x unified",  # Keeps all metrics in one box
+    hoverlabel=dict(
+        bgcolor="rgba(30, 30, 30, 0.9)", # Dark background for the box
+        font_size=14,
+        font_family="Inter",
+        font_color="white"
+    ),
     # ... rest of your styling ...
     xaxis=dict(
         gridcolor="rgba(255, 255, 255, 0.1)",
