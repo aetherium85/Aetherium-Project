@@ -245,13 +245,6 @@ if well_json:
         if (df['tsb'] == 0).all(): df['tsb'] = df['ctl'] - df['atl']
 
         st.markdown("### ⚡ Your Current Training Status")
-        st.markdown("""
-    <div style="display: flex; justify-content: space-around; margin-bottom: 20px; opacity: 0.7;">
-        <div style="font-size: 1rem; color: #70C4B0;">● <b>FITNESS:</b> 42-day average load</div>
-        <div style="font-size: 1rem; color: #E16C45;">● <b>FATIGUE:</b> 7-day average load</div>
-        <div style="font-size: 1rem; color: #4BD4B0;">● <b>FORM:</b> Readiness (Fitness - Fatigue)</div>
-    </div>
-    """, unsafe_allow_html=True)
 
 # Then your elegant_stat columns...
 
@@ -273,7 +266,13 @@ if well_json:
             xaxis=dict(gridcolor="rgba(255, 255, 255, 0.2)"), yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)")
         )
         st.plotly_chart(fig, use_container_width=True)
-
+        st.markdown("""
+    <div style="display: flex; justify-content: space-around; margin-bottom: 20px; opacity: 0.7;">
+        <div style="font-size: 1rem; color: #70C4B0;">● <b>FITNESS:</b> 42-day average load</div>
+        <div style="font-size: 1rem; color: #E16C45;">● <b>FATIGUE:</b> 7-day average load</div>
+        <div style="font-size: 1rem; color: #4BD4B0;">● <b>FORM:</b> Readiness (Fitness - Fatigue)</div>
+    </div>
+    """, unsafe_allow_html=True)
 # ==============================================================================
 # --- SECTION 8: PERFORMANCE HISTORY ---
 # ==============================================================================
