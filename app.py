@@ -282,15 +282,49 @@ if well_json:
         
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         
-        # YEARLY PROGRESS CHART
-        st.markdown("### 📈 Yearly Training Load Progression")
-        fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
-        fig.update_layout(
-            hovermode="x unified", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="white"), legend=dict(orientation="h", y=0.5),
-            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.2)"), yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)")
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        # --- 📈 Yearly Training Load Progression ---
+st.markdown("### 📈 Yearly Training Load Progression")
+
+# 1. Use line chart instead of area to handle negative TSB correctly
+fig = px.line(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
+
+# 2. Add shading under the lines to keep the 'area' look without stacking
+fig.update_traces(fill='tozeroy')
+
+# 3. Fix the Legend Names (Mapping ctl -> Fitness, etc.)
+fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
+
+fig.update_layout(
+    hovermode="x unified",
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+    font=dict(color="white"),
+    
+    # 4. Move legend to the top-right (standard position)
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1,
+        title=None
+    ),
+    
+    # 5. Improve Axis Grid & Zero Line
+    xaxis=dict(
+        gridcolor="rgba(255, 255, 255, 0.1)",
+        title=None
+    ),
+    yaxis=dict(
+        gridcolor="rgba(255, 255, 255, 0.1)",
+        zeroline=True,
+        zerolinecolor="rgba(255, 255, 255, 0.5)", # Highlight the 0 line for Form
+        zerolinewidth=1,
+        title="Score"
+    )
+)
+
+st.plotly_chart(fig, use_container_width=True)
         
 # ==============================================================================
 # --- SECTION 8: PERFORMANCE HISTORY ---
