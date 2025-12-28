@@ -260,13 +260,13 @@ if act_json:
 if well_json:
     df = pd.DataFrame(well_json)
     if not df.empty:
-        # Data Cleanup
+        # 1. Data Cleanup
         date_col = next((c for c in ['timestamp', 'id', 'date'] if c in df.columns), None)
         if date_col:
             df = df.rename(columns={date_col: 'date'})
             df['date'] = pd.to_datetime(df['date'])
 
-        # Fitness Metrics Logic
+        # 2. Fitness Metrics Logic
         for col in ['ctl', 'atl', 'tsb']:
             if col not in df.columns: df[col] = 0.0
         if (df['tsb'] == 0).all(): df['tsb'] = df['ctl'] - df['atl']
@@ -274,75 +274,55 @@ if well_json:
         st.markdown("### ⚡ Your Current Training Status")
         latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
+        
+        # Display the Stat Boxes
         elegant_stat(s1, "Fitness - 42-day average load", latest.get('ctl', 0), "#70C4B0")
         elegant_stat(s2, "Fatigue - 7-day average load", latest.get('atl', 0), "#E16C45")
+        
         tsb_val = latest.get('tsb', 0)
         tsb_color = "#4BD4B0" if tsb_val > -10 else "#E16C45"
         elegant_stat(s3, "Form - Readiness (Fitness - Fatigue)", tsb_val, tsb_color)
         
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         
-    # --- 📈 Yearly Training Load Progression ---
-    st.markdown("### 📈 Yearly Training Load Progression")
+        # --- 📈 Yearly Training Load Progression (NOW PROPERLY NESTED) ---
+        st.markdown("### 📈 Yearly Training Load Progression")
 
-    # We use px.line and DO NOT add the fill property
-    # Define your signature colors
-    colors = {
-    "Fitness (CTL)": "#70C4B0",  # Teal/Green
-    "Fatigue (ATL)": "#E16C45",  # Orange/Coral
-    "Form (TSB)": "#4BD4B0"      # Bright Mint
-}
+        colors = {
+            "Fitness (CTL)": "#70C4B0",
+            "Fatigue (ATL)": "#E16C45",
+            "Form (TSB)": "#4BD4B0"
+        }
 
-fig = px.line(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
+        fig = go.Figure()
 
-# Apply the colors and thickness
-for trace in fig.data:
-    trace_name = pretty_labels.get(trace.name, trace.name)
-    if trace_name in colors:
-        trace.line.color = colors[trace_name]
-    trace.line.width = 3
+        # Manually add traces to ensure perfect control over colors and names
+        for col in ['ctl', 'atl', 'tsb']:
+            full_name = pretty_labels.get(col, col)
+            fig.add_trace(go.Scatter(
+                x=df['date'], 
+                y=df[col],
+                mode='lines',
+                name=full_name,
+                line=dict(color=colors.get(full_name), width=3),
+                hovertemplate=f"<b>{full_name}</b>: %{{y:.1f}}<extra></extra>"
+            ))
 
-fig.update_layout(
-    # ... keep your existing layout ...
-)
+        fig.update_layout(
+            hovermode="x unified",
+            hoverlabel=dict(bgcolor="rgba(30, 30, 30, 0.9)", font_size=14, font_color="white"),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="white"),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font=dict(color="white")),
+            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white"), title=None, hoverformat="%b %d, %Y"),
+            yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white"), zeroline=True, 
+                       zerolinecolor="rgba(255, 255, 255, 0.5)", zerolinewidth=1.5, title="Score")
+        )
 
-fig.update_layout(
-    hovermode="x unified",
-    hoverlabel=dict(
-        bgcolor="rgba(30, 30, 30, 0.9)", 
-        font_size=14,
-        font_family="Inter",
-        font_color="white"
-    ),
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(color="white"),
-    legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=1.02,
-        xanchor="right",
-        x=1,
-        font=dict(color="white")
-    ),
-    xaxis=dict(
-        gridcolor="rgba(255, 255, 255, 0.1)",
-        tickfont=dict(color="white"),
-        title=None,
-        hoverformat="%b %d, %Y"
-    ),
-    yaxis=dict(
-        gridcolor="rgba(255, 255, 255, 0.1)",
-        tickfont=dict(color="white"),
-        zeroline=True,
-        zerolinecolor="rgba(255, 255, 255, 0.5)",
-        zerolinewidth=1.5, # Slightly thicker zero line for better context
-        title=dict(text="Score", font=dict(color="white"))
-    )
-)
+        st.plotly_chart(fig, use_container_width=True)
+        st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
-st.plotly_chart(fig, use_container_width=True)
-        
 # ==============================================================================
 # --- SECTION 8: PERFORMANCE HISTORY ---
 # ==============================================================================
