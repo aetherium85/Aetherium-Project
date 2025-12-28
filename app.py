@@ -255,6 +255,13 @@ if well_json:
         tsb_val = latest.get('tsb', 0)
         tsb_color = "#4BD4B0" if tsb_val > -10 else "#E16C45"
         elegant_stat(s3, "Form (TSB)", tsb_val, tsb_color)
+        st.markdown("""
+    <div style="display: flex; justify-content: space-around; margin-bottom: 20px; opacity: 0.7;">
+        <div style="font-size: 1rem; color: #70C4B0;">● <b>FITNESS:</b> 42-day average load</div>
+        <div style="font-size: 1rem; color: #E16C45;">● <b>FATIGUE:</b> 7-day average load</div>
+        <div style="font-size: 1rem; color: #4BD4B0;">● <b>FORM:</b> Readiness (Fitness - Fatigue)</div>
+    </div>
+    """, unsafe_allow_html=True)
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         
         # YEARLY PROGRESS CHART
@@ -265,13 +272,6 @@ if well_json:
             font=dict(color="white"), legend=dict(orientation="h", y=1.02),
             xaxis=dict(gridcolor="rgba(255, 255, 255, 0.2)"), yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)")
         )
-        st.markdown("""
-    <div style="display: flex; justify-content: space-around; margin-bottom: 20px; opacity: 0.7;">
-        <div style="font-size: 1rem; color: #70C4B0;">● <b>FITNESS:</b> 42-day average load</div>
-        <div style="font-size: 1rem; color: #E16C45;">● <b>FATIGUE:</b> 7-day average load</div>
-        <div style="font-size: 1rem; color: #4BD4B0;">● <b>FORM:</b> Readiness (Fitness - Fatigue)</div>
-    </div>
-    """, unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True)
         
 # ==============================================================================
