@@ -58,7 +58,7 @@ st.markdown(
 
     /* Fix for the Expander Header text specifically */
     summary[data-testid="stExpanderSummary"] {
-        color: white !important;
+        color: black !important;
     }
     
     .performance-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px !important; }
