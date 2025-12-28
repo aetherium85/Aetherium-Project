@@ -209,12 +209,18 @@ def get_ytd_data():
 # MOVE THIS TO THE TOP: Always show logout if authenticated
 with st.sidebar:
     st.markdown("### 👤 User Settings")
-    if st.sidebar.button("🔓 Logout / Change Athlete", use_container_width=True):
+    if st.button("🔓 Logout / Change Athlete", use_container_width=True):
+        # 1. Clear session state
         st.session_state.authenticated = False
         st.session_state.token_data = None
+        
+        # 2. CLEAR URL PARAMETERS (Crucial: prevents auto-relogin)
+        st.query_params.clear() 
+        
+        # 3. Force a full rerun
         st.rerun()
-    st.info("Logging out allows you to re-authorize and fix permission issues (like missing Wellness data).")
-
+    
+    st.info("Log out to fix permission issues or switch accounts.")
 
 # --- 6. DASHBOARD LOGIC ---
 well_json, act_json, ath_json = get_ytd_data()
