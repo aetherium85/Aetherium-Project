@@ -283,51 +283,65 @@ if well_json:
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         
     # --- 📈 Yearly Training Load Progression ---
-        st.markdown("### 📈 Yearly Training Load Progression")
+    st.markdown("### 📈 Yearly Training Load Progression")
 
-        fig = px.line(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
+# We use px.line and DO NOT add the fill property
+# Define your signature colors
+colors = {
+    "Fitness (CTL)": "#70C4B0",  # Teal/Green
+    "Fatigue (ATL)": "#E16C45",  # Orange/Coral
+    "Form (TSB)": "#4BD4B0"      # Bright Mint
+}
 
-        # 1. FIX: Clean up the hover template for each line
-        fig.update_traces(
-        line=dict(width=3),
-        # <extra></extra> removes the "variable=ctl" side box
-        # %{fullData.name} uses the human-readable name from pretty_labels
-        hovertemplate="<b>%{fullData.name}</b>: %{y:.1f}<extra></extra>"
+fig = px.line(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
+
+# Apply the colors and thickness
+for trace in fig.data:
+    trace_name = pretty_labels.get(trace.name, trace.name)
+    if trace_name in colors:
+        trace.line.color = colors[trace_name]
+    trace.line.width = 3
+
+fig.update_layout(
+    # ... keep your existing layout ...
 )
 
-    # Apply colors if you are using the custom color mapping
-    for trace in fig.data:
-        trace_name = pretty_labels.get(trace.name, trace.name)
-        if trace_name in colors:
-            trace.line.color = colors[trace_name]
-
-    fig.update_layout(
-    hovermode="x unified",  # Keeps all metrics in one box
+fig.update_layout(
+    hovermode="x unified",
     hoverlabel=dict(
-        bgcolor="rgba(30, 30, 30, 0.9)", # Dark background for the box
+        bgcolor="rgba(30, 30, 30, 0.9)", 
         font_size=14,
         font_family="Inter",
         font_color="white"
     ),
-    # ... rest of your styling ...
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+    font=dict(color="white"),
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1,
+        font=dict(color="white")
+    ),
     xaxis=dict(
         gridcolor="rgba(255, 255, 255, 0.1)",
         tickfont=dict(color="white"),
         title=None,
-        # 2. FIX: Format the date at the top of the hover box
-        hoverformat="%b %d, %Y" 
+        hoverformat="%b %d, %Y"
     ),
     yaxis=dict(
         gridcolor="rgba(255, 255, 255, 0.1)",
         tickfont=dict(color="white"),
         zeroline=True,
         zerolinecolor="rgba(255, 255, 255, 0.5)",
+        zerolinewidth=1.5, # Slightly thicker zero line for better context
         title=dict(text="Score", font=dict(color="white"))
-    ),
-    # ... ensure paper_bgcolor and plot_bgcolor are transparent ...
+    )
 )
 
-    st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
         
 # ==============================================================================
 # --- SECTION 8: PERFORMANCE HISTORY ---
