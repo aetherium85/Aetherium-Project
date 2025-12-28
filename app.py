@@ -283,15 +283,15 @@ if well_json:
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         
         # --- 📈 Yearly Training Load Progression ---
-st.markdown("### 📈 Yearly Training Load Progression")
+        st.markdown("### 📈 Yearly Training Load Progression")
 
-fig = px.line(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
+        fig = px.line(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
 
-# Update hover appearance and shading
-fig.update_traces(
-    fill='tozeroy',
-    # <extra></extra> hides the secondary box that usually shows the trace name
-    hovertemplate="<b>%{y:.1f}</b><extra></extra>" 
+        # Update hover appearance and shading
+        fig.update_traces(
+        fill='tozeroy',
+        # <extra></extra> hides the secondary box that usually shows the trace name
+        hovertemplate="<b>%{y:.1f}</b><extra></extra>" 
 )
 
 # Fix Legend Names
