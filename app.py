@@ -38,6 +38,29 @@ st.markdown(
         border-radius: 15px !important; padding: 20px !important; border: 1px solid rgba(255, 255, 255, 0.1) !important;
         margin-bottom: 10px !important;
     }
+
+    .stExpander {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 10px !important;
+    }
+
+    /* Target the text inside the expander specifically */
+    .stExpander p, .stExpander span, .stExpander label {
+        color: white !important;
+    }
+
+    /* Fix for Tables inside expanders */
+    .stExpander table, .stExpander th, .stExpander td {
+        color: white !important;
+        background-color: transparent !important;
+    }
+
+    /* Fix for the Expander Header text specifically */
+    summary[data-testid="stExpanderSummary"] {
+        color: white !important;
+    }
+    
     .performance-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px !important; }
     h3 { text-transform: uppercase !important; letter-spacing: 4px !important; font-size: 0.9rem !important; opacity: 0.8; }
     </style>
