@@ -245,15 +245,15 @@ if well_json:
         if (df['tsb'] == 0).all(): df['tsb'] = df['ctl'] - df['atl']
 
         st.markdown("### ⚡ Your Current Training Status")
-        with st.expander("ℹ️ Understanding Fitness, Fatigue, and Form"):
-            st.markdown("""
-        | Metric | What it means | Ideal Range |
-        | :--- | :--- | :--- |
-        | **Fitness (CTL)** | Your long-term chronic training load. It builds slowly over months. | The higher, the better. |
-        | **Fatigue (ATL)** | Your short-term acute training load. It spikes after a hard session. | High during build weeks. |
-        | **Form (TSB)** | Your readiness to perform. It tells you if you are overtrained or fresh. | **-10 to +10** is the 'Fresh' zone. |
-        """)
-        latest = df.iloc[-1]
+        st.markdown("""
+    <div style="display: flex; justify-content: space-around; margin-bottom: 20px; opacity: 0.7;">
+        <div style="font-size: 0.7rem; color: #70C4B0;">● <b>FITNESS:</b> 42-day average load</div>
+        <div style="font-size: 0.7rem; color: #E16C45;">● <b>FATIGUE:</b> 7-day average load</div>
+        <div style="font-size: 0.7rem; color: #4BD4B0;">● <b>FORM:</b> Readiness (Fitness - Fatigue)</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+        # Then your elegant_stat columns...
         s1, s2, s3 = st.columns(3)
         elegant_stat(s1, "Fitness (CTL)", latest.get('ctl', 0), "#70C4B0")
         elegant_stat(s2, "Fatigue (ATL)", latest.get('atl', 0), "#E16C45")
