@@ -169,24 +169,32 @@ def get_muscle_focus(activity_name, description=""):
 def get_ytd_data():
     if "token_data" not in st.session_state or st.session_state.token_data is None:
         return None, None, None
+    
+    # 1. DEFINE VARIABLES FIRST (So they are available everywhere in the function)
     token = st.session_state.token_data.get('access_token')
     headers = {"Authorization": f"Bearer {token}"}
-    
     base_url = "https://intervals.icu/api/v1/athlete/0" 
+    
     first_day = datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d')
     today = datetime.now().strftime('%Y-%m-%d')
     params = {'oldest': first_day, 'newest': today}
     
     try:
+        # 2. PERFORM THE REQUESTS
         well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
         act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
         ath_res = requests.get(base_url, headers=headers)
         
+        # 3. DEBUGGING CHECK (This will now work because base_url/headers are defined)
+        if well_res.status_code != 200:
+            st.error(f"Wellness API Error {well_res.status_code}: {well_res.text}")
+            return None, None, None
+
         wellness = well_res.json()
         activities = act_res.json()
         athlete = ath_res.json()
 
-        # DEEPER FETCH for Strength to get 'icu_weight'
+        # 4. DEEPER FETCH for Strength Details
         if activities and activities[0].get('type') == 'WeightTraining':
             act_id = activities[0].get('id')
             detail_res = requests.get(f"{base_url}/activities/{act_id}", headers=headers)
@@ -194,13 +202,11 @@ def get_ytd_data():
                 activities[0].update(detail_res.json())
 
         return wellness, activities, athlete
-    except Exception as e:
-        st.error(f"Fetch failed: {e}")
-    # This will print the actual error to your terminal/command prompt
-    print(f"DEBUG ERROR: {e}") 
-    return None, None, None
 
-# ... (Keep your create_gauge, show_login_screen, etc.)
+    except Exception as e:
+        st.error(f"Connection failed: {e}")
+        return None, None, None
+
 
 # --- 6. DASHBOARD LOGIC ---
 well_json, act_json, ath_json = get_ytd_data()
