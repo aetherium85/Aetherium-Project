@@ -241,12 +241,21 @@ if act_json:
 
     # 3. SWAP LOGIC: Distance vs. Weight
     if display_type == "Strength":
-        # 'icu_weight' is the total KG moved (Sets x Reps x Weight)
-        total_kg = latest_act.get('icu_weight') or 0
+        # Check our new custom field from the deeper fetch
+        actual_volume = latest_act.get('REAL_TOTAL_VOLUME', 0)
         hero_icon = "🏋️"
-        hero_label = "Total Volume"
-        hero_value = f"{total_kg:,.0f} kg"
+        
+        if actual_volume > 0:
+            hero_label = "Total Volume"
+            hero_value = f"{actual_volume:,.0f} kg"
+        else:
+            # Fallback if no weight data is found in the detail fetch
+            load = latest_act.get('icu_training_load') or 0
+            hero_label = "Session Load"
+            hero_value = f"{load} pts"
+            
     else:
+        # This handles Running, Cycling, etc.
         dist = (latest_act.get('distance') or 0) / 1000
         hero_label = "Distance"
         hero_value = f"{dist:.2f} km"
