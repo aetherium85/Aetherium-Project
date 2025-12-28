@@ -138,6 +138,33 @@ def get_access_token(auth_code):
     }
     response = requests.post(token_url, data=payload)
     return response.json() if response.status_code == 200 else {}
+def elegant_hero_item(col, icon, label, value):
+    with col:
+        st.markdown(f"""
+            <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="font-size: 2rem; line-height: 1;">{icon}</div>
+                <div>
+                    <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5);">{label}</div>
+                    <div style="font-size: 1.4rem; font-weight: 200; line-height: 1.1; color: white;">{value}</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+
+# Muscle Focus Keyword Mapping
+MUSCLE_KEYWORDS = {
+    "Legs": ["squat", "leg", "quad", "hamstring", "glute", "calf", "deadlift", "lunge"],
+    "Chest/Push": ["bench", "press", "push", "chest", "tricep", "shoulder", "dip"],
+    "Back/Pull": ["row", "pull", "back", "deadlift", "lat", "bicep", "chin"],
+    "Core": ["plank", "core", "abs", "situp", "crunch"],
+    "Full Body": ["crossfit", "hiit", "metcon", "full"]
+}
+
+def get_muscle_focus(activity_name, description=""):
+    text = (str(activity_name) + " " + str(description or "")).lower()
+    for focus, keywords in MUSCLE_KEYWORDS.items():
+        if any(word in text for word in keywords):
+            return focus
+    return "Mixed"
 
 def get_ytd_data():
     if "token_data" not in st.session_state or st.session_state.token_data is None:
@@ -145,7 +172,6 @@ def get_ytd_data():
     token = st.session_state.token_data.get('access_token')
     headers = {"Authorization": f"Bearer {token}"}
     
-    # We use athlete '0' as a shortcut for the authenticated athlete
     base_url = "https://intervals.icu/api/v1/athlete/0" 
     first_day = datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d')
     today = datetime.now().strftime('%Y-%m-%d')
@@ -160,107 +186,54 @@ def get_ytd_data():
         activities = act_res.json()
         athlete = ath_res.json()
 
-        # DEEPER FETCH: If the latest activity is Weight Training, get more details
+        # DEEPER FETCH for Strength to get 'icu_weight'
         if activities and activities[0].get('type') == 'WeightTraining':
             act_id = activities[0].get('id')
             detail_res = requests.get(f"{base_url}/activities/{act_id}", headers=headers)
             if detail_res.status_code == 200:
-                # Merge the detailed data (which contains icu_weight) into the summary
                 activities[0].update(detail_res.json())
 
         return wellness, activities, athlete
     except Exception as e:
         st.error(f"Fetch failed: {e}")
         return None, None, None
-    
 
-def create_gauge(value, title, color_steps, min_val, max_val):
-    fig = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=value,
-        title={'text': title, 'font': {'size': 18, 'color': 'white'}},
-        number={'font': {'color': 'white'}},
-        gauge={'axis': {'range': [min_val, max_val], 'tickcolor': "white"},
-               'bar': {'color': "rgba(255,255,255,0.3)"}, 'steps': color_steps}
-    ))
-    fig.update_layout(height=220, margin=dict(l=30, r=30, t=50, b=20),
-                      paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
-    return fig
+# ... (Keep your create_gauge, show_login_screen, etc.)
 
-# --- 4. SESSION LOGIC & AUTHENTICATION ---
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-query_params = st.query_params
-if "code" in query_params and not st.session_state.authenticated:
-    token_response = get_access_token(query_params["code"])
-    if "access_token" in token_response:
-        st.session_state.authenticated = True
-        st.session_state.token_data = token_response
-        st.query_params.clear()
-        st.rerun()
-
-# --- 5. MAIN PAGE ROUTING ---
-if not st.session_state.authenticated:
-    show_login_screen()
-    st.stop()
-
-# --- 6. DASHBOARD (Only runs if authenticated) ---
-well_json, act_json, ath_json = get_ytd_data()
-
-# --- MAIN DASHBOARD ---
-if st.sidebar.button("Logout"):
-    st.session_state.authenticated = False
-    st.rerun()
-
+# --- 6. DASHBOARD LOGIC ---
 well_json, act_json, ath_json = get_ytd_data()
 
 if act_json:
     latest_act = act_json[0]
-    
-    # 1. Identify Activity Type
     raw_type = latest_act.get('type', 'Other')
     display_type = TYPE_MAPPING.get(raw_type, "Workout")
     
-    # 2. Standard Safe Metrics
+    # Safe metrics (the 'or 0' prevents your distance crash!)
     secs = latest_act.get('moving_time') or 0
     duration_str = f"{secs // 3600}h {(secs % 3600) // 60}m"
     load = latest_act.get('icu_training_load') or 0
-    hr = latest_act.get('average_heartrate') or 0
 
-    # 3. Dynamic Metric Swap (Distance vs Tonnage)
+    # Dynamic Swap: Cardio vs Strength
     if display_type == "Strength":
-        # 'icu_weight' is the field for total KG moved in Intervals.icu details
         total_kg = latest_act.get('icu_weight') or 0
-        hero_icon = "🏋️"
-        hero_label = "Total Volume"
-        hero_value = f"{total_kg:,.0f} kg"
+        h3_icon, h3_label, h3_value = "🏋️", "Total Volume", f"{total_kg:,.0f} kg"
+        
+        focus = get_muscle_focus(latest_act.get('name', ''), latest_act.get('description', ''))
+        h4_icon, h4_label, h4_value = "🧬", "Muscle Focus", focus
     else:
         dist = (latest_act.get('distance') or 0) / 1000
-        hero_icon = "🗺️"
-        hero_label = "Distance"
-        hero_value = f"{dist:.2f} km"
+        h3_icon, h3_label, h3_value = "🗺️", "Distance", f"{dist:.2f} km"
+        
+        hr = latest_act.get('average_heartrate') or 0
+        h4_icon, h4_label, h4_value = "💓", "Avg. HR", f"{hr:.0f} bpm" if hr > 0 else "N/A"
 
     st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')} — {display_type}")
     
-    def elegant_hero_item(col, icon, label, value):
-        with col:
-            st.markdown(f"""
-            <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                <div style="font-size: 2rem; line-height: 1;">{icon}</div>
-                <div>
-                    <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5);">{label}</div>
-                    <div style="font-size: 1.4rem; font-weight: 200; line-height: 1.1; color: white;">{value}</div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-    # 4. Render Hero Row
     h1, h2, h3, h4 = st.columns(4)
     elegant_hero_item(h1, "⏱️", "Duration", duration_str)
     elegant_hero_item(h2, "⚡", "Impact", f"{load} pts")
-    elegant_hero_item(h3, hero_icon, hero_label, hero_value)
-    elegant_hero_item(h4, "💓", "Avg. HR", f"{hr:.0f} bpm" if hr > 0 else "N/A") 
-
+    elegant_hero_item(h3, h3_icon, h3_label, h3_value)
+    elegant_hero_item(h4, h4_icon, h4_label, h4_value)
     st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 
