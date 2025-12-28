@@ -253,7 +253,9 @@ if well_json:
     </div>
     """, unsafe_allow_html=True)
 
-        # Then your elegant_stat columns...
+# Then your elegant_stat columns...
+
+        latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
         elegant_stat(s1, "Fitness (CTL)", latest.get('ctl', 0), "#70C4B0")
         elegant_stat(s2, "Fatigue (ATL)", latest.get('atl', 0), "#E16C45")
