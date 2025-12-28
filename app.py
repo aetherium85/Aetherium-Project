@@ -279,12 +279,12 @@ if well_json:
         s1, s2, s3 = st.columns(3)
         
         # Display the Stat Boxes
-        elegant_stat(s1, "Fitness - 42-day average load", latest.get('ctl', 0), "#70C4B0")
-        elegant_stat(s2, "Fatigue - 7-day average load", latest.get('atl', 0), "#E16C45")
+        elegant_stat(s1, "Fitness", latest.get('ctl', 0), "#70C4B0")
+        elegant_stat(s2, "Fatigue", latest.get('atl', 0), "#E16C45")
         
         tsb_val = latest.get('tsb', 0)
         tsb_color = "#4BD4B0" if tsb_val > -10 else "#E16C45"
-        elegant_stat(s3, "Form - Readiness (Fitness - Fatigue)", tsb_val, tsb_color)
+        elegant_stat(s3, "Form)", tsb_val, tsb_color)
         
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         
