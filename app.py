@@ -115,6 +115,15 @@ footer {
 )
 
 # --- 3. FUNCTION DEFINITIONS ---
+# MOVE THIS TO THE TOP: Always show logout if authenticated
+with st.sidebar:
+    st.markdown("### 👤 User Settings")
+    if st.sidebar.button("🔓 Logout / Change Athlete", use_container_width=True):
+        st.session_state.authenticated = False
+        st.session_state.token_data = None
+        st.rerun()
+    st.info("Logging out allows you to re-authorize and fix permission issues (like missing Wellness data).")
+
 
 def show_login_screen():
     st.title("❤️ Fitness Command Center")
@@ -138,6 +147,7 @@ def get_access_token(auth_code):
     }
     response = requests.post(token_url, data=payload)
     return response.json() if response.status_code == 200 else {}
+
 def elegant_hero_item(col, icon, label, value):
     with col:
         st.markdown(f"""
