@@ -287,7 +287,7 @@ if well_json:
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
         fig.update_layout(
             hovermode="x unified", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="white"), legend=dict(orientation="h", y=1.02),
+            font=dict(color="white"), legend=dict(orientation="h", y=0.5),
             xaxis=dict(gridcolor="rgba(255, 255, 255, 0.2)"), yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)")
         )
         st.plotly_chart(fig, use_container_width=True)
