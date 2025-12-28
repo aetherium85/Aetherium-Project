@@ -150,17 +150,7 @@ def get_ytd_data():
     first_day = datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d')
     today = datetime.now().strftime('%Y-%m-%d')
     params = {'oldest': first_day, 'newest': today}
-    def elegant_hero_item(col, icon, label, value):
-        with col:
-            st.markdown(f"""
-            <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                <div style="font-size: 2rem; line-height: 1;">{icon}</div>
-                <div>
-                    <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5);">{label}</div>
-                    <div style="font-size: 1.4rem; font-weight: 200; line-height: 1.1; color: white;">{value}</div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
+    
     try:
         well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
         act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
@@ -253,6 +243,17 @@ if act_json:
 
     st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')} — {display_type}")
     
+    def elegant_hero_item(col, icon, label, value):
+        with col:
+            st.markdown(f"""
+            <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="font-size: 2rem; line-height: 1;">{icon}</div>
+                <div>
+                    <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5);">{label}</div>
+                    <div style="font-size: 1.4rem; font-weight: 200; line-height: 1.1; color: white;">{value}</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
     # 4. Render Hero Row
     h1, h2, h3, h4 = st.columns(4)
     elegant_hero_item(h1, "⏱️", "Duration", duration_str)
