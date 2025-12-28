@@ -142,12 +142,15 @@ def get_access_token(auth_code):
 def get_ytd_data():
     if "token_data" not in st.session_state or st.session_state.token_data is None:
         return None, None, None
+    
     token = st.session_state.token_data.get('access_token')
     headers = {"Authorization": f"Bearer {token}"}
     base_url = "https://intervals.icu/api/v1/athlete/0" 
+    
     first_day = datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d')
     today = datetime.now().strftime('%Y-%m-%d')
     params = {'oldest': first_day, 'newest': today}
+    
     try:
         well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
         act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
@@ -157,7 +160,7 @@ def get_ytd_data():
         activities = act_res.json()
         athlete = ath_res.json()
 
-        # --- REVISED DEEPER FETCH ---
+        # --- REVISED FETCH LOGIC ---
         if activities and activities[0].get('type') == 'WeightTraining':
             act_id = activities[0].get('id')
             detail_res = requests.get(f"{base_url}/activities/{act_id}", headers=headers)
@@ -165,17 +168,19 @@ def get_ytd_data():
             if detail_res.status_code == 200:
                 detail_data = detail_res.json()
                 
-                # If detail_data is a list, the first item is usually the activity object
-                if isinstance(detail_data, list):
-                    # Intervals.icu sometimes returns a list of exercises
-                    # We look for the summary data or sum the 'icu_weight' manually
-                    activities[0]['icu_weight'] = sum(item.get('icu_weight', 0) for item in detail_data if isinstance(item, dict))
-                elif isinstance(detail_data, dict):
-                    # If it's a dictionary, we can update normally
-                    activities[0].update(detail_data)
+                # Check for the total tonnage in various possible fields
+                # Sometimes it's in a dictionary, sometimes a list of exercises
+                tonnage = 0
+                if isinstance(detail_data, dict):
+                    tonnage = detail_data.get('icu_weight') or detail_data.get('tonnage') or 0
+                elif isinstance(detail_data, list):
+                    # Sum weight from all exercises in the list
+                    tonnage = sum(item.get('icu_weight', 0) or item.get('tonnage', 0) for item in detail_data if isinstance(item, dict))
+                
+                # Assign the found tonnage to a NEW unique field to avoid fallback confusion
+                activities[0]['REAL_TOTAL_VOLUME'] = tonnage
 
         return wellness, activities, athlete
-    
     except Exception as e:
         st.error(f"Fetch failed: {e}")
         return None, None, None
