@@ -152,7 +152,23 @@ def get_ytd_data():
         well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
         act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
         ath_res = requests.get(base_url, headers=headers)
-        return well_res.json(), act_res.json(), ath_res.json()
+
+        wellness = well_res.json()
+        activities = act_res.json()
+        athlete = ath_res.json()
+
+        # --- THE FIX: DEEPER FETCH FOR STRENGTH ---
+        # If the most recent activity is Weight Training, we need more detail
+        if activities and activities[0].get('type') == 'WeightTraining':
+            act_id = activities[0].get('id')
+            # Fetch the specific activity detail endpoint
+            detail_res = requests.get(f"{base_url}/activities/{act_id}", headers=headers)
+            if detail_res.status_code == 200:
+                # Update the first activity in our list with the detailed 'icu_weight' field
+                activities[0].update(detail_res.json())
+
+        return wellness, activities, athlete
+    
     except Exception as e:
         st.error(f"Fetch failed: {e}")
         return None, None, None
@@ -213,11 +229,11 @@ if act_json:
 
     # 3. SWAP LOGIC: Distance vs. Weight
     if display_type == "Strength":
-        # intervals.icu uses 'icu_weight' or 'icu_training_weight' for total tonnage
-        total_kg = latest_act.get('icu_weight') or latest_act.get('icu_training_load') * 10 # Fallback estimate if tonnage isn't synced
-        hero_label = "Total Weight"
-        hero_value = f"{total_kg:,.0f} kg"
+        # 'icu_weight' is the total KG moved (Sets x Reps x Weight)
+        total_kg = latest_act.get('icu_weight') or 0
         hero_icon = "🏋️"
+        hero_label = "Total Volume"
+        hero_value = f"{total_kg:,.0f} kg"
     else:
         dist = (latest_act.get('distance') or 0) / 1000
         hero_label = "Distance"
