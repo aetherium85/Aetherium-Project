@@ -92,24 +92,27 @@ MUSCLE_KEYWORDS = {
 # --- SECTION 3: UTILITY FUNCTIONS (Logic & Processing) ---
 # ==============================================================================
 def get_status_label(metric, value):
-    # Convert to lowercase and check if the keyword is IN the string
     m = metric.lower()
     
+    # FITNESS: Long-term base building
     if "fitness" in m:
         if value > 50: return "Elite Base"
         if value > 30: return "Strong Base"
         return "Building"
         
+    # FATIGUE: Short-term training stress
     if "fatigue" in m:
         if value > 40: return "Heavy Load"
         if value > 20: return "Productive"
         return "Light"
         
+    # FORM: Readiness and Recovery (TSB)
     if "form" in m:
-        if value < -30: return "Overload"
+        if value < -30: return "Overload / Risk"
         if value < -10: return "Productive"
-        if value < 10: return "Optimal"
-        return "Fresh"
+        if value < 5:   return "Optimal / Ready"
+        if value < 15:  return "Fresh"
+        return "Recovery"
     
     return "Neutral"
 
