@@ -196,7 +196,9 @@ def get_ytd_data():
         return wellness, activities, athlete
     except Exception as e:
         st.error(f"Fetch failed: {e}")
-        return None, None, None
+    # This will print the actual error to your terminal/command prompt
+    print(f"DEBUG ERROR: {e}") 
+    return None, None, None
 
 # ... (Keep your create_gauge, show_login_screen, etc.)
 
