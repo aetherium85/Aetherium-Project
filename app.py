@@ -247,9 +247,9 @@ if well_json:
         st.markdown("### ⚡ Your Current Training Status")
         st.markdown("""
     <div style="display: flex; justify-content: space-around; margin-bottom: 20px; opacity: 0.7;">
-        <div style="font-size: 0.7rem; color: #70C4B0;">● <b>FITNESS:</b> 42-day average load</div>
-        <div style="font-size: 0.7rem; color: #E16C45;">● <b>FATIGUE:</b> 7-day average load</div>
-        <div style="font-size: 0.7rem; color: #4BD4B0;">● <b>FORM:</b> Readiness (Fitness - Fatigue)</div>
+        <div style="font-size: 1rem; color: #70C4B0;">● <b>FITNESS:</b> 42-day average load</div>
+        <div style="font-size: 1rem; color: #E16C45;">● <b>FATIGUE:</b> 7-day average load</div>
+        <div style="font-size: 1rem; color: #4BD4B0;">● <b>FORM:</b> Readiness (Fitness - Fatigue)</div>
     </div>
     """, unsafe_allow_html=True)
 
