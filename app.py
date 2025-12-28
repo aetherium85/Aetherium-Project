@@ -142,45 +142,21 @@ def get_access_token(auth_code):
 def get_ytd_data():
     if "token_data" not in st.session_state or st.session_state.token_data is None:
         return None, None, None
-    
     token = st.session_state.token_data.get('access_token')
     headers = {"Authorization": f"Bearer {token}"}
     base_url = "https://intervals.icu/api/v1/athlete/0" 
     
-    first_day = datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d')
-    today = datetime.now().strftime('%Y-%m-%d')
-    params = {'oldest': first_day, 'newest': today}
+    params = {
+        'oldest': datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d'),
+        'newest': datetime.now().strftime('%Y-%m-%d')
+    }
     
     try:
         well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
         act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
         ath_res = requests.get(base_url, headers=headers)
         
-        wellness = well_res.json()
-        activities = act_res.json()
-        athlete = ath_res.json()
-
-        # --- REVISED FETCH LOGIC ---
-        if activities and activities[0].get('type') == 'WeightTraining':
-            act_id = activities[0].get('id')
-            detail_res = requests.get(f"{base_url}/activities/{act_id}", headers=headers)
-            
-            if detail_res.status_code == 200:
-                detail_data = detail_res.json()
-                
-                # Check for the total tonnage in various possible fields
-                # Sometimes it's in a dictionary, sometimes a list of exercises
-                tonnage = 0
-                if isinstance(detail_data, dict):
-                    tonnage = detail_data.get('icu_weight') or detail_data.get('tonnage') or 0
-                elif isinstance(detail_data, list):
-                    # Sum weight from all exercises in the list
-                    tonnage = sum(item.get('icu_weight', 0) or item.get('tonnage', 0) for item in detail_data if isinstance(item, dict))
-                
-                # Assign the found tonnage to a NEW unique field to avoid fallback confusion
-                activities[0]['REAL_TOTAL_VOLUME'] = tonnage
-
-        return wellness, activities, athlete
+        return well_res.json(), act_res.json(), ath_res.json()
     except Exception as e:
         st.error(f"Fetch failed: {e}")
         return None, None, None
@@ -239,33 +215,30 @@ if act_json:
     load = latest_act.get('icu_training_load') or 0
     hr = latest_act.get('average_heartrate') or 0
 
-    # 3. SWAP LOGIC: Distance vs. Weight
+    # 3. Dynamic Metric Swap (Intensity vs Distance)
     if display_type == "Strength":
-        # Check our new custom field from the deeper fetch
-        actual_volume = latest_act.get('REAL_TOTAL_VOLUME', 0)
-        hero_icon = "🏋️"
+        # Calculate Intensity: Load / (Moving Time in hours)
+        hours = (latest_act.get('moving_time') or 0) / 3600
+        load = latest_act.get('icu_training_load') or 0
         
-        if actual_volume > 0:
-            hero_label = "Total Volume"
-            hero_value = f"{actual_volume:,.0f} kg"
-        else:
-            # Fallback if no weight data is found in the detail fetch
-            load = latest_act.get('icu_training_load') or 0
-            hero_label = "Session Load"
-            hero_value = f"{load} pts"
+        intensity = load / hours if hours > 0 else 0
+        
+        hero_icon = "🔥"
+        hero_label = "Intensity"
+        hero_value = f"{intensity:.1f} pts/hr"
             
     else:
-        # This handles Running, Cycling, etc.
+        # Standard Cardio view
         dist = (latest_act.get('distance') or 0) / 1000
+        hero_icon = "🗺️"
         hero_label = "Distance"
         hero_value = f"{dist:.2f} km"
-        hero_icon = "🗺️"
 
-    st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')} ({display_type})")
+    st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')} — {display_type}")
     
-    # Hero Row
+    # 4. Render Hero Row
     h1, h2, h3, h4 = st.columns(4)
-    
+       
     def elegant_hero_item(col, icon, label, value):
         with col:
             st.markdown(f"""
@@ -281,10 +254,13 @@ if act_json:
     hero_icon = "🏋️" if display_type == "Strength" else "⏱️"
 
     # Then call your function
-    elegant_hero_item(h1, hero_icon, "Duration", duration_str)
+    elegant_hero_item(h1, "⏱️", "Duration", duration_str)
     elegant_hero_item(h2, "⚡", "Impact", f"{load} pts")
     elegant_hero_item(h3, hero_icon, hero_label, hero_value)
-    elegant_hero_item(h4, "💓", "Avg. HR", f"{hr:.0f} bpm" if hr > 0 else "N/A")
+    
+    # Use HR if available, otherwise show "Strength" status
+    hr_val = f"{hr:.0f} bpm" if hr > 0 else "N/A"
+    elegant_hero_item(h4, "💓", "Avg. HR", hr_val)
 
     st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
