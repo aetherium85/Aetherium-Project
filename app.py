@@ -269,11 +269,10 @@ if well_json:
         if (df['tsb'] == 0).all(): df['tsb'] = df['ctl'] - df['atl']
 
         st.markdown("### ⚡ Your Current Training Status")
-
         latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
         elegant_stat(s1, "Fitness - 42-day average load", latest.get('ctl', 0), "#70C4B0")
-        elegant_stat(s2, "Fatigue - 7-day average load)", latest.get('atl', 0), "#E16C45")
+        elegant_stat(s2, "Fatigue - 7-day average load", latest.get('atl', 0), "#E16C45")
         tsb_val = latest.get('tsb', 0)
         tsb_color = "#4BD4B0" if tsb_val > -10 else "#E16C45"
         elegant_stat(s3, "Form - Readiness (Fitness - Fatigue)", tsb_val, tsb_color)
