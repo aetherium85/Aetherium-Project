@@ -286,16 +286,25 @@ if well_json:
     st.markdown("### 📈 Yearly Training Load Progression")
 
 # We use px.line and DO NOT add the fill property
+# Define your signature colors
+colors = {
+    "Fitness (CTL)": "#70C4B0",  # Teal/Green
+    "Fatigue (ATL)": "#E16C45",  # Orange/Coral
+    "Form (TSB)": "#4BD4B0"      # Bright Mint
+}
+
 fig = px.line(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
 
-# Customize the line thickness and hover behavior
-fig.update_traces(
-    line=dict(width=3), # Makes the lines stand out more
-    hovertemplate="<b>%{y:.1f}</b><extra></extra>" 
-)
+# Apply the colors and thickness
+for trace in fig.data:
+    trace_name = pretty_labels.get(trace.name, trace.name)
+    if trace_name in colors:
+        trace.line.color = colors[trace_name]
+    trace.line.width = 3
 
-# Fix Legend Names
-fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
+fig.update_layout(
+    # ... keep your existing layout ...
+)
 
 fig.update_layout(
     hovermode="x unified",
