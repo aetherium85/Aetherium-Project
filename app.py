@@ -285,42 +285,49 @@ if well_json:
         # --- 📈 Yearly Training Load Progression ---
 st.markdown("### 📈 Yearly Training Load Progression")
 
-# 1. Use line chart instead of area to handle negative TSB correctly
 fig = px.line(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
 
-# 2. Add shading under the lines to keep the 'area' look without stacking
-fig.update_traces(fill='tozeroy')
+# Update hover appearance and shading
+fig.update_traces(
+    fill='tozeroy',
+    # <extra></extra> hides the secondary box that usually shows the trace name
+    hovertemplate="<b>%{y:.1f}</b><extra></extra>" 
+)
 
-# 3. Fix the Legend Names (Mapping ctl -> Fitness, etc.)
+# Fix Legend Names
 fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
 
 fig.update_layout(
-    hovermode="x unified",
+    hovermode="x unified", # Shows all 3 metrics in one window when you hover over a date
+    hoverlabel=dict(
+        bgcolor="rgba(30, 30, 30, 0.8)", # Darker, semi-transparent background
+        font_size=14,
+        font_family="Inter",
+        font_color="white"
+    ),
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
     font=dict(color="white"),
-    
-    # 4. Move legend to the top-right (standard position)
     legend=dict(
         orientation="h",
         yanchor="bottom",
         y=1.02,
         xanchor="right",
         x=1,
-        title=None
+        font=dict(color="white")
     ),
-    
-    # 5. Improve Axis Grid & Zero Line
     xaxis=dict(
         gridcolor="rgba(255, 255, 255, 0.1)",
-        title=None
+        tickfont=dict(color="white"),
+        title=None,
+        hoverformat="%b %d, %Y" # Formats date in hover as "Dec 28, 2025"
     ),
     yaxis=dict(
         gridcolor="rgba(255, 255, 255, 0.1)",
+        tickfont=dict(color="white"),
         zeroline=True,
-        zerolinecolor="rgba(255, 255, 255, 0.5)", # Highlight the 0 line for Form
-        zerolinewidth=1,
-        title="Score"
+        zerolinecolor="rgba(255, 255, 255, 0.5)",
+        title=dict(text="Score", font=dict(color="white"))
     )
 )
 
