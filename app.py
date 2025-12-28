@@ -32,13 +32,13 @@ st.markdown(
     """
     <style>
     header[data-testid="stHeader"] {
-    visibility: hidden;
+    visibility: visible;
     height: 0%;
 }
 
 /* Hide the "Made with Streamlit" footer */
 footer {
-    visibility: hidden;
+    visibility: visible;
 }
     /* 1. IMPORT FONT */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
