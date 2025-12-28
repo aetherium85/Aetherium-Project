@@ -152,20 +152,27 @@ def get_ytd_data():
         well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
         act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
         ath_res = requests.get(base_url, headers=headers)
-
+        
         wellness = well_res.json()
         activities = act_res.json()
         athlete = ath_res.json()
 
-        # --- THE FIX: DEEPER FETCH FOR STRENGTH ---
-        # If the most recent activity is Weight Training, we need more detail
+        # --- REVISED DEEPER FETCH ---
         if activities and activities[0].get('type') == 'WeightTraining':
             act_id = activities[0].get('id')
-            # Fetch the specific activity detail endpoint
             detail_res = requests.get(f"{base_url}/activities/{act_id}", headers=headers)
+            
             if detail_res.status_code == 200:
-                # Update the first activity in our list with the detailed 'icu_weight' field
-                activities[0].update(detail_res.json())
+                detail_data = detail_res.json()
+                
+                # If detail_data is a list, the first item is usually the activity object
+                if isinstance(detail_data, list):
+                    # Intervals.icu sometimes returns a list of exercises
+                    # We look for the summary data or sum the 'icu_weight' manually
+                    activities[0]['icu_weight'] = sum(item.get('icu_weight', 0) for item in detail_data if isinstance(item, dict))
+                elif isinstance(detail_data, dict):
+                    # If it's a dictionary, we can update normally
+                    activities[0].update(detail_data)
 
         return wellness, activities, athlete
     
