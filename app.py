@@ -241,22 +241,29 @@ if act_json:
 
 # --- WELLNESS SECTION ---
 if well_json is not None:
-    df = pd.DataFrame([well_json]) if isinstance(well_json, dict) else pd.DataFrame(well_json)
+    # Safely convert to DataFrame even if it's an empty list
+    df = pd.DataFrame(well_json) 
 
-    if not df.empty:
+    if df.empty:
+        # Instead of an error, show a helpful warning for new users
+        st.warning("📊 No wellness data found for 2025 yet. Start logging to see your fitness trends!")
+    else:
+        # Standardize date column names
         date_col = next((c for c in ['timestamp', 'id', 'date'] if c in df.columns), None)
         if date_col:
             df = df.rename(columns={date_col: 'date'})
             df['date'] = pd.to_datetime(df['date'])
 
+        # Ensure core metrics exist to prevent chart crashes
         for col in ['ctl', 'atl', 'tsb']:
             if col not in df.columns:
                 df[col] = 0.0
 
+        # Calculate Form (TSB) if missing but CTL/ATL exist
         if (df['tsb'] == 0).all() and 'ctl' in df.columns and 'atl' in df.columns:
              df['tsb'] = df['ctl'] - df['atl']
 
-        # --- FEATURE: FLOATING STATS ---
+        # --- RENDER STATS & CHARTS ---
         st.markdown("### ⚡ Your Current Training Status")
         latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
@@ -279,7 +286,7 @@ if well_json is not None:
         elegant_stat(s3, "Form (TSB)", tsb_val, tsb_color)
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         
-        # --- FEATURE: YEARLY AREA CHART ---
+        # --- YEARLY AREA CHART ---
         st.markdown("### 📈 Yearly Training Load Progression")
         fig = px.area(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
         fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
@@ -303,8 +310,8 @@ if well_json is not None:
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 else:
-    st.error("Could not load wellness data.")
-    # --- ACTIVITIES SECTION ---
+    # This only triggers if the API call itself failed (e.g., 401 Unauthorized)
+    st.error("🚫 Authentication Error: Could not connect to your wellness data.")    # --- ACTIVITIES SECTION ---
 if act_json:
     df_act = pd.DataFrame(act_json)
     df_act['date_dt'] = pd.to_datetime(df_act['start_date_local'])
