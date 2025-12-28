@@ -265,7 +265,6 @@ if well_json:
             font=dict(color="white"), legend=dict(orientation="h", y=1.02),
             xaxis=dict(gridcolor="rgba(255, 255, 255, 0.2)"), yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)")
         )
-        st.plotly_chart(fig, use_container_width=True)
         st.markdown("""
     <div style="display: flex; justify-content: space-around; margin-bottom: 20px; opacity: 0.7;">
         <div style="font-size: 1rem; color: #70C4B0;">● <b>FITNESS:</b> 42-day average load</div>
@@ -273,6 +272,8 @@ if well_json:
         <div style="font-size: 1rem; color: #4BD4B0;">● <b>FORM:</b> Readiness (Fitness - Fatigue)</div>
     </div>
     """, unsafe_allow_html=True)
+        st.plotly_chart(fig, use_container_width=True)
+        
 # ==============================================================================
 # --- SECTION 8: PERFORMANCE HISTORY ---
 # ==============================================================================
