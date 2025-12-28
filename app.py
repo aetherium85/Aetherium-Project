@@ -38,10 +38,22 @@ MUSCLE_KEYWORDS = {
 
 def get_muscle_focus(activity_name):
     text = str(activity_name).lower()
+    matches = []
+    
     for focus, keywords in MUSCLE_KEYWORDS.items():
         if any(word in text for word in keywords):
-            return focus
-    return "Mixed Focus"
+            matches.append(focus)
+    
+    # Logic to handle the display
+    if not matches:
+        return "General"
+    
+    # If it hits 3 or more distinct groups, it's effectively "Full Body"
+    if len(matches) >= 3:
+        return "Full Body"
+    
+    # Otherwise, list them out (e.g., "Legs, Core")
+    return ", ".join(matches)
 
 st.markdown(
     """
@@ -241,8 +253,16 @@ if act_json:
         h3_icon, h3_label, h3_value = "🔥", "Intensity", f"{intensity:.1f} pts/hr"
         
         # Box 4: Muscle Focus
-        focus = get_muscle_focus(latest_act.get('name', ''))
-        h4_icon, h4_label, h4_value = "🧬", "Focus", focus
+        focus_text = get_muscle_focus(latest_act.get('name', ''))
+        
+        # Simple logic: if text is too long, maybe shorten it
+        if len(focus_text) > 15:
+            # Replaces the comma with a line break or just shortens
+            focus_display = focus_text.replace(", ", " + ")
+        else:
+            focus_display = focus_text
+
+        h4_icon, h4_label, h4_value = "🧬", "Focus", focus_display
             
     else:
         # Box 3: Distance for Cardio
