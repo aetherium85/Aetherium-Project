@@ -144,18 +144,45 @@ def get_ytd_data():
         return None, None, None
     token = st.session_state.token_data.get('access_token')
     headers = {"Authorization": f"Bearer {token}"}
+    
+    # We use athlete '0' as a shortcut for the authenticated athlete
     base_url = "https://intervals.icu/api/v1/athlete/0" 
     first_day = datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d')
     today = datetime.now().strftime('%Y-%m-%d')
     params = {'oldest': first_day, 'newest': today}
+    def elegant_hero_item(col, icon, label, value):
+        with col:
+            st.markdown(f"""
+            <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="font-size: 2rem; line-height: 1;">{icon}</div>
+                <div>
+                    <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5);">{label}</div>
+                    <div style="font-size: 1.4rem; font-weight: 200; line-height: 1.1; color: white;">{value}</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
     try:
         well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
         act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
         ath_res = requests.get(base_url, headers=headers)
-        return well_res.json(), act_res.json(), ath_res.json()
+        
+        wellness = well_res.json()
+        activities = act_res.json()
+        athlete = ath_res.json()
+
+        # DEEPER FETCH: If the latest activity is Weight Training, get more details
+        if activities and activities[0].get('type') == 'WeightTraining':
+            act_id = activities[0].get('id')
+            detail_res = requests.get(f"{base_url}/activities/{act_id}", headers=headers)
+            if detail_res.status_code == 200:
+                # Merge the detailed data (which contains icu_weight) into the summary
+                activities[0].update(detail_res.json())
+
+        return wellness, activities, athlete
     except Exception as e:
         st.error(f"Fetch failed: {e}")
         return None, None, None
+    
 
 def create_gauge(value, title, color_steps, min_val, max_val):
     fig = go.Figure(go.Indicator(
@@ -201,34 +228,37 @@ well_json, act_json, ath_json = get_ytd_data()
 if act_json:
     latest_act = act_json[0]
     
-    # Data Formatting
-    secs = latest_act.get('moving_time', 0)
+    # 1. Identify Activity Type
+    raw_type = latest_act.get('type', 'Other')
+    display_type = TYPE_MAPPING.get(raw_type, "Workout")
+    
+    # 2. Standard Safe Metrics
+    secs = latest_act.get('moving_time') or 0
     duration_str = f"{secs // 3600}h {(secs % 3600) // 60}m"
-    dist = latest_act.get('distance', 0) / 1000
-    hr = latest_act.get('average_heartrate', 0)
-    load = latest_act.get('icu_training_load', 0)
+    load = latest_act.get('icu_training_load') or 0
+    hr = latest_act.get('average_heartrate') or 0
 
-    st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')}")
+    # 3. Dynamic Metric Swap (Distance vs Tonnage)
+    if display_type == "Strength":
+        # 'icu_weight' is the field for total KG moved in Intervals.icu details
+        total_kg = latest_act.get('icu_weight') or 0
+        hero_icon = "🏋️"
+        hero_label = "Total Volume"
+        hero_value = f"{total_kg:,.0f} kg"
+    else:
+        dist = (latest_act.get('distance') or 0) / 1000
+        hero_icon = "🗺️"
+        hero_label = "Distance"
+        hero_value = f"{dist:.2f} km"
+
+    st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')} — {display_type}")
     
-    # Hero Row
+    # 4. Render Hero Row
     h1, h2, h3, h4 = st.columns(4)
-    
-    def elegant_hero_item(col, icon, label, value):
-        with col:
-            st.markdown(f"""
-                <div style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size: 2rem; line-height: 1;">{icon}</div>
-                    <div>
-                        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5);">{label}</div>
-                        <div style="font-size: 1.4rem; font-weight: 200; line-height: 1.1;">{value}</div>
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
-
     elegant_hero_item(h1, "⏱️", "Duration", duration_str)
     elegant_hero_item(h2, "⚡", "Impact", f"{load} pts")
-    elegant_hero_item(h3, "🗺️", "Distance", f"{dist:.2f} km" if dist > 0 else "N/A")
-    elegant_hero_item(h4, "💓", "Avg. HR", f"{hr:.0f} bpm" if hr > 0 else "N/A")
+    elegant_hero_item(h3, hero_icon, hero_label, hero_value)
+    elegant_hero_item(h4, "💓", "Avg. HR", f"{hr:.0f} bpm" if hr > 0 else "N/A") 
 
     st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
