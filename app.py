@@ -91,6 +91,24 @@ MUSCLE_KEYWORDS = {
 # ==============================================================================
 # --- SECTION 3: UTILITY FUNCTIONS (Logic & Processing) ---
 # ==============================================================================
+def get_status_label(metric, value):
+    if metric == "Fitness":
+        if value > 50: return "Elite Base"
+        if value > 30: return "Strong Base"
+        return "Building"
+        
+    if metric == "Fatigue":
+        if value > 40: return "Heavy Load"
+        if value > 20: return "Productive"
+        return "Light"
+        
+    if metric == "Form":
+        if value < -30: return "Overload"
+        if value < -10: return "Productive"
+        if value < 10: return "Optimal"
+        return "Fresh"
+    return ""
+
 def get_muscle_focus(activity_name):
     """Detects multiple muscle groups from the activity name."""
     text = str(activity_name).lower()
@@ -117,13 +135,19 @@ def elegant_hero_item(col, icon, label, value):
         """, unsafe_allow_html=True)
 
 def elegant_stat(col, label, value, color):
-    """Renders a large glowing training status stat."""
+    # Get the dynamic sub-label
+    clean_label = label.split(" (")[0] # Gets just 'Fitness' or 'Form'
+    status_text = get_status_label(clean_label, value)
+    
     with col:
         st.markdown(f"""
             <div style="text-align: center; padding: 25px 10px; background: rgba(255, 255, 255, 0.03); 
                         border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
                 <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 0;">{label}</p>
-                <h1 style="color: white; font-size: 4rem; font-weight: 200; margin: 0; text-shadow: 0 0 30px {color}66;">{int(value)}</h1>
+                <h1 style="color: white; font-size: 4rem; font-weight: 200; margin: 0; line-height: 1.1; text-shadow: 0 0 30px {color}66;">{int(value)}</h1>
+                <div style="color: {color}; font-size: 0.85rem; font-weight: 400; text-transform: uppercase; letter-spacing: 2px; margin-top: 5px;">
+                    ● {status_text}
+                </div>
             </div>
         """, unsafe_allow_html=True)
 
