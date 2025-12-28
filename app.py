@@ -92,22 +92,26 @@ MUSCLE_KEYWORDS = {
 # --- SECTION 3: UTILITY FUNCTIONS (Logic & Processing) ---
 # ==============================================================================
 def get_status_label(metric, value):
-    if metric == "Fitness":
+    # Convert to lowercase and check if the keyword is IN the string
+    m = metric.lower()
+    
+    if "fitness" in m:
         if value > 50: return "Elite Base"
         if value > 30: return "Strong Base"
         return "Building"
         
-    if metric == "Fatigue":
+    if "fatigue" in m:
         if value > 40: return "Heavy Load"
         if value > 20: return "Productive"
         return "Light"
         
-    if metric == "Form":
+    if "form" in m:
         if value < -30: return "Overload"
         if value < -10: return "Productive"
         if value < 10: return "Optimal"
         return "Fresh"
-    return ""
+    
+    return "Neutral"
 
 def get_muscle_focus(activity_name):
     """Detects multiple muscle groups from the activity name."""
@@ -135,9 +139,8 @@ def elegant_hero_item(col, icon, label, value):
         """, unsafe_allow_html=True)
 
 def elegant_stat(col, label, value, color):
-    # Get the dynamic sub-label
-    clean_label = label.split(" (")[0] # Gets just 'Fitness' or 'Form'
-    status_text = get_status_label(clean_label, value)
+    # We pass the full label to the helper function now
+    status_text = get_status_label(label, value)
     
     with col:
         st.markdown(f"""
