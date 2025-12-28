@@ -28,6 +28,21 @@ TYPE_MAPPING = {
     "WeightTraining": "Strength", "Yoga": "Mobility", "Pilates": "Mobility"
 }
 
+MUSCLE_KEYWORDS = {
+    "Legs": ["squat", "leg", "quad", "hamstring", "glute", "calf", "deadlift", "lunge"],
+    "Chest/Push": ["bench", "press", "push", "chest", "tricep", "shoulder", "dip"],
+    "Back/Pull": ["row", "pull", "back", "deadlift", "lat", "bicep", "chin"],
+    "Core": ["plank", "core", "abs", "situp", "crunch"],
+    "Full Body": ["crossfit", "hiit", "metcon", "full"]
+}
+
+def get_muscle_focus(activity_name):
+    text = str(activity_name).lower()
+    for focus, keywords in MUSCLE_KEYWORDS.items():
+        if any(word in text for word in keywords):
+            return focus
+    return "Mixed Focus"
+
 st.markdown(
     """
     <style>
@@ -216,27 +231,31 @@ if act_json:
     hr = latest_act.get('average_heartrate') or 0
 
     # 3. Dynamic Metric Swap (Intensity vs Distance)
+    # --- 3. Dynamic Metric Logic ---
     if display_type == "Strength":
-        # Calculate Intensity: Load / (Moving Time in hours)
+        # Box 3: Intensity (Load/Hour)
         hours = (latest_act.get('moving_time') or 0) / 3600
         load = latest_act.get('icu_training_load') or 0
-        
         intensity = load / hours if hours > 0 else 0
         
-        hero_icon = "🔥"
-        hero_label = "Intensity"
-        hero_value = f"{intensity:.1f} pts/hr"
+        h3_icon, h3_label, h3_value = "🔥", "Intensity", f"{intensity:.1f} pts/hr"
+        
+        # Box 4: Muscle Focus
+        focus = get_muscle_focus(latest_act.get('name', ''))
+        h4_icon, h4_label, h4_value = "🧬", "Focus", focus
             
     else:
-        # Standard Cardio view
+        # Box 3: Distance for Cardio
         dist = (latest_act.get('distance') or 0) / 1000
-        hero_icon = "🗺️"
-        hero_label = "Distance"
-        hero_value = f"{dist:.2f} km"
+        h3_icon, h3_label, h3_value = "🗺️", "Distance", f"{dist:.2f} km"
+        
+        # Box 4: Heart Rate for Cardio
+        hr = latest_act.get('average_heartrate') or 0
+        h4_icon, h4_label, h4_value = "💓", "Avg. HR", f"{hr:.0f} bpm" if hr > 0 else "N/A"
 
+    # --- 4. Render Hero Row ---
     st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')} — {display_type}")
     
-    # 4. Render Hero Row
     h1, h2, h3, h4 = st.columns(4)
        
     def elegant_hero_item(col, icon, label, value):
@@ -253,14 +272,10 @@ if act_json:
 
     hero_icon = "🏋️" if display_type == "Strength" else "⏱️"
 
-    # Then call your function
     elegant_hero_item(h1, "⏱️", "Duration", duration_str)
     elegant_hero_item(h2, "⚡", "Impact", f"{load} pts")
-    elegant_hero_item(h3, hero_icon, hero_label, hero_value)
-    
-    # Use HR if available, otherwise show "Strength" status
-    hr_val = f"{hr:.0f} bpm" if hr > 0 else "N/A"
-    elegant_hero_item(h4, "💓", "Avg. HR", hr_val)
+    elegant_hero_item(h3, h3_icon, h3_label, h3_value)
+    elegant_hero_item(h4, h4_icon, h4_label, h4_value)
 
     st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
