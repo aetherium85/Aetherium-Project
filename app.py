@@ -115,16 +115,6 @@ footer {
 )
 
 # --- 3. FUNCTION DEFINITIONS ---
-# MOVE THIS TO THE TOP: Always show logout if authenticated
-with st.sidebar:
-    st.markdown("### 👤 User Settings")
-    if st.sidebar.button("🔓 Logout / Change Athlete", use_container_width=True):
-        st.session_state.authenticated = False
-        st.session_state.token_data = None
-        st.rerun()
-    st.info("Logging out allows you to re-authorize and fix permission issues (like missing Wellness data).")
-
-
 def show_login_screen():
     st.title("❤️ Fitness Command Center")
     st.write("Securely sync your 2025 performance data.")
@@ -216,6 +206,14 @@ def get_ytd_data():
     except Exception as e:
         st.error(f"Connection failed: {e}")
         return None, None, None
+# MOVE THIS TO THE TOP: Always show logout if authenticated
+with st.sidebar:
+    st.markdown("### 👤 User Settings")
+    if st.sidebar.button("🔓 Logout / Change Athlete", use_container_width=True):
+        st.session_state.authenticated = False
+        st.session_state.token_data = None
+        st.rerun()
+    st.info("Logging out allows you to re-authorize and fix permission issues (like missing Wellness data).")
 
 
 # --- 6. DASHBOARD LOGIC ---
