@@ -256,7 +256,7 @@ if act_json:
         focus_text = get_muscle_focus(latest_act.get('name', ''))
         
         # Simple logic: if text is too long, maybe shorten it
-        if len(focus_text) > 15:
+        if len(focus_text) > 60:
             # Replaces the comma with a line break or just shortens
             focus_display = focus_text.replace(", ", " + ")
         else:
