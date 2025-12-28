@@ -113,7 +113,21 @@ footer {
     """,
     unsafe_allow_html=True
 )
-
+# MOVE THIS TO THE TOP: Always show logout if authenticated
+with st.sidebar:
+    st.markdown("### 👤 User Settings")
+    if st.button("🔓 Logout / Change Athlete", use_container_width=True):
+        # 1. Clear session state
+        st.session_state.authenticated = False
+        st.session_state.token_data = None
+        
+        # 2. CLEAR URL PARAMETERS (Crucial: prevents auto-relogin)
+        st.query_params.clear() 
+        
+        # 3. Force a full rerun
+        st.rerun()
+    
+    st.info("Log out to fix permission issues or switch accounts.")
 # --- 3. FUNCTION DEFINITIONS ---
 def show_login_screen():
     st.title("❤️ Fitness Command Center")
@@ -206,22 +220,6 @@ def get_ytd_data():
     except Exception as e:
         st.error(f"Connection failed: {e}")
         return None, None, None
-# MOVE THIS TO THE TOP: Always show logout if authenticated
-with st.sidebar:
-    st.markdown("### 👤 User Settings")
-    if st.button("🔓 Logout / Change Athlete", use_container_width=True):
-        # 1. Clear session state
-        st.session_state.authenticated = False
-        st.session_state.token_data = None
-        
-        # 2. CLEAR URL PARAMETERS (Crucial: prevents auto-relogin)
-        st.query_params.clear() 
-        
-        # 3. Force a full rerun
-        st.rerun()
-    
-    st.info("Log out to fix permission issues or switch accounts.")
-
 # --- 6. DASHBOARD LOGIC ---
 well_json, act_json, ath_json = get_ytd_data()
 
