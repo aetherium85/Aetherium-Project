@@ -93,14 +93,14 @@ def elegant_hero_item(col, icon, label, value):
             </div>
         """, unsafe_allow_html=True)
 
-def elegant_stat(col, label, value, color):
-    """Renders a large glowing training status stat."""
+def elegant_stat(col, label, value, color, description):
     with col:
         st.markdown(f"""
-            <div style="text-align: center; padding: 25px 10px; background: rgba(255, 255, 255, 0.03); 
-                        border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
+            <div style="text-align: center; padding: 25px 15px; background: rgba(255, 255, 255, 0.03); 
+                        border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); min-height: 220px;">
                 <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 0;">{label}</p>
                 <h1 style="color: white; font-size: 4rem; font-weight: 200; margin: 0; text-shadow: 0 0 30px {color}66;">{int(value)}</h1>
+                <p style="color: rgba(255,255,255,0.4); font-size: 0.75rem; line-height: 1.3; margin-top: 10px; font-style: italic;">{description}</p>
             </div>
         """, unsafe_allow_html=True)
 
@@ -224,11 +224,16 @@ if well_json:
         st.markdown("### ⚡ Your Current Training Status")
         latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
-        elegant_stat(s1, "Fitness (CTL)", latest.get('ctl', 0), "#70C4B0")
-        elegant_stat(s2, "Fatigue (ATL)", latest.get('atl', 0), "#E16C45")
+        elegant_stat(s1, "Fitness (CTL)", latest.get('ctl', 0), "#70C4B0", 
+             "A 42-day rolling average of your work. Higher means better aerobic engine.")
+
+        elegant_stat(s2, "Fatigue (ATL)", latest.get('atl', 0), "#E16C45", 
+             "A 7-day average of recent stress. High numbers mean you're training hard.")
+
         tsb_val = latest.get('tsb', 0)
         tsb_color = "#4BD4B0" if tsb_val > -10 else "#E16C45"
-        elegant_stat(s3, "Form (TSB)", tsb_val, tsb_color)
+        elegant_stat(s3, "Form (TSB)", tsb_val, tsb_color, 
+             "Fitness minus Fatigue. Positive (>0) means you're fresh and ready to race.")
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         
         # YEARLY PROGRESS CHART
