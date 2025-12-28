@@ -282,25 +282,25 @@ if well_json:
         
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         
-        # --- 📈 Yearly Training Load Progression ---
-        st.markdown("### 📈 Yearly Training Load Progression")
+    # --- 📈 Yearly Training Load Progression ---
+    st.markdown("### 📈 Yearly Training Load Progression")
 
-        fig = px.line(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
+# We use px.line and DO NOT add the fill property
+fig = px.line(df, x='date', y=['ctl', 'atl', 'tsb'], labels=pretty_labels)
 
-        # Update hover appearance and shading
-        fig.update_traces(
-        fill='tozeroy',
-        # <extra></extra> hides the secondary box that usually shows the trace name
-        hovertemplate="<b>%{y:.1f}</b><extra></extra>" 
+# Customize the line thickness and hover behavior
+fig.update_traces(
+    line=dict(width=3), # Makes the lines stand out more
+    hovertemplate="<b>%{y:.1f}</b><extra></extra>" 
 )
 
 # Fix Legend Names
 fig.for_each_trace(lambda t: t.update(name = pretty_labels.get(t.name, t.name)))
 
 fig.update_layout(
-    hovermode="x unified", # Shows all 3 metrics in one window when you hover over a date
+    hovermode="x unified",
     hoverlabel=dict(
-        bgcolor="rgba(30, 30, 30, 0.8)", # Darker, semi-transparent background
+        bgcolor="rgba(30, 30, 30, 0.9)", 
         font_size=14,
         font_family="Inter",
         font_color="white"
@@ -320,13 +320,14 @@ fig.update_layout(
         gridcolor="rgba(255, 255, 255, 0.1)",
         tickfont=dict(color="white"),
         title=None,
-        hoverformat="%b %d, %Y" # Formats date in hover as "Dec 28, 2025"
+        hoverformat="%b %d, %Y"
     ),
     yaxis=dict(
         gridcolor="rgba(255, 255, 255, 0.1)",
         tickfont=dict(color="white"),
         zeroline=True,
         zerolinecolor="rgba(255, 255, 255, 0.5)",
+        zerolinewidth=1.5, # Slightly thicker zero line for better context
         title=dict(text="Score", font=dict(color="white"))
     )
 )
