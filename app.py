@@ -285,9 +285,9 @@ if well_json:
     # --- 📈 Yearly Training Load Progression ---
     st.markdown("### 📈 Yearly Training Load Progression")
 
-# We use px.line and DO NOT add the fill property
-# Define your signature colors
-colors = {
+    # We use px.line and DO NOT add the fill property
+    # Define your signature colors
+    colors = {
     "Fitness (CTL)": "#70C4B0",  # Teal/Green
     "Fatigue (ATL)": "#E16C45",  # Orange/Coral
     "Form (TSB)": "#4BD4B0"      # Bright Mint
