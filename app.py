@@ -201,20 +201,28 @@ well_json, act_json, ath_json = get_ytd_data()
 if act_json:
     latest_act = act_json[0]
     
-    # 1. Get the Activity Type
+    # 1. Determine Activity Type
     raw_type = latest_act.get('type', 'Other')
     display_type = TYPE_MAPPING.get(raw_type, "Workout")
-
-    # 2. Safe Data Extraction (Prevents TypeErrors)
+    
+    # 2. Extract Data Safely
     secs = latest_act.get('moving_time') or 0
     duration_str = f"{secs // 3600}h {(secs % 3600) // 60}m"
-    
-    # Distance fix: Use 0 if it's a gym session
-    dist = (latest_act.get('distance') or 0) / 1000
-    
-    # HR and Load safety
-    hr = latest_act.get('average_heartrate') or 0
     load = latest_act.get('icu_training_load') or 0
+    hr = latest_act.get('average_heartrate') or 0
+
+    # 3. SWAP LOGIC: Distance vs. Weight
+    if display_type == "Strength":
+        # intervals.icu uses 'icu_weight' or 'icu_training_weight' for total tonnage
+        total_kg = latest_act.get('icu_weight') or latest_act.get('icu_training_load') * 10 # Fallback estimate if tonnage isn't synced
+        hero_label = "Total Weight"
+        hero_value = f"{total_kg:,.0f} kg"
+        hero_icon = "🏋️"
+    else:
+        dist = (latest_act.get('distance') or 0) / 1000
+        hero_label = "Distance"
+        hero_value = f"{dist:.2f} km"
+        hero_icon = "🗺️"
 
     st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')} ({display_type})")
     
@@ -238,7 +246,7 @@ if act_json:
     # Then call your function
     elegant_hero_item(h1, hero_icon, "Duration", duration_str)
     elegant_hero_item(h2, "⚡", "Impact", f"{load} pts")
-    elegant_hero_item(h3, "🗺️", "Distance", f"{dist:.2f} km" if dist > 0 else "N/A")
+    elegant_hero_item(h3, hero_icon, hero_label, hero_value)
     elegant_hero_item(h4, "💓", "Avg. HR", f"{hr:.0f} bpm" if hr > 0 else "N/A")
 
     st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
