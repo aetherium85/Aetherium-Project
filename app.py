@@ -566,19 +566,19 @@ if 'act_json' in locals() and act_json:
         for _, row in monthly.iterrows():
             # Note: The HTML tags are pushed to the left to prevent "Code Block" formatting
             st.markdown(f"""
-<div class="performance-row">
-    <div style="flex: 2; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #70C4B0;">
-        {row['MonthDisplay']}
-    </div>
-    <div style="flex: 1; text-align: right; font-family: 'Inter', sans-serif; font-size: 0.9rem;">
-        <span style="opacity: 0.6; margin-right: 5px;">🏃</span> 
-        <b>{int(row['Sessions'])}</b>
-    </div>
-    <div style="flex: 1; text-align: right; font-family: 'Inter', sans-serif; font-size: 0.9rem;">
-        <span style="opacity: 0.6; margin-right: 5px;">🔥</span> 
-        <b>{row['Total Load']:.0f}</b>
-    </div>
-</div>
+            <div class="performance-row">
+                <div style="flex: 2; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #70C4B0;">
+                {row['MonthDisplay']}
+            </div>
+            <div style="flex: 1; text-align: right; font-family: 'Inter', sans-serif; font-size: 0.9rem;">
+                <span style="opacity: 0.6; margin-right: 5px;">🏃</span> 
+                <b>{int(row['Sessions'])}</b>
+            </div>
+            <div style="flex: 1; text-align: right; font-family: 'Inter', sans-serif; font-size: 0.9rem;">
+                <span style="opacity: 0.6; margin-right: 5px;">🔥</span> 
+                <b>{row['Total Load']:.0f}</b>
+            </div>
+        </div>
 """, unsafe_allow_html=True)
             
     else:
