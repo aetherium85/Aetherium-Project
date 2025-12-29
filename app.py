@@ -193,10 +193,20 @@ def show_login_screen():
     }
     auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(auth_params)}"
 
-    # 4. Redirect Button
-    if st.button("🚀 Connect with Intervals.icu", type="primary", use_container_width=False):
-        js = f"window.parent.location.href = '{auth_url}'"
-        st.components.v1.html(f"<script>{js}</script>", height=0)
+    # 1. Create an empty placeholder
+    redirect_placeholder = st.empty()
+
+    # 2. Render the button
+    if st.button("🚀 Connect with Intervals.icu", type="primary"):
+        # 3. When clicked, fill the placeholder with the redirect script
+        # We use window.top to ensure we break out of the Streamlit iframe entirely
+        js = f"""
+            <script>
+                window.top.location.href = '{auth_url}';
+            </script>
+        """
+        with redirect_placeholder:
+            st.components.v1.html(js, height=0)
 
 def get_access_token(auth_code):
     token_url = "https://intervals.icu/api/oauth/token"
