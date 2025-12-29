@@ -270,7 +270,7 @@ def show_login_screen():
     auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(params)}"
 
     # Using the native Streamlit button (Opens in new tab)
-    st.link_button("🚀 Connect with Intervals.icu", auth_url, type="primary")
+    st.button("🚀 Connect with Intervals.icu", auth_url, type="primary")
 
 def get_access_token(auth_code):
     token_url = "https://intervals.icu/api/oauth/token"
