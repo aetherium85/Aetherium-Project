@@ -1,11 +1,13 @@
 import streamlit.components.v1 as components
 import urllib.parse
 import streamlit as st
+import base64
 import requests
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
+
 
 # ==============================================================================
 # --- SECTION 1: APP CONFIGURATION & STYLING ---
@@ -195,7 +197,7 @@ def show_login_screen():
     if st.button("🚀 Connect with Intervals.icu", type="primary", use_container_width=False):
         js = f"window.parent.location.href = '{auth_url}'"
         st.components.v1.html(f"<script>{js}</script>", height=0)
-        
+
 def get_access_token(auth_code):
     token_url = "https://intervals.icu/api/oauth/token"
     payload = {
