@@ -191,7 +191,7 @@ def show_login_screen():
     f"client_id={client_id}&"
     f"redirect_uri={redirect_uri}&"
     f"response_type=code&"
-    f"scope=ACTIVITY:READ%20WELLNESS:READ" # Space replaced with %20
+    f"scope=ACTIVITY:READ,WELLNESS:READ" # Space replaced with %20
 )
     
     st.markdown(f"""
