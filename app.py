@@ -179,7 +179,8 @@ def show_login_screen():
 
     # JavaScript to redirect the current tab instead of opening a new one
     if st.button("🚀 Connect with Intervals.icu", type="primary"):
-        js = f"window.location.href = '{auth_url}'"
+        # We use window.parent to break out of the iframe
+        js = f"window.parent.location.href = '{auth_url}'"
         st.components.v1.html(f"<script>{js}</script>", height=0)
 
 def get_access_token(auth_code):
