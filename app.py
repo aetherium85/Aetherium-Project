@@ -26,7 +26,9 @@ st.markdown(
     <style>
     header[data-testid="stHeader"] { visibility: visible; height: 0%; }
     footer { visibility: visible; }
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
+    
+    /* 1. Import all fonts at the very top */
+    @import url('https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@200;300;400&display=swap');
 
     .stApp::before {
         content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -36,10 +38,15 @@ st.markdown(
         background-attachment: fixed !important; filter: blur(4px); transform: scale(1.1); z-index: -1;
     }
     .stApp { background: transparent !important; }
+
+    /* 2. Universal Rule: MOVED h1 OUT OF HERE so it doesn't fight Michroma */
     h2, h3, p, label, .performance-row, .performance-row div, .performance-row b {
-        font-family: 'Inter', sans-serif !important; font-weight: 200 !important;
-        color: white !important; letter-spacing: 1px;
+        font-family: 'Inter', sans-serif !important; 
+        font-weight: 200 !important;
+        color: white !important; 
+        letter-spacing: 1px;
     }
+
     [data-testid="stHorizontalBlock"] div, [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { color: white !important; }
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart), .performance-row {
         background-color: rgba(255, 255, 255, 0.05) !important; backdrop-filter: blur(10px) !important;
@@ -72,7 +79,7 @@ st.markdown(
     .performance-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px !important; }
     h3 { text-transform: uppercase !important; letter-spacing: 4px !important; font-size: 0.9rem !important; opacity: 0.8; }
 
-    @import url('https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@200&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Michroma&display=swap');
 
     .brand-wrapper {
         display: flex !important;
@@ -109,7 +116,6 @@ st.markdown(
         margin-top: 4px !important;
         text-transform: uppercase !important;
     }
-
     </style>
     """,
     unsafe_allow_html=True
@@ -344,7 +350,7 @@ if well_json:
         
         tsb_val = latest.get('tsb', 0)
         tsb_color = "#4BD4B0" if tsb_val > -10 else "#E16C45"
-        elegant_stat(s3, "Form)", tsb_val, tsb_color)
+        elegant_stat(s3, "Form", tsb_val, tsb_color)
         
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         
