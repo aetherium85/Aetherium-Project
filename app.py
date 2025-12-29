@@ -164,29 +164,38 @@ def elegant_stat(col, label, value, color):
         """, unsafe_allow_html=True)
 
 def show_login_screen():
-    # Use your existing CSS for a beautiful splash screen
+    # 1. Ensure your LOGO_BASE64 is defined as a clean string elsewhere
+    # 2. Use a triple-quoted f-string for the markdown
     st.markdown(f"""
-    <div style="text-align: center; padding: 50px;">
-        <img src="data:image/png;base64,{LOGO_BASE64}" style="width: 120px; margin-bottom: 20px;">
-        
-        <h1 style="font-size: 3rem; margin-bottom: 20px;">Aetherium Project</h1>
-        <p style="opacity: 0.7; margin-bottom: 40px;">Performance Data for the Athlete of Tomorrow</p>
-    </div>
-""", unsafe_allow_html=True)
+        <div style="text-align: center; padding: 40px 0;">
+            <img src="data:image/png;base64,{LOGO_BASE64}" 
+                 style="width: 120px; height: auto; margin-bottom: 20px; 
+                        filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));">
+            
+            <h1 style="font-size: 3rem; margin-bottom: 10px; font-weight: 200; letter-spacing: 2px;">
+                Aetherium Project
+            </h1>
+            
+            <p style="opacity: 0.7; font-size: 1.1rem; margin-bottom: 40px; font-weight: 200;">
+                Performance Data for the Athlete of Tomorrow
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
 
-    auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode({
+    # 3. Auth URL logic
+    auth_params = {
         'client_id': st.secrets['INTERVALS_CLIENT_ID'],
         'redirect_uri': st.secrets['REDIRECT_URI'],
         'response_type': 'code',
         'scope': 'ACTIVITY:READ,WELLNESS:READ'
-    })}"
+    }
+    auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(auth_params)}"
 
-    # JavaScript to redirect the current tab instead of opening a new one
-    if st.button("🚀 Connect with Intervals.icu", type="primary"):
-        # We use window.parent to break out of the iframe
+    # 4. Redirect Button
+    if st.button("🚀 Connect with Intervals.icu", type="primary", use_container_width=False):
         js = f"window.parent.location.href = '{auth_url}'"
         st.components.v1.html(f"<script>{js}</script>", height=0)
-
+        
 def get_access_token(auth_code):
     token_url = "https://intervals.icu/api/oauth/token"
     payload = {
