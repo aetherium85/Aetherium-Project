@@ -72,13 +72,12 @@ st.markdown(
     .performance-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px !important; }
     h3 { text-transform: uppercase !important; letter-spacing: 4px !important; font-size: 0.9rem !important; opacity: 0.8; }
 
-    /* 1. Import Michroma and Inter from Google Fonts */
     @import url('https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@200&display=swap');
 
     .brand-wrapper {
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: center; /* Centers the whole logo block on the page */
         width: 100%;
         margin-top: 30px;
     }
@@ -86,20 +85,18 @@ st.markdown(
     .title-container {
         display: flex;
         flex-direction: column;
-        /* Michroma is wide, so we keep the container tight to the text */
+        /* CRITICAL: Shrinks the box to exactly the width of the word AETHERIUM */
         width: min-content; 
     }
 
     .title-main {
         font-family: 'Michroma', sans-serif !important;
-        font-size: 3.2rem; /* Adjusted for Michroma's width */
-        font-weight: 400;
-        letter-spacing: 4px; /* Michroma is wide, less spacing needed */
-        line-height: 1.1;
+        font-size: 3.2rem;
+        line-height: 1;
         color: #ffffff;
         text-shadow: 0 0 15px rgba(112, 196, 176, 0.4);
         margin: 0;
-        white-space: nowrap;
+        white-space: nowrap; /* Prevents word wrapping */
     }
 
     .title-sub {
@@ -108,9 +105,10 @@ st.markdown(
         font-weight: 200;
         letter-spacing: 8px;
         color: #70C4B0;
-        text-align: right;
+        /* Aligns to the right of the 'title-container' box */
+        text-align: right; 
         width: 100%;
-        margin-top: 2px;
+        margin-top: 4px;
         text-transform: uppercase;
     }
 
@@ -213,10 +211,10 @@ def elegant_stat(col, label, value, color):
 def show_login_screen():
     # Re-applying your clean branding
     st.markdown(f"""
-        <div class="brand-container">
-            <img src="data:image/png;base64,{LOGO_BASE64}" style="width: 100px; margin-bottom: 20px;">
-            <div style="display: inline-block;">
-                <div class="title-main">aetherium</div>
+        <div class="brand-wrapper">
+            <img src="data:image/png;base64,{LOGO_BASE64}" style="width: 70px; margin-bottom: 20px;">
+            <div class="title-container">
+                <div class="title-main">AETHERIUM</div>
                 <div class="title-sub">PROJECT</div>
             </div>
         </div>
