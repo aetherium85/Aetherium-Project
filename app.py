@@ -222,7 +222,7 @@ def show_login_screen():
         <div class="brand-wrapper">
             <img src="data:image/png;base64,{LOGO_BASE64}" style="width: 70px; margin-bottom: 20px;">
             <div class="title-container">
-                <div class="title-main">AETHERIUM</div>
+                <div class="title-main">aetherium</div>
                 <div class="title-sub">PROJECT</div>
             </div>
         </div>
