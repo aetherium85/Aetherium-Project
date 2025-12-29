@@ -166,36 +166,30 @@ def elegant_stat(col, label, value, color):
         """, unsafe_allow_html=True)
 
 def show_login_screen():
-    # 1. Logo and Header (f-string fixes the rendering issue in your screenshot)
+    # 1. Re-display your logo and title (f-string fix)
     st.markdown(f"""
         <div style="text-align: center; padding: 40px 0;">
-            <img src="data:image/png;base64,{LOGO_BASE64}" 
-                 style="width: 120px; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));">
-            <h1 style="font-size: 3rem; margin-bottom: 10px;">Aetherium Project</h1>
-            <p style="opacity: 0.7; margin-bottom: 40px;">Performance Data for the Athlete of Tomorrow</p>
+            <img src="data:image/png;base64,{LOGO_BASE64}" style="width: 120px; margin-bottom: 20px;">
+            <h1 style="font-size: 3rem;">Aetherium Project</h1>
         </div>
     """, unsafe_allow_html=True)
 
-    # 2. Auth URL
-    auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode({
-        'client_id': st.secrets['INTERVALS_CLIENT_ID'],
-        'redirect_uri': st.secrets['REDIRECT_URI'],
-        'response_type': 'code',
-        'scope': 'ACTIVITY:READ,WELLNESS:READ'
-    })}"
-
-    # 3. The "Button" (Standard HTML Link styled as a button to avoid iframe blocks)
+    # 2. Build parameters carefully
+    params = {
+        "client_id": st.secrets["INTERVALS_CLIENT_ID"],
+        "redirect_uri": st.secrets["REDIRECT_URI"],
+        "response_type": "code",
+        "scope": "ACTIVITY:READ,WELLNESS:READ"
+    }
+    
+    # 3. Use the styled anchor tag to bypass iframe security
+    auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(params)}"
+    
     st.markdown(f"""
         <div style="text-align: center;">
             <a href="{auth_url}" target="_self" style="
-                background-color: #ff4b4b; 
-                color: white; 
-                padding: 12px 24px; 
-                text-decoration: none; 
-                border-radius: 8px; 
-                font-family: 'Inter', sans-serif;
-                font-weight: 400;
-                display: inline-block;
+                background-color: #ff4b4b; color: white; padding: 12px 24px; 
+                text-decoration: none; border-radius: 8px; display: inline-block;
             ">🚀 Connect with Intervals.icu</a>
         </div>
     """, unsafe_allow_html=True)
