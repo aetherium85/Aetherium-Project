@@ -157,18 +157,26 @@ def elegant_stat(col, label, value, color):
             </div>
         """, unsafe_allow_html=True)
 
-# ==============================================================================
-# --- SECTION 4: API & AUTHENTICATION ---
-# ==============================================================================
 def show_login_screen():
-    st.title("❤️ Fitness Command Center")
+    # Use your existing CSS for a beautiful splash screen
+    st.markdown("""
+        <div style="text-align: center; padding: 50px;">
+            <h1 style="font-size: 3rem; margin-bottom: 20px;">Aetherium Project</h1>
+            <p style="opacity: 0.7; margin-bottom: 40px;">Securely sync your 2025 performance data.</p>
+        </div>
+    """, unsafe_allow_html=True)
+
     auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode({
         'client_id': st.secrets['INTERVALS_CLIENT_ID'],
         'redirect_uri': st.secrets['REDIRECT_URI'],
         'response_type': 'code',
         'scope': 'ACTIVITY:READ,WELLNESS:READ'
     })}"
-    st.link_button("🚀 Connect with Intervals.icu", auth_url, type="primary")
+
+    # JavaScript to redirect the current tab instead of opening a new one
+    if st.button("🚀 Connect with Intervals.icu", type="primary"):
+        js = f"window.location.href = '{auth_url}'"
+        st.components.v1.html(f"<script>{js}</script>", height=0)
 
 def get_access_token(auth_code):
     token_url = "https://intervals.icu/api/oauth/token"
