@@ -146,7 +146,7 @@ st.markdown(
     a[href*="intervals.icu"] {
         display: block !important;
         width: 100% !important;        /* Controls width so it doesn't span full screen */
-        margin: 20px auto 0 auto !important; /* 50px Top margin, Auto Left/Right centers it */
+        margin: 5px auto 0 auto !important; /* 50px Top margin, Auto Left/Right centers it */
         text-align: center !important;
         
         /* The Teal Gradient */
