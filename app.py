@@ -553,7 +553,7 @@ if 'act_json' in locals() and act_json:
         # We use the same 'flex' ratios (2, 1, 1) as the data rows so they align perfectly.
         st.markdown("""
             <div style="display: flex; justify-content: space-between; padding: 10px 25px; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <div style="flex: 2; color: #70C4B0; font-family: 'Michroma', sans-serif; font-size: 0.8rem; letter-spacing: 2px;">MONTH</div>
+                <div style="flex: 1; color: #70C4B0; font-family: 'Michroma', sans-serif; font-size: 0.8rem; letter-spacing: 2px;">MONTH</div>
                 <div style="flex: 1; text-align: right; color: rgba(255,255,255,0.6); font-family: 'Michroma', sans-serif; font-size: 0.7rem;">SESSIONS</div>
                 <div style="flex: 1; text-align: right; color: rgba(255,255,255,0.6); font-family: 'Michroma', sans-serif; font-size: 0.7rem;">LOAD</div>
             </div>
