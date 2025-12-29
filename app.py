@@ -277,7 +277,7 @@ def show_login_screen():
 
     with col2:
         # The CSS above will still style the colors, but this forces the position
-        st.button("🚀 Connect with Intervals.icu", auth_url, type="primary", use_container_width=True)
+        st.link_button("🚀 Connect with Intervals.icu", auth_url, type="primary", use_container_width=True)
 
 def get_access_token(auth_code):
     token_url = "https://intervals.icu/api/oauth/token"
