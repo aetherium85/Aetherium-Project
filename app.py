@@ -102,11 +102,11 @@ st.markdown(
         font-weight: 200;
         letter-spacing: 5px;
         text-transform: uppercase;
-        color: #70C4B0;
+        color: #ffffff;
         /* This aligns 'PROJECT' to the right edge of its container */
         align-self: flex-end; 
         margin-top: -10px;
-        padding-right: 10%; /* Adjust this to line up with the 'M' in AETHERIUM */
+        padding-right: 0%; /* Adjust this to line up with the 'M' in AETHERIUM */
     }
 
     </style>
