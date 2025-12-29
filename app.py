@@ -71,6 +71,44 @@ st.markdown(
     
     .performance-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px !important; }
     h3 { text-transform: uppercase !important; letter-spacing: 4px !important; font-size: 0.9rem !important; opacity: 0.8; }
+
+    /* Import futuristic fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Michroma:wght@400;700&family=Inter:wght@200;400&display=swap');
+
+    .brand-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Centers the whole block */
+        width: 100%;
+        margin-bottom: 40px;
+    }
+
+    .title-main {
+        font-family: 'Michroma', sans-serif !important;
+        font-size: 4rem;
+        font-weight: 700;
+        letter-spacing: 8px;
+        margin-bottom: 0px;
+        color: #ffffff;
+        /* Subtle neon glow */
+        text-shadow: 0 0 10px rgba(112, 196, 176, 0.6);
+        text-align: center;
+        width: 100%;
+    }
+
+    .title-sub {
+        font-family: 'Michroma', sans-serif;
+        font-size: 1rem;
+        font-weight: 200;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        color: #70C4B0;
+        /* This aligns 'PROJECT' to the right edge of its container */
+        align-self: flex-end; 
+        margin-top: -10px;
+        padding-right: 10%; /* Adjust this to line up with the 'M' in AETHERIUM */
+    }
+
     </style>
     """,
     unsafe_allow_html=True
@@ -165,13 +203,17 @@ def elegant_stat(col, label, value, color):
             </div>
         """, unsafe_allow_html=True)
 
+
+
 def show_login_screen():
     # Re-applying your clean branding
     st.markdown(f"""
-        <div style="text-align: center; padding: 50px;">
-            <img src="data:image/png;base64,{LOGO_BASE64}" style="width: 120px; margin-bottom: 20px;">
-            <h1 style="font-size: 3rem; margin-bottom: 20px;">Aetherium Project</h1>
-            <p style="opacity: 0.7; margin-bottom: 40px;">Today's Data for Tomorrow's Athlete</p>
+        <div class="brand-container">
+            <img src="data:image/png;base64,{LOGO_BASE64}" style="width: 100px; margin-bottom: 20px;">
+            <div style="display: inline-block;">
+                <div class="title-main">AETHERIUM</div>
+                <div class="title-sub">project</div>
+            </div>
         </div>
     """, unsafe_allow_html=True)
 
