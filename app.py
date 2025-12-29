@@ -24,62 +24,67 @@ LOGO_BASE64 = "iVBORw0KGgoAAAANSUhEUgAABlcAAAZXCAYAAAD6rSYVAAAAAXNSR0IArs4c6QAAA
 st.markdown(
     """
     <style>
-    header[data-testid="stHeader"] { visibility: visible; height: 0%; }
-    footer { visibility: visible; }
-    
-    /* 1. Import all fonts at the very top */
-    @import url('https://fonts.googleapis.com/css2?family=Michroma&display=swap');
-    @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Michroma&display=swap');
+    /* 1. CLEAN IMPORT: Single line for both fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Michroma&display=swap');
 
+    /* 2. HEADER FIX: Makes the header transparent instead of squashing it */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+        backdrop-filter: none !important;
+    }
+    
+    /* 3. BACKGROUND IMAGE */
     .stApp::before {
         content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
-                    url("https://images.unsplash.com/photo-1663104192417-6804188a9a8e") !important;
-        background-size: cover !important; background-position: center !important;
-        background-attachment: fixed !important; filter: blur(4px); transform: scale(1.1); z-index: -1;
+                    url("https://images.unsplash.com/photo-1663104192417-6804188a9a8e");
+        background-size: cover; background-position: center;
+        background-attachment: fixed; filter: blur(4px); transform: scale(1.1); z-index: -1;
     }
     .stApp { background: transparent !important; }
 
-    /* 2. Universal Rule: MOVED h1 OUT OF HERE so it doesn't fight Michroma */
+    /* 4. TEXT DEFAULTS: Note that h1 is NOT included here */
     h2, h3, p, label, .performance-row, .performance-row div, .performance-row b {
         font-family: 'Inter', sans-serif !important; 
         font-weight: 200 !important;
         color: white !important; 
-        letter-spacing: 1px;
+        letter-spacing: 1px !important;
     }
 
-    [data-testid="stHorizontalBlock"] div, [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { color: white !important; }
+    /* 5. METRIC & PLOT STYLING */
+    [data-testid="stHorizontalBlock"] div, [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { 
+        color: white !important; 
+    }
+    
+    /* Glassmorphism for containers */
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart), .performance-row {
-        background-color: rgba(255, 255, 255, 0.05) !important; backdrop-filter: blur(10px) !important;
-        border-radius: 15px !important; padding: 20px !important; border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background-color: rgba(255, 255, 255, 0.05) !important; 
+        backdrop-filter: blur(10px) !important;
+        border-radius: 15px !important; 
+        padding: 20px !important; 
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
         margin-bottom: 10px !important;
     }
 
+    /* 6. EXPANDER STYLING */
     .stExpander {
         background: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         border-radius: 10px !important;
     }
-
-    /* Target the text inside the expander specifically */
-    .stExpander p, .stExpander span, .stExpander label {
-        color: white !important;
-    }
-
-    /* Fix for Tables inside expanders */
-    .stExpander table, .stExpander th, .stExpander td {
+    .stExpander p, .stExpander span, .stExpander label, .stExpander table, .stExpander th, .stExpander td {
         color: white !important;
         background-color: transparent !important;
     }
-
-    /* Fix for the Expander Header text specifically */
+    /* Fixed: Changed this to white so it's readable */
     summary[data-testid="stExpanderSummary"] {
-        color: black !important;
+        color: white !important; 
     }
-    
-    .performance-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px !important; }
-    h3 { text-transform: uppercase !important; letter-spacing: 4px !important; font-size: 0.9rem !important; opacity: 0.8; }
+    summary[data-testid="stExpanderSummary"]:hover {
+        color: #70C4B0 !important;
+    }
 
+    /* 7. BRANDING & MICHROMA FONT */
     .brand-wrapper {
         display: flex !important;
         flex-direction: column !important;
@@ -95,7 +100,7 @@ st.markdown(
     }
 
     .title-main {
-        font-family: 'Michroma', sans-serif !important; /* Forces Michroma */
+        font-family: 'Michroma', sans-serif !important;
         font-size: 3.2rem !important;
         line-height: 1 !important;
         color: #ffffff !important;
