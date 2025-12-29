@@ -50,7 +50,29 @@ st.markdown(
         color: white !important; 
         letter-spacing: 1px !important;
     }
+    
+    h1 {
+        font-size: 2.2rem !important;
+        font-weight: 700 !important;
+    }
 
+    /* H2: Section Headers */
+    h2 {
+        font-size: 1.5rem !important;
+        font-weight: 600 !important;
+        margin-top: 20px !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* H3: "### ⚡ Your Current Training Status" */
+    h3 {
+        font-size: 1.1rem !important; /* Adjust this number to make it bigger/smaller */
+        font-weight: 400 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 2px !important;
+        opacity: 0.9 !important;
+        margin-top: 10px !important;
+    }
     /* 5. METRIC & PLOT STYLING */
     [data-testid="stHorizontalBlock"] div, [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { 
         color: white !important; 
@@ -123,8 +145,8 @@ st.markdown(
 
     a[href*="intervals.icu"] {
         display: block !important;
-        width: 50% !important;        /* Controls width so it doesn't span full screen */
-        margin: 50px auto 0 auto !important; /* 50px Top margin, Auto Left/Right centers it */
+        width: 100% !important;        /* Controls width so it doesn't span full screen */
+        margin: 20px auto 0 auto !important; /* 50px Top margin, Auto Left/Right centers it */
         text-align: center !important;
         
         /* The Teal Gradient */
