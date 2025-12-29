@@ -195,13 +195,19 @@ def show_login_screen():
 )
     
     st.markdown(f"""
-        <div style="text-align: center;">
-            <a href="{auth_url}" target="_self" style="
-                background-color: #ff4b4b; color: white; padding: 12px 24px; 
-                text-decoration: none; border-radius: 8px; display: inline-block;
-            ">🚀 Connect with Intervals.icu</a>
-        </div>
-    """, unsafe_allow_html=True)
+    <div style="text-align: center; padding: 20px;">
+        <a href="{auth_url}" target="_self" style="
+            background-color: #70C4B0; 
+            color: white; 
+            padding: 15px 30px; 
+            text-decoration: none; 
+            border-radius: 12px; 
+            font-weight: bold;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(112, 196, 176, 0.3);
+        ">🚀 AUTHORIZE AETHERIUM</a>
+    </div>
+""", unsafe_allow_html=True)
 
 def get_access_token(auth_code):
     token_url = "https://intervals.icu/api/oauth/token"
