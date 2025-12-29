@@ -166,48 +166,26 @@ def elegant_stat(col, label, value, color):
         """, unsafe_allow_html=True)
 
 def show_login_screen():
-    # 1. Re-display your logo and title (f-string fix)
+    # Re-applying your clean branding
     st.markdown(f"""
-        <div style="text-align: center; padding: 40px 0;">
+        <div style="text-align: center; padding: 50px;">
             <img src="data:image/png;base64,{LOGO_BASE64}" style="width: 120px; margin-bottom: 20px;">
-            <h1 style="font-size: 3rem;">Aetherium Project</h1>
+            <h1 style="font-size: 3rem; margin-bottom: 20px;">Aetherium Project</h1>
+            <p style="opacity: 0.7; margin-bottom: 40px;">Securely sync your 2025 performance data.</p>
         </div>
     """, unsafe_allow_html=True)
 
-    # 2. Build parameters carefully
+    # Standard URL construction using urllib
     params = {
-        "client_id": st.secrets["INTERVALS_CLIENT_ID"],
-        "redirect_uri": st.secrets["REDIRECT_URI"],
-        "response_type": "code",
-        "scope": "ACTIVITY:READ,WELLNESS:READ"
+        'client_id': st.secrets['INTERVALS_CLIENT_ID'],
+        'redirect_uri': st.secrets['REDIRECT_URI'],
+        'response_type': 'code',
+        'scope': 'ACTIVITY:READ,WELLNESS:READ'
     }
-    
-    client_id = st.secrets["INTERVALS_CLIENT_ID"]
-    redirect_uri = st.secrets["REDIRECT_URI"]
+    auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(params)}"
 
-# Construct the URL manually to ensure it's clean
-    auth_url = (
-    f"https://intervals.icu/oauth/authorize?"
-    f"client_id={client_id}&"
-    f"redirect_uri={redirect_uri}&"
-    f"response_type=code&"
-    f"scope=ACTIVITY:READ,WELLNESS:READ" # Space replaced with %20
-)
-    
-    st.markdown(f"""
-    <div style="text-align: center; padding: 20px;">
-        <a href="{auth_url}" target="_self" style="
-            background-color: #70C4B0; 
-            color: white; 
-            padding: 15px 30px; 
-            text-decoration: none; 
-            border-radius: 12px; 
-            font-weight: bold;
-            display: inline-block;
-            box-shadow: 0 4px 15px rgba(112, 196, 176, 0.3);
-        ">🚀 AUTHORIZE AETHERIUM</a>
-    </div>
-""", unsafe_allow_html=True)
+    # Using the native Streamlit button (Opens in new tab)
+    st.link_button("🚀 Connect with Intervals.icu", auth_url, type="primary")
 
 def get_access_token(auth_code):
     token_url = "https://intervals.icu/api/oauth/token"
