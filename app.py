@@ -524,67 +524,60 @@ if well_json:
 # --- SECTION 8: PERFORMANCE HISTORY ---
 # ==============================================================================
 if 'act_json' in locals() and act_json:
-    # 1. Create the DataFrame safely
     df_history = pd.DataFrame(act_json)
     
-    # 2. Check if the DataFrame has the actual data columns we need
-    # We use .columns to check if 'start_date_local' actually exists before using it
     if not df_history.empty and 'start_date_local' in df_history.columns:
         
         # --- A. DATA PROCESSING ---
-        # Convert string dates to real datetime objects
         df_history['date_dt'] = pd.to_datetime(df_history['start_date_local'])
-        
-        # Create a 'Period' column for accurate grouping & sorting (e.g., "2025-12")
         df_history['month_period'] = df_history['date_dt'].dt.to_period('M')
 
-        # Ensure 'icu_training_load' exists; fill missing values with 0
         if 'icu_training_load' not in df_history.columns:
             df_history['icu_training_load'] = 0
         df_history['icu_training_load'] = df_history['icu_training_load'].fillna(0)
 
         # --- B. AGGREGATION ---
-        # Group by the Period object
         monthly = df_history.groupby('month_period').agg({
-            'start_date_local': 'count',  # Count number of activities
-            'icu_training_load': 'sum'    # Sum total load
+            'start_date_local': 'count', 
+            'icu_training_load': 'sum'
         }).reset_index()
 
-        # Rename columns for clarity
         monthly.columns = ['MonthPeriod', 'Sessions', 'Total Load']
-
-        # --- C. FORMATTING & SORTING ---
-        # Sort Descending (Newest Month First) using the Period object
         monthly = monthly.sort_values('MonthPeriod', ascending=False)
-        
-        # Create the pretty string for display (e.g., "December 2025")
         monthly['MonthDisplay'] = monthly['MonthPeriod'].dt.strftime('%B %Y')
 
-        # --- D. RENDER THE UI ---
+        # --- C. RENDER UI ---
         st.markdown("### 📅 Monthly Performance History")
 
+        # 1. THE HEADER ROW (NEW)
+        # We use the same 'flex' ratios (2, 1, 1) as the data rows so they align perfectly.
+        st.markdown("""
+            <div style="display: flex; justify-content: space-between; padding: 10px 25px; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <div style="flex: 2; color: #70C4B0; font-family: 'Michroma', sans-serif; font-size: 0.8rem; letter-spacing: 2px;">MONTH</div>
+                <div style="flex: 1; text-align: right; color: rgba(255,255,255,0.6); font-family: 'Michroma', sans-serif; font-size: 0.7rem;">SESSIONS</div>
+                <div style="flex: 1; text-align: right; color: rgba(255,255,255,0.6); font-family: 'Michroma', sans-serif; font-size: 0.7rem;">LOAD</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+        # 2. THE DATA LOOP
         for _, row in monthly.iterrows():
-            # Note: The HTML tags are pushed to the left to prevent "Code Block" formatting
             st.markdown(f"""
-            <div class="performance-row">
-                <div style="flex: 2; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #70C4B0;">
-                {row['MonthDisplay']}
-            </div>
-            <div style="flex: 1; text-align: right; font-family: 'Inter', sans-serif; font-size: 0.9rem;">
-                <span style="opacity: 0.6; margin-right: 5px;">🏃</span> 
-                <b>{int(row['Sessions'])}</b>
-            </div>
-            <div style="flex: 1; text-align: right; font-family: 'Inter', sans-serif; font-size: 0.9rem;">
-                <span style="opacity: 0.6; margin-right: 5px;">🔥</span> 
-                <b>{row['Total Load']:.0f}</b>
-            </div>
-        </div>
+<div class="performance-row">
+    <div style="flex: 2; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #ffffff;">
+        {row['MonthDisplay']}
+    </div>
+    <div style="flex: 1; text-align: right; font-family: 'Inter', sans-serif; font-size: 0.9rem;">
+        <span style="opacity: 0.6; margin-right: 5px;">🏃</span> 
+        <b>{int(row['Sessions'])}</b>
+    </div>
+    <div style="flex: 1; text-align: right; font-family: 'Inter', sans-serif; font-size: 0.9rem;">
+        <span style="opacity: 0.6; margin-right: 5px;">🔥</span> 
+        <b>{row['Total Load']:.0f}</b>
+    </div>
+</div>
 """, unsafe_allow_html=True)
             
     else:
-        # This runs if the dataframe exists but is missing the 'start_date_local' column
         st.warning("⚠️ Activity data found, but date information is missing.")
-        # Debugging helper: Uncomment the line below to see what columns you actually have
-        # st.write(df_history.columns.tolist()) 
 else:
     st.info("No activity history found for this year.")
