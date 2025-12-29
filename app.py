@@ -36,7 +36,7 @@ st.markdown(
         background-attachment: fixed !important; filter: blur(4px); transform: scale(1.1); z-index: -1;
     }
     .stApp { background: transparent !important; }
-    h1, h2, h3, p, label, .performance-row, .performance-row div, .performance-row b {
+    h2, h3, p, label, .performance-row, .performance-row div, .performance-row b {
         font-family: 'Inter', sans-serif !important; font-weight: 200 !important;
         color: white !important; letter-spacing: 1px;
     }
@@ -75,41 +75,39 @@ st.markdown(
     @import url('https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@200&display=swap');
 
     .brand-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* Centers the whole logo block on the page */
-        width: 100%;
-        margin-top: 30px;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        width: 100% !important;
+        margin-top: 30px !important;
     }
 
     .title-container {
-        display: flex;
-        flex-direction: column;
-        /* CRITICAL: Shrinks the box to exactly the width of the word AETHERIUM */
-        width: min-content; 
+        display: flex !important;
+        flex-direction: column !important;
+        width: min-content !important; 
     }
 
     .title-main {
-        font-family: 'Michroma', sans-serif !important;
-        font-size: 3.2rem;
-        line-height: 1;
-        color: #ffffff;
-        text-shadow: 0 0 15px rgba(112, 196, 176, 0.4);
-        margin: 0;
-        white-space: nowrap; /* Prevents word wrapping */
+        font-family: 'Michroma', sans-serif !important; /* Forces Michroma */
+        font-size: 3.2rem !important;
+        line-height: 1 !important;
+        color: #ffffff !important;
+        text-shadow: 0 0 15px rgba(112, 196, 176, 0.4) !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
     }
 
     .title-sub {
-        font-family: 'Inter', sans-serif;
-        font-size: 1rem;
-        font-weight: 200;
-        letter-spacing: 8px;
-        color: #70C4B0;
-        /* Aligns to the right of the 'title-container' box */
-        text-align: right; 
-        width: 100%;
-        margin-top: 4px;
-        text-transform: uppercase;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 1rem !important;
+        font-weight: 200 !important;
+        letter-spacing: 8px !important;
+        color: #70C4B0 !important;
+        text-align: right !important; 
+        width: 100% !important;
+        margin-top: 4px !important;
+        text-transform: uppercase !important;
     }
 
     </style>
