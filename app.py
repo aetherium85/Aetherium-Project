@@ -121,36 +121,38 @@ st.markdown(
         text-transform: uppercase !important;
     }
 
-    .stButton {
-        display: flex !important;
-        justify-content: center !important;
-        margin-top: 20px !important;
-    }
-
-    .stButton button {
+    a[href*="intervals.icu"] {
+        display: block !important;
+        width: 50% !important;        /* Controls width so it doesn't span full screen */
+        margin: 50px auto 0 auto !important; /* 50px Top margin, Auto Left/Right centers it */
+        text-align: center !important;
+        
+        /* The Teal Gradient */
         background: linear-gradient(135deg, #70C4B0 0%, #008f7a 100%) !important;
         color: white !important;
         border: none !important;
-        padding: 12px 30px !important;
+        padding: 15px 30px !important;
+        
+        /* Modern Typography */
         font-family: 'Inter', sans-serif !important;
         font-weight: 600 !important;
         font-size: 1.1rem !important;
-        border-radius: 50px !important; /* Makes it pill-shaped */
+        text-decoration: none !important; /* Removes underline */
+        
+        /* Shape & Glow */
+        border-radius: 50px !important;
         box-shadow: 0 4px 15px rgba(112, 196, 176, 0.3) !important;
         transition: all 0.3s ease !important;
         text-transform: uppercase !important;
         letter-spacing: 1px !important;
     }
 
-    /* Hover Effect */
-    .stButton button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(112, 196, 176, 0.5) !important;
+    /* Hover Animation */
+    a[href*="intervals.icu"]:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 25px rgba(112, 196, 176, 0.5) !important;
         background: linear-gradient(135deg, #82d8c2 0%, #00a892 100%) !important;
-    }
-
-    .stButton button:active {
-        transform: translateY(1px) !important;
+        color: white !important;
     }
     </style>
     """,
@@ -269,8 +271,13 @@ def show_login_screen():
     }
     auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(params)}"
 
-    # Using the native Streamlit button (Opens in new tab)
-    st.button("🚀 Connect with Intervals.icu", auth_url, type="primary")
+    # Create 3 columns: [Spacer, Button, Spacer]
+    # The middle column (2) is where the button goes.
+    col1, col2, col3 = st.columns([1, 2, 1]) 
+
+    with col2:
+        # The CSS above will still style the colors, but this forces the position
+        st.button("🚀 Connect with Intervals.icu", auth_url, type="primary", use_container_width=True)
 
 def get_access_token(auth_code):
     token_url = "https://intervals.icu/api/oauth/token"
