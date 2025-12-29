@@ -10,7 +10,11 @@ from datetime import datetime
 # ==============================================================================
 # --- SECTION 1: APP CONFIGURATION & STYLING ---
 # ==============================================================================
-st.set_page_config(page_title="Aetherium Project", layout="wide")
+st.set_page_config(
+    page_title="Aetherium Project",
+    page_icon="Δ",
+    layout="wide"
+)
 
 # Custom CSS for Glassmorphism UI
 st.markdown(
