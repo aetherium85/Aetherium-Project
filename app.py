@@ -105,8 +105,8 @@ st.markdown(
         color: #ffffff;
         /* This aligns 'PROJECT' to the right edge of its container */
         align-self: flex-end; 
-        margin-top: -10px;
-        padding-right: 0%; /* Adjust this to line up with the 'M' in AETHERIUM */
+        margin-top: 0px;
+        padding-left: 0%; /* Adjust this to line up with the 'M' in AETHERIUM */
     }
 
     </style>
