@@ -176,6 +176,48 @@ st.markdown(
         background: linear-gradient(135deg, #82d8c2 0%, #00a892 100%) !important;
         color: white !important;
     }
+
+    /* Target standard HTML tables (st.table) */
+    table {
+        color: white !important;
+        background-color: rgba(255, 255, 255, 0.05) !important; /* Slight background */
+        border-collapse: collapse !important;
+        width: 100% !important;
+        border-radius: 10px !important;
+        overflow: hidden !important; /* Keeps border radius on corners */
+    }
+
+    /* Header Cells */
+    th {
+        background-color: rgba(112, 196, 176, 0.2) !important; /* Teal tint header */
+        color: white !important;
+        font-family: 'Michroma', sans-serif !important; /* Use your brand font */
+        font-size: 0.85rem !important;
+        font-weight: 400 !important;
+        text-transform: uppercase !important;
+        padding: 12px 15px !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Data Cells */
+    td {
+        color: rgba(255, 255, 255, 0.9) !important;
+        padding: 12px 15px !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 200 !important;
+    }
+
+    /* Zebra Striping for readability */
+    tr:nth-child(even) {
+        background-color: rgba(255, 255, 255, 0.02) !important;
+    }
+    
+    /* Fix for interactive st.dataframe (if you use that instead of st.table) */
+    [data-testid="stDataFrame"] {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
