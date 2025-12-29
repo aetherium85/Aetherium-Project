@@ -218,6 +218,27 @@ st.markdown(
         background-color: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
+
+    /* STYLE FOR YOUR CUSTOM PERFORMANCE ROWS */
+    .performance-row {
+        display: flex !important;
+        justify-content: space-between !important; /* Spreads items across full width */
+        align-items: center !important;
+        background-color: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        padding: 15px 25px !important;
+        margin-bottom: 12px !important;
+        transition: all 0.2s ease !important;
+    }
+
+    /* Hover effect to make it feel interactive */
+    .performance-row:hover {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(112, 196, 176, 0.3) !important; /* Subtle teal glow */
+        transform: translateX(5px) !important;
+    }
+
     </style>
     """,
     unsafe_allow_html=True
@@ -525,14 +546,45 @@ if act_json:
         
         monthly.columns = ['Month', 'Sessions', 'Total Load']
 
-        st.markdown("### 📅 Monthly Performance History")
-        for _, row in monthly.iterrows():
-            st.markdown(f"""
-                <div class="performance-row">
-                    <div style="flex: 1; font-weight: bold; font-size: 1rem;">{row['Month']}</div>
-                    <div style="flex: 1; text-align: left;">🏃 <b>{int(row['Sessions'])}</b> Sessions</div>
-                    <div style="flex: 1; text-align: left;">🔥 <b>{row['Total Load']:.0f}</b> Load</div>
-                </div>
-            """, unsafe_allow_html=True)
-    else:
+        if 'df' in locals() and not df.empty:
+    
+    # 2. CREATE THE MONTHLY AGGREGATION
+    # We group by Month and Year, then count sessions and sum the load
+            df['month_dt'] = pd.to_datetime(df['start_date_local']).dt.to_period('M')
+    
+    monthly = df.groupby('month_dt').agg({
+        'moving_time': 'count',       # Counts number of activities
+        'icu_training_load': 'sum'    # Sums up the training load
+    }).reset_index()
+
+    # 3. RENAME COLUMNS TO MATCH YOUR LOOP
+    monthly.columns = ['MonthDate', 'Sessions', 'Total Load']
+    
+    # 4. FORMAT THE MONTH NAME (e.g., "December 2025")
+    monthly['Month'] = monthly['MonthDate'].dt.strftime('%B %Y')
+    
+    # 5. SORT BY DATE DESCENDING (Newest first)
+    monthly = monthly.sort_values('MonthDate', ascending=False)
+
+    st.markdown("### 📅 Monthly Performance History")
+
+for _, row in monthly.iterrows():
+        st.markdown(f"""
+        <div class="performance-row">
+            <div style="flex: 2; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #70C4B0;">
+                {row['Month']}
+            </div>
+            
+            <div style="flex: 1; text-align: right; font-family: 'Inter', sans-serif; font-size: 0.9rem;">
+                <span style="opacity: 0.6; margin-right: 5px;">🏃</span> 
+                <b>{int(row['Sessions'])}</b>
+            </div>
+            
+            <div style="flex: 1; text-align: right; font-family: 'Inter', sans-serif; font-size: 0.9rem;">
+                <span style="opacity: 0.6; margin-right: 5px;">🔥</span> 
+                <b>{row['Total Load']:.0f}</b>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+else:
         st.info("No activity history found for this year.")
