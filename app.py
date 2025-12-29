@@ -523,11 +523,12 @@ if well_json:
 # ==============================================================================
 # --- SECTION 8: PERFORMANCE HISTORY ---
 # ==============================================================================
-# 1. Check if we have activity data to process
 if 'act_json' in locals() and act_json:
+    # 1. Create the DataFrame safely
     df_history = pd.DataFrame(act_json)
     
-    # Check if the DataFrame has actual data and the required date column
+    # 2. Check if the DataFrame has the actual data columns we need
+    # We use .columns to check if 'start_date_local' actually exists before using it
     if not df_history.empty and 'start_date_local' in df_history.columns:
         
         # --- A. DATA PROCESSING ---
@@ -543,7 +544,7 @@ if 'act_json' in locals() and act_json:
         df_history['icu_training_load'] = df_history['icu_training_load'].fillna(0)
 
         # --- B. AGGREGATION ---
-        # Group by the Period object to keep time-awareness
+        # Group by the Period object
         monthly = df_history.groupby('month_period').agg({
             'start_date_local': 'count',  # Count number of activities
             'icu_training_load': 'sum'    # Sum total load
@@ -582,6 +583,9 @@ if 'act_json' in locals() and act_json:
             """, unsafe_allow_html=True)
             
     else:
-        st.info("Activity data is empty or missing date information.")
+        # This runs if the dataframe exists but is missing the 'start_date_local' column
+        st.warning("⚠️ Activity data found, but date information is missing.")
+        # Debugging helper: Uncomment the line below to see what columns you actually have
+        # st.write(df_history.columns.tolist()) 
 else:
     st.info("No activity history found for this year.")
