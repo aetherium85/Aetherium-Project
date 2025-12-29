@@ -120,6 +120,38 @@ st.markdown(
         margin-top: 4px !important;
         text-transform: uppercase !important;
     }
+
+    .stButton {
+        display: flex !important;
+        justify-content: center !important;
+        margin-top: 20px !important;
+    }
+
+    .stButton button {
+        background: linear-gradient(135deg, #70C4B0 0%, #008f7a 100%) !important;
+        color: white !important;
+        border: none !important;
+        padding: 12px 30px !important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 1.1rem !important;
+        border-radius: 50px !important; /* Makes it pill-shaped */
+        box-shadow: 0 4px 15px rgba(112, 196, 176, 0.3) !important;
+        transition: all 0.3s ease !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+    }
+
+    /* Hover Effect */
+    .stButton button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(112, 196, 176, 0.5) !important;
+        background: linear-gradient(135deg, #82d8c2 0%, #00a892 100%) !important;
+    }
+
+    .stButton button:active {
+        transform: translateY(1px) !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
