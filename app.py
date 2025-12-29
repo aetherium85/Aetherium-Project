@@ -166,47 +166,39 @@ def elegant_stat(col, label, value, color):
         """, unsafe_allow_html=True)
 
 def show_login_screen():
-    # 1. Ensure your LOGO_BASE64 is defined as a clean string elsewhere
-    # 2. Use a triple-quoted f-string for the markdown
+    # 1. Logo and Header (f-string fixes the rendering issue in your screenshot)
     st.markdown(f"""
         <div style="text-align: center; padding: 40px 0;">
             <img src="data:image/png;base64,{LOGO_BASE64}" 
-                 style="width: 120px; height: auto; margin-bottom: 20px; 
-                        filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));">
-            
-            <h1 style="font-size: 3rem; margin-bottom: 10px; font-weight: 200; letter-spacing: 2px;">
-                Aetherium Project
-            </h1>
-            
-            <p style="opacity: 0.7; font-size: 1.1rem; margin-bottom: 40px; font-weight: 200;">
-                Performance Data for the Athlete of Tomorrow
-            </p>
+                 style="width: 120px; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));">
+            <h1 style="font-size: 3rem; margin-bottom: 10px;">Aetherium Project</h1>
+            <p style="opacity: 0.7; margin-bottom: 40px;">Performance Data for the Athlete of Tomorrow</p>
         </div>
     """, unsafe_allow_html=True)
 
-    # 3. Auth URL logic
-    auth_params = {
+    # 2. Auth URL
+    auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode({
         'client_id': st.secrets['INTERVALS_CLIENT_ID'],
         'redirect_uri': st.secrets['REDIRECT_URI'],
         'response_type': 'code',
         'scope': 'ACTIVITY:READ,WELLNESS:READ'
-    }
-    auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(auth_params)}"
+    })}"
 
-    # 1. Create an empty placeholder
-    redirect_placeholder = st.empty()
-
-    # 2. Render the button
-    if st.button("🚀 Connect with Intervals.icu", type="primary"):
-        # 3. When clicked, fill the placeholder with the redirect script
-        # We use window.top to ensure we break out of the Streamlit iframe entirely
-        js = f"""
-            <script>
-                window.top.location.href = '{auth_url}';
-            </script>
-        """
-        with redirect_placeholder:
-            st.components.v1.html(js, height=0)
+    # 3. The "Button" (Standard HTML Link styled as a button to avoid iframe blocks)
+    st.markdown(f"""
+        <div style="text-align: center;">
+            <a href="{auth_url}" target="_self" style="
+                background-color: #ff4b4b; 
+                color: white; 
+                padding: 12px 24px; 
+                text-decoration: none; 
+                border-radius: 8px; 
+                font-family: 'Inter', sans-serif;
+                font-weight: 400;
+                display: inline-block;
+            ">🚀 Connect with Intervals.icu</a>
+        </div>
+    """, unsafe_allow_html=True)
 
 def get_access_token(auth_code):
     token_url = "https://intervals.icu/api/oauth/token"
