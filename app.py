@@ -563,7 +563,7 @@ if 'act_json' in locals() and act_json:
         for _, row in monthly.iterrows():
             st.markdown(f"""
 <div class="performance-row">
-    <div style="flex: 2; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #ffffff;">
+    <div style="flex: 1; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #ffffff;">
         {row['MonthDisplay']}
     </div>
     <div style="flex: 1; text-align: right; font-family: 'Inter', sans-serif; font-size: 0.9rem;">
