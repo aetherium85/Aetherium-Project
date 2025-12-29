@@ -331,16 +331,35 @@ if well_json:
 # ==============================================================================
 if act_json:
     df_act = pd.DataFrame(act_json)
-    df_act['Month'] = pd.to_datetime(df_act['start_date_local']).dt.strftime('%B %Y')
-    monthly = df_act.groupby('Month', sort=False).agg({'id':'count', 'icu_training_load':'sum'}).reset_index()
-    monthly.columns = ['Month', 'Sessions', 'Total Load']
+    
+    # Check if the DataFrame is empty or missing required columns
+    if not df_act.empty and 'start_date_local' in df_act.columns:
+        # 1. Standardize column names and types
+        df_act['date_dt'] = pd.to_datetime(df_act['start_date_local'])
+        df_act['Month'] = df_act['date_dt'].dt.strftime('%B %Y')
+        
+        # 2. Ensure the load column exists and fill missing values with 0
+        if 'icu_training_load' not in df_act.columns:
+            df_act['icu_training_load'] = 0
+        else:
+            df_act['icu_training_load'] = df_act['icu_training_load'].fillna(0)
 
-    st.markdown("### 📅 Monthly Performance History")
-    for _, row in monthly.iterrows():
-        st.markdown(f"""
-            <div class="performance-row">
-                <div style="flex: 1; font-weight: bold; font-size: 1rem;">{row['Month']}</div>
-                <div style="flex: 1; text-align: left;">🏃 <b>{row['Sessions']}</b> Sessions</div>
-                <div style="flex: 1; text-align: left;">🔥 <b>{row['Total Load']:.0f}</b> Load</div>
-            </div>
-        """, unsafe_allow_html=True)
+        # 3. Perform the aggregation safely
+        monthly = df_act.groupby('Month', sort=False).agg({
+            'id': 'count', 
+            'icu_training_load': 'sum'
+        }).reset_index()
+        
+        monthly.columns = ['Month', 'Sessions', 'Total Load']
+
+        st.markdown("### 📅 Monthly Performance History")
+        for _, row in monthly.iterrows():
+            st.markdown(f"""
+                <div class="performance-row">
+                    <div style="flex: 1; font-weight: bold; font-size: 1rem;">{row['Month']}</div>
+                    <div style="flex: 1; text-align: left;">🏃 <b>{int(row['Sessions'])}</b> Sessions</div>
+                    <div style="flex: 1; text-align: left;">🔥 <b>{row['Total Load']:.0f}</b> Load</div>
+                </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("No activity history found for this year.")
