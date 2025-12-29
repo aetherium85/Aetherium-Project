@@ -28,7 +28,8 @@ st.markdown(
     footer { visibility: visible; }
     
     /* 1. Import all fonts at the very top */
-    @import url('https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@200;300;400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Michroma&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Michroma&display=swap');
 
     .stApp::before {
         content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -78,8 +79,6 @@ st.markdown(
     
     .performance-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px !important; }
     h3 { text-transform: uppercase !important; letter-spacing: 4px !important; font-size: 0.9rem !important; opacity: 0.8; }
-
-    @import url('https://fonts.googleapis.com/css2?family=Michroma&display=swap');
 
     .brand-wrapper {
         display: flex !important;
