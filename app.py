@@ -72,43 +72,46 @@ st.markdown(
     .performance-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px !important; }
     h3 { text-transform: uppercase !important; letter-spacing: 4px !important; font-size: 0.9rem !important; opacity: 0.8; }
 
-    /* Import futuristic fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Michroma:wght@400;700&family=Inter:wght@200;400&display=swap');
+    /* 1. Import Michroma and Inter from Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@200&display=swap');
 
     .brand-wrapper {
         display: flex;
         flex-direction: column;
-        align-items: center;  /* Centers the logo and title block on page */
+        align-items: center;
         width: 100%;
-        margin-top: 20px;
+        margin-top: 30px;
     }
 
     .title-container {
         display: flex;
         flex-direction: column;
-        width: auto; /* Shrinks to the width of 'AETHERIUM' */
+        /* Michroma is wide, so we keep the container tight to the text */
+        width: min-content; 
     }
 
     .title-main {
         font-family: 'Michroma', sans-serif !important;
-        font-size: 3.5rem;
-        font-weight: 700;
-        letter-spacing: 8px;
-        line-height: 1;
+        font-size: 3.2rem; /* Adjusted for Michroma's width */
+        font-weight: 400;
+        letter-spacing: 4px; /* Michroma is wide, less spacing needed */
+        line-height: 1.1;
         color: #ffffff;
         text-shadow: 0 0 15px rgba(112, 196, 176, 0.4);
         margin: 0;
+        white-space: nowrap;
     }
 
     .title-sub {
-        font-family: 'Michroma', sans-serif;
-        font-size: 1.2rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
         font-weight: 200;
-        letter-spacing: 6px;
+        letter-spacing: 8px;
         color: #70C4B0;
-        text-align: right; /* Aligns text within its own box */
-        width: 100%;       /* Ensures the box is as wide as the 'AETHERIUM' box */
-        margin-top: 5px;   /* Space between the two words */
+        text-align: right;
+        width: 100%;
+        margin-top: 2px;
+        text-transform: uppercase;
     }
 
     </style>
