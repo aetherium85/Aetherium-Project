@@ -182,8 +182,17 @@ def show_login_screen():
         "scope": "ACTIVITY:READ,WELLNESS:READ"
     }
     
-    # 3. Use the styled anchor tag to bypass iframe security
-    auth_url = f"https://intervals.icu/oauth/authorize?{urllib.parse.urlencode(params)}"
+    client_id = st.secrets["INTERVALS_CLIENT_ID"]
+    redirect_uri = st.secrets["REDIRECT_URI"]
+
+# Construct the URL manually to ensure it's clean
+    auth_url = (
+    f"https://intervals.icu/oauth/authorize?"
+    f"client_id={client_id}&"
+    f"redirect_uri={redirect_uri}&"
+    f"response_type=code&"
+    f"scope=ACTIVITY:READ%20WELLNESS:READ" # Space replaced with %20
+)
     
     st.markdown(f"""
         <div style="text-align: center;">
