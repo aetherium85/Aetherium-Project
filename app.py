@@ -75,38 +75,40 @@ st.markdown(
     /* Import futuristic fonts */
     @import url('https://fonts.googleapis.com/css2?family=Michroma:wght@400;700&family=Inter:wght@200;400&display=swap');
 
-    .brand-container {
+    .brand-wrapper {
         display: flex;
         flex-direction: column;
-        align-items: center; /* Centers the whole block */
+        align-items: center;  /* Centers the logo and title block on page */
         width: 100%;
-        margin-bottom: 40px;
+        margin-top: 20px;
+    }
+
+    .title-container {
+        display: flex;
+        flex-direction: column;
+        width: auto; /* Shrinks to the width of 'AETHERIUM' */
     }
 
     .title-main {
         font-family: 'Michroma', sans-serif !important;
-        font-size: 4rem;
+        font-size: 3.5rem;
         font-weight: 700;
         letter-spacing: 8px;
-        margin-bottom: 0px;
+        line-height: 1;
         color: #ffffff;
-        /* Subtle neon glow */
-        text-shadow: 0 0 10px rgba(112, 196, 176, 0.6);
-        text-align: center;
-        width: 100%;
+        text-shadow: 0 0 15px rgba(112, 196, 176, 0.4);
+        margin: 0;
     }
 
     .title-sub {
         font-family: 'Michroma', sans-serif;
-        font-size: 1rem;
+        font-size: 1.2rem;
         font-weight: 200;
-        letter-spacing: 5px;
-        text-transform: uppercase;
-        color: #ffffff;
-        /* This aligns 'PROJECT' to the right edge of its container */
-        align-self: flex-end; 
-        margin-top: 0px;
-        padding-left: 0%; /* Adjust this to line up with the 'M' in AETHERIUM */
+        letter-spacing: 6px;
+        color: #70C4B0;
+        text-align: right; /* Aligns text within its own box */
+        width: 100%;       /* Ensures the box is as wide as the 'AETHERIUM' box */
+        margin-top: 5px;   /* Space between the two words */
     }
 
     </style>
@@ -211,8 +213,8 @@ def show_login_screen():
         <div class="brand-container">
             <img src="data:image/png;base64,{LOGO_BASE64}" style="width: 100px; margin-bottom: 20px;">
             <div style="display: inline-block;">
-                <div class="title-main">AETHERIUM</div>
-                <div class="title-sub">project</div>
+                <div class="title-main">aetherium</div>
+                <div class="title-sub">PROJECT</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
