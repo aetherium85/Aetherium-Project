@@ -470,18 +470,18 @@ if act_json:
     st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 # In your sidebar section
-st.sidebar.markdown("---")
-st.sidebar.header("🎯 Your Goal")
+    st.sidebar.markdown("---")
+    st.sidebar.header("🎯 Your Goal")
 
 # 1. Detect Sport (Auto)
-user_sport = infer_primary_sport(act_json) if act_json else "General"
-st.sidebar.info(f"Detected Sport: **{user_sport}**")
+    user_sport = infer_primary_sport(act_json) if act_json else "General"
+    st.sidebar.info(f"Detected Sport: **{user_sport}**")
 
 # 2. Ask Goal (Manual)
-user_goal = st.sidebar.selectbox(
-    "Current Focus:",
-    ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max / Speed", "Recovery / Taper", "Race Prep"],
-    index=0
+    user_goal = st.sidebar.selectbox(
+        "Current Focus:",
+        ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max / Speed", "Recovery / Taper", "Race Prep"],
+        index=0
 )
 
 # ==============================================================================
