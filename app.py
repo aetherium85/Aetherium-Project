@@ -670,20 +670,20 @@ if 'act_json' in locals() and act_json:
         # 2. THE DATA LOOP
         for _, row in monthly.iterrows():
             st.markdown(f"""
-<div class="performance-row">
-    <div style="flex: 1; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #ffffff;">
-        {row['MonthDisplay']}
+    <div class="performance-row">
+        <div style="flex: 1; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #ffffff;">
+            {row['MonthDisplay']}
+        </div>
+        <div style="flex: 1; text-align: center; font-family: 'Michroma', sans-serif; font-size: 0.9rem;">
+            <span style="opacity: 0.6; margin-right: 5px;">🏃</span> 
+            <b>{int(row['Sessions'])}</b>
+        </div>
+        <div style="flex: 1; text-align: right; font-family: 'Michroma', sans-serif; font-size: 0.9rem;">
+            <span style="opacity: 0.6; margin-right: 5px;">🔥</span> 
+            <b>{row['Total Load']:.0f}</b>
+        </div>
     </div>
-    <div style="flex: 1; text-align: center; font-family: 'Michroma', sans-serif; font-size: 0.9rem;">
-        <span style="opacity: 0.6; margin-right: 5px;">🏃</span> 
-        <b>{int(row['Sessions'])}</b>
-    </div>
-    <div style="flex: 1; text-align: right; font-family: 'Michroma', sans-serif; font-size: 0.9rem;">
-        <span style="opacity: 0.6; margin-right: 5px;">🔥</span> 
-        <b>{row['Total Load']:.0f}</b>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
         for _, row in monthly.iterrows():
         # textwrap.dedent fixes the indentation issue automatically
             st.markdown(textwrap.dedent(f"""
