@@ -334,7 +334,21 @@ def elegant_stat(col, label, value, color):
             </div>
         """, unsafe_allow_html=True)
 
-
+def infer_primary_sport(activities):
+    if not activities:
+        return "General Fitness"
+    
+    # Count occurrences of mapped types (Running, Cycling, etc.)
+    type_counts = {}
+    for a in activities:
+        # Use your existing TYPE_MAPPING dict
+        raw_type = a.get('type', 'Other')
+        # Map 'VirtualRide' -> 'Cycling', etc.
+        sport = TYPE_MAPPING.get(raw_type, raw_type)
+        type_counts[sport] = type_counts.get(sport, 0) + 1
+    
+    # Return the most frequent sport
+    return max(type_counts, key=type_counts.get)
 
 def show_login_screen():
     # Re-applying your clean branding
