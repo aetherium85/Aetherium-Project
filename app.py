@@ -431,6 +431,24 @@ with st.sidebar:
         st.session_state.authenticated = False
         st.rerun()
 
+# In your sidebar section
+st.sidebar.markdown("---")
+st.sidebar.header("🎯 AI Trainer Settings")
+
+# 1. Detect Sport (Auto)
+user_sport = infer_primary_sport(act_json) if act_json else "General"
+st.sidebar.info(f"Detected Sport: **{user_sport}**")
+
+# 2. Ask Goal (Manual)
+user_goal = st.sidebar.selectbox(
+    "Current Focus:",
+    ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max / Speed", "Recovery / Taper", "Race Prep"],
+    index=0
+)
+
+# 3. Available Time
+time_avail = st.sidebar.slider("Time Available (mins)", 30, 120, 60, step=15)
+
 well_json, act_json, ath_json = get_ytd_data()
 
 if act_json:
