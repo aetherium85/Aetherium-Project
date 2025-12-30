@@ -471,7 +471,7 @@ if act_json:
 
 # In your sidebar section
 st.sidebar.markdown("---")
-st.sidebar.header("🎯 AI Trainer Settings")
+st.sidebar.header("🎯 Your Goal")
 
 # 1. Detect Sport (Auto)
 user_sport = infer_primary_sport(act_json) if act_json else "General"
