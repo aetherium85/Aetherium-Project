@@ -1,3 +1,4 @@
+import textwrap
 import streamlit.components.v1 as components
 import urllib.parse
 import streamlit as st
@@ -238,6 +239,29 @@ st.markdown(
         background-color: rgba(255, 255, 255, 0.08) !important;
         border-color: rgba(112, 196, 176, 0.3) !important; /* Subtle teal glow */
         transform: translateX(5px) !important;
+    }
+
+    section[data-testid="stSidebar"] {
+        background-color: #0e1117 !important; /* Matches Streamlit Dark Mode */
+        background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Ensure all Sidebar Text is crisp White */
+        section[data-testid="stSidebar"] h1, 
+        section[data-testid="stSidebar"] h2, 
+        section[data-testid="stSidebar"] h3, 
+        section[data-testid="stSidebar"] label, 
+        section[data-testid="stSidebar"] span, 
+        section[data-testid="stSidebar"] p {
+            color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    /* Fix the Slider Colors in Sidebar */
+        section[data-testid="stSidebar"] div[data-testid="stThumbValue"],
+        section[data-testid="stSidebar"] div[data-testid="stTickBarMin"],
+        section[data-testid="stSidebar"] div[data-testid="stTickBarMax"] {
+            color: white !important;
     }
 
     </style>
@@ -660,6 +684,23 @@ if 'act_json' in locals() and act_json:
     </div>
 </div>
 """, unsafe_allow_html=True)
+        for _, row in monthly.iterrows():
+        # textwrap.dedent fixes the indentation issue automatically
+            st.markdown(textwrap.dedent(f"""
+                <div class="performance-row">
+                    <div style="flex: 1; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #ffffff;">
+                        {row['MonthDisplay']}
+                    </div>
+                    <div style="flex: 1; text-align: center; font-family: 'Michroma', sans-serif; font-size: 0.9rem;">
+                        <span style="opacity: 0.6; margin-right: 5px;">🏃</span> 
+                        <b>{int(row['Sessions'])}</b>
+                    </div>
+                    <div style="flex: 1; text-align: right; font-family: 'Michroma', sans-serif; font-size: 0.9rem;">
+                        <span style="opacity: 0.6; margin-right: 5px;">🔥</span> 
+                        <b>{row['Total Load']:.0f}</b>
+                    </div>
+                </div>
+            """), unsafe_allow_html=True)
             
     else:
         st.warning("⚠️ Activity data found, but date information is missing.")
