@@ -113,6 +113,7 @@ st.markdown(
         align-items: center !important;
         width: 100% !important;
         margin-top: 30px !important;
+        margin-bottom: 80px !important;
     }
 
     .title-container {
@@ -343,9 +344,6 @@ def show_login_screen():
             <div class="title-container">
                 <div class="title-main">aetherium</div>
                 <div class="title-sub">PROJECT</div>
-                <div class="title-sub"></div>
-                <div class="title-sub"></div>
-                <div class="title-sub"></div>
             </div>
         </div>
     """, unsafe_allow_html=True)
