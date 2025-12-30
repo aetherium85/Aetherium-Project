@@ -113,7 +113,7 @@ st.markdown(
         align-items: center !important;
         width: 100% !important;
         margin-top: 30px !important;
-        margin-bottom: 80px !important;
+        margin-bottom: 180px !important;
     }
 
     .title-container {
