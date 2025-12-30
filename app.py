@@ -343,6 +343,9 @@ def show_login_screen():
             <div class="title-container">
                 <div class="title-main">aetherium</div>
                 <div class="title-sub">PROJECT</div>
+                <div class="title-sub"></div>
+                <div class="title-sub"></div>
+                <div class="title-sub"></div>
             </div>
         </div>
     """, unsafe_allow_html=True)
