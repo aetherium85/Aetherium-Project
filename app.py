@@ -877,7 +877,7 @@ else:
     st.info("No activity history found for this year.")
 
 # ==============================================================================
-# --- SECTION 9: DIAGNOSTIC MODE (SAFE VERSION) ---
+# --- SECTION 9: AI WORKOUT GENERATOR ---
 # ==============================================================================
 st.markdown("---") 
 
@@ -893,35 +893,50 @@ if not api_key:
 else:
     client = genai.Client(api_key=api_key)
 
-# 2. DEBUG BUTTON
+# 2. THE UI
 b1, b2, b3 = st.columns([1, 2, 1])
-with b2:
-    debug_btn = st.button("🛠️ FIND MY AVAILABLE MODELS", type="primary")
 
-if debug_btn and client:
-    st.info("Querying Google API for available models...")
-    try:
-        # Get all models
-        # We convert the iterator to a list to ensure we have data
-        all_models = list(client.models.list())
-        
-        if all_models:
-            st.success(f"✅ FOUND {len(all_models)} MODELS:")
+with b2:
+    generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
+
+if generate_btn:
+    if not client:
+        st.error("❌ AI Client is not connected.")
+    else:
+        with st.spinner(f"Analyzing your recent training & {selected_sport} goals..."):
             
-            # extract names safely
-            model_names = []
-            for m in all_models:
-                # Try to get the name, or fall back to the object string
-                name = getattr(m, 'name', str(m))
-                # Cleanup: Remove 'models/' prefix if present
-                clean_name = name.replace("models/", "")
-                model_names.append(clean_name)
+            # Build the prompt
+            ai_prompt = build_ai_prompt(
+                sport=selected_sport,
+                goal=user_goal,
+                time=time_avail,
+                form=current_form, 
+                recent_activities=act_json 
+            )
             
-            # Show them clearly
-            st.code("\n".join(model_names), language="text")
-            st.warning("👉 Copy one of the names starting with 'gemini-' (e.g. gemini-1.5-flash)")
-        else:
-            st.error("API returned an empty list. Check your API key permissions.")
-            
-    except Exception as e:
-        st.error(f"Error connecting to Google: {e}")
+            try:
+                # WE ARE USING YOUR SPECIFIC "LITE" MODEL HERE
+                response = client.models.generate_content(
+                    model="gemini-2.0-flash-lite", 
+                    contents=ai_prompt
+                )
+                
+                result_text = response.text
+                
+                # Render the result
+                st.markdown(f"""
+                    <div style="
+                        background-color: rgba(0,0,0,0.3); 
+                        border: 1px solid #70C4B0; 
+                        border-radius: 10px; 
+                        padding: 25px; 
+                        margin-top: 20px;">
+                        <h3 style="color: #70C4B0; margin-top: 0; font-family: 'Michroma';">⚡ COACH'S RECOMMENDATION</h3>
+                        <div style="color: white; font-family: 'Inter'; line-height: 1.6;">
+                            {result_text.replace(chr(10), '<br>')} 
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
+                
+            except Exception as e:
+                st.error(f"Generation Failed: {e}")
