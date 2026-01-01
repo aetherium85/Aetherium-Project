@@ -846,16 +846,16 @@ if generate_btn:
                 with st.container(border=True):
                     st.markdown(f"### ⚡ Recommended Workout: {selected_sport}")
                     st.markdown(f"""
-        <div style="
-            color: white !important; 
-            -webkit-text-fill-color: white !important; 
-            background-color: rgba(0,0,0,0.0); 
-            padding: 10px; 
-            border-radius: 10px;
-        ">
-            {response.text}
-        </div>
-    """, unsafe_allow_html=True)
+                        <div style="
+                            color: white !important;
+                            -webkit-text-fill-color: white !important;
+                            background-color: rgba(0,0,0,0.0);
+                            padding: 10px;
+                            border-radius: 10px;
+                        ">
+                            {response.text}
+                        </div>
+                    """, unsafe_allow_html=True)
                     
             except Exception as e:
                 st.error(f"Generation Failed: {e}")
