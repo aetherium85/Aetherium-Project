@@ -818,16 +818,6 @@ if generate_btn:
                 
                 # Result Display
                 st.markdown("---")
-                st.markdown("""
-                <style>
-                /* Forces lists (li) and bold (strong) text to be white inside the container */
-                div[data-testid="stVerticalBlockBorderWrapper"] li,
-                div[data-testid="stVerticalBlockBorderWrapper"] p,
-                div[data-testid="stVerticalBlockBorderWrapper"] strong {
-                    color: white !important;
-                }
-                </style>
-                """, unsafe_allow_html=True)
                 with st.container(border=True):
                     st.markdown(f"### ⚡ Recommended Workout: {selected_sport}")
                     st.markdown(response.text)
