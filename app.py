@@ -1,3 +1,5 @@
+from google import genai
+import os
 import textwrap
 import streamlit.components.v1 as components
 import urllib.parse
@@ -521,6 +523,53 @@ def get_ytd_data():
         st.error(f"Fetch failed: {e}")
         return None, None, None
 
+def build_ai_prompt(sport, goal, time, form, recent_activities):
+    """
+    Constructs the prompt for the AI.
+    - sport: User selected sport (e.g. "Triathlon")
+    - form: TSB Score (e.g. -10)
+    - recent_activities: List of last 3 activity dicts
+    """
+    
+    # 1. Summarize last 3 days (To prevent repetition)
+    recent_context = ""
+    if recent_activities:
+        # Take only the last 3
+        last_3 = recent_activities[:3] 
+        recent_context = "Recent History (Do NOT repeat these):"
+        for act in last_3:
+            name = act.get('name', 'Unknown')
+            type_ = act.get('type', 'Workout')
+            date = act.get('start_date_local', '')[:10]
+            recent_context += f"\n- {date}: {type_} ({name})"
+
+    # 2. Determine Biological State
+    bio_state = "Neutral"
+    if form < -20: bio_state = "High Fatigue (Needs Recovery)"
+    elif form > 15: bio_state = "Very Fresh (Ready for Hard Effort)"
+    
+    # 3. The Prompt
+    prompt = f"""
+    Act as an elite {sport} coach. Design the single best workout for today.
+    
+    **Athlete Context:**
+    - Primary Sport: {sport}
+    - Current Goal: {goal}
+    - Time Available: {time} minutes
+    - Biological State (TSB): {form} ({bio_state})
+    
+    {recent_context}
+    
+    **Instructions:**
+    1. If the user is a Triathlete, look at Recent History to balance disciplines (e.g., if they ran yesterday, suggest a Bike or Swim).
+    2. Adjust intensity based on Biological State.
+    3. Output format: 
+       - Workout Title
+       - Main Set (Specific Intervals)
+       - "Why this workout?" (Explain the logic based on my recent history).
+    """
+    return prompt
+
 # ==============================================================================
 # --- SECTION 5: APP ROUTING & SESSION STATE ---
 # ==============================================================================
@@ -651,30 +700,43 @@ if 'well_json' in locals() and well_json:
 # ==============================================================================
 with st.expander("⚙️ Configure AI Workout Settings", expanded=False):
     
-    # 1. LOGIC: Define the variable FIRST
-    display_sport = "General"
+    # 1. DEFINE AVAILABLE SPORTS
+    # These are the options the user can manually select
+    sports_options = ["Triathlon", "Running", "Cycling", "Swimming", "General Fitness"]
+    
+    # 2. SMART DETECTION LOGIC
+    # We try to detect the sport to set the "Default" index of the dropdown
+    detected_sport = "General Fitness" # Fallback
+    default_index = 4 # Default to "General Fitness" (index 4)
+    
     if 'act_json' in locals() and act_json:
         try:
-            display_sport = infer_primary_sport(act_json)
+            detected = infer_primary_sport(act_json) # e.g., returns "Triathlon"
+            
+            # Map the detected string to our options list
+            # This handles cases like "Ride" mapping to "Cycling"
+            if detected == "Triathlon": detected_sport = "Triathlon"
+            elif detected == "Cycling": detected_sport = "Cycling"
+            elif detected == "Running": detected_sport = "Running"
+            elif detected == "Swimming": detected_sport = "Swimming"
+            
+            # Find the index in the list so we can pre-select it
+            if detected_sport in sports_options:
+                default_index = sports_options.index(detected_sport)
         except:
-            display_sport = "Run/Bike"
+            pass # Keep defaults if detection fails
 
-    # 2. LAYOUT
+    # 3. LAYOUT
     c1, c2, c3 = st.columns(3)
     
     with c1:
-        # NOTICE: I have pushed the HTML string all the way to the left.
-        # This prevents Streamlit from thinking it is a code block.
-        st.markdown(f"""
-            <div style="background-color: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); min-height: 72px; display: flex; flex-direction: column; justify-content: center;">
-                <span style="font-size: 0.7rem; color: #70C4B0; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px;">
-                    DETECTED SPORT
-                </span>
-                <span style="font-size: 1.1rem; color: white; font-family: 'Michroma'; text-transform: uppercase;">
-                    {display_sport}
-                </span>
-            </div>
-            """, unsafe_allow_html=True)
+        # THE MANUAL SELECTOR (With Smart Default)
+        selected_sport = st.selectbox(
+            "Sport Focus",
+            options=sports_options,
+            index=default_index, # <--- This makes it "Smart"
+            key="sport_selector"
+        )
         
     with c2:
         user_goal = st.selectbox(
@@ -813,3 +875,80 @@ if 'act_json' in locals() and act_json:
         st.warning("⚠️ Activity data found, but date information is missing.")
 else:
     st.info("No activity history found for this year.")
+
+# ==============================================================================
+# --- SECTION 9: AI WORKOUT GENERATOR ---
+# ==============================================================================
+st.markdown("---") # Visual separator
+
+# Center the button using columns
+b1, b2, b3 = st.columns([1, 2, 1])
+
+with b2:
+    # A big, wide button
+    generate_btn = st.button("✨ Generate Next Workout", type="primary", use_container_width=True)
+
+if generate_btn:
+    # 1. Show a loading spinner while AI "thinks"
+    with st.spinner(f"Analyzing your recent training & {selected_sport} goals..."):
+        
+        # 2. Build the Prompt using the function we made
+        # We use the variables from Section 7 (current_form) and Section 7.1 (selected_sport, etc)
+        ai_prompt = build_ai_prompt(
+            sport=selected_sport,
+            goal=user_goal,
+            time=time_avail,
+            form=current_form, # From Section 7
+            recent_activities=act_json # From Section 4/5
+        )
+        
+        # ---------------------------------------------------------
+        # TODO: CONNECT YOUR LLM HERE (OpenAI, Gemini, Claude, etc.)
+        # ---------------------------------------------------------
+        # Example pseudo-code:
+        client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents="Write a haiku about coding."
+        )
+
+        print(response.text)
+        
+        # FOR NOW: Simulating a response so you can see the UI working
+        import time
+        time.sleep(1.5) # Fake delay
+        result_text = f"""
+### 🚴 {selected_sport} Power Builder
+**Focus:** {user_goal} | **Duration:** {time_avail} mins
+
+**Warm Up (10 mins):**
+- 5 mins easy spinning / jogging (Zone 1)
+- 3 x 1 min Fast Pedaling / Strides (100+ rpm)
+
+**Main Set (40 mins):**
+- 3 x 8 mins @ Threshold Power (Zone 4)
+- *Rest: 4 mins easy between intervals*
+
+**Cool Down (10 mins):**
+- Easy spinning, bringing HR down.
+
+**Coach's Logic:**
+Your TSB is {int(current_form)}, indicating you are fresh enough for intensity. Since you did a long slow distance yesterday, today is perfect for threshold work to boost your FTP.
+        """
+        # ---------------------------------------------------------
+
+        # 3. Display the Result in a Styling Box
+        st.markdown(f"""
+            <div style="
+                background-color: rgba(0,0,0,0.3); 
+                border: 1px solid #70C4B0; 
+                border-radius: 10px; 
+                padding: 25px; 
+                margin-top: 20px;">
+                <h3 style="color: #70C4B0; margin-top: 0; font-family: 'Michroma';">⚡ COACH'S RECOMMENDATION</h3>
+                <div style="color: white; font-family: 'Inter'; line-height: 1.6;">
+                    {result_text.replace(chr(10), '<br>')} 
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
