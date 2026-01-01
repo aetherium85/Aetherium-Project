@@ -784,7 +784,7 @@ except:
     client = None
 
 # 2. CONFIGURATION (Directly on page, no expander)
-st.markdown("### ⚙️ AI Coach Settings")
+st.markdown("### ⚙️ Workout Planner Settings")
 
 # Smart Defaults Logic
 sports_options = ["Triathlon", "Running", "Cycling", "Swimming", "General Fitness"]
