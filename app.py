@@ -49,7 +49,7 @@ st.markdown(
         background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
                     url("https://images.unsplash.com/photo-1663104192417-6804188a9a8e");
         background-size: cover; background-position: center;
-        background-attachment: fixed; filter: blur(8px); transform: scale(1.1); z-index: -1;
+        background-attachment: fixed; filter: blur(18px); transform: scale(1.1); z-index: -1;
     }
     .stApp { background: transparent !important; }
 
