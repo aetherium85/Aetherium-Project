@@ -284,12 +284,24 @@ st.markdown(
 
     /* The Clickable Header */
     .streamlit-expanderHeader {
-        background-color: rgba(255, 255, 255, 0.05) !important; /* Subtle highlight */
-        color: white !important;
+        background-color: rgba(255, 255, 255, 0.05) !important; /* Slight transparent tint */
+        color: white !important; /* Force text to be white */
         font-family: 'Inter', sans-serif !important;
         font-size: 1rem !important;
         font-weight: 600 !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Separator line */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Remove any default Streamlit background */
+    div[data-testid="stExpander"] details > summary {
+        background-color: transparent !important;
+        color: white !important;
+    }
+    
+    /* Ensure the SVG arrow icon is white */
+    .streamlit-expanderHeader svg {
+        fill: white !important;
+        color: white !important;
     }
     
     /* Hover Effect for Header */
