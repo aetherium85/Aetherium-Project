@@ -71,30 +71,43 @@ st.markdown(
     h3 { font-size: 1.1rem !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: 2px !important; opacity: 0.9 !important; color: white !important; margin-top: 10px !important; }
 
     /* 🎯 TARGETED FIX FOR THE RESULT BOX */
-    /* This makes the box glass-like */
+    /* 1. Make the box glass-like */
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: rgba(255, 255, 255, 0.05) !important;
+        background-color: rgba(0, 0, 0, 0.4) !important; /* Slightly darker background for contrast */
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 10px !important;
     }
-    
-    /* This forces ALL text inside the box to be White, but keeps the "Small/Compact" font */
-    div[data-testid="stVerticalBlockBorderWrapper"] * {
-        color: white !important;
+
+    /* 2. FORCE TEXT COLORS - Explicitly targeting paragraph and list tags */
+    div[data-testid="stVerticalBlockBorderWrapper"] p,
+    div[data-testid="stVerticalBlockBorderWrapper"] li, 
+    div[data-testid="stVerticalBlockBorderWrapper"] ul, 
+    div[data-testid="stVerticalBlockBorderWrapper"] ol,
+    div[data-testid="stVerticalBlockBorderWrapper"] span,
+    div[data-testid="stVerticalBlockBorderWrapper"] div {
+        color: #FFFFFF !important; /* Pure White */
         font-family: 'Inter', sans-serif !important;
-        font-weight: 400 !important; /* Normal weight (not thin) makes it easier to read at small sizes */
-        letter-spacing: normal !important; /* Removes the wide gap, keeping it compact */
-        font-size: 0.95rem !important; /* Explicitly sets the "smaller" size you liked */
+        font-weight: 400 !important;
+        font-size: 0.95rem !important;
+        line-height: 1.6 !important; /* Improves readability */
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5); /* Adds a tiny shadow to make text pop against background */
     }
 
-    /* Keeps bold text poping */
+    /* 3. Ensure Bold text is also white */
     div[data-testid="stVerticalBlockBorderWrapper"] strong,
     div[data-testid="stVerticalBlockBorderWrapper"] b {
+        color: #FFFFFF !important;
         font-weight: 700 !important;
-        color: white !important;
     }
 
+    /* 4. Fix headers inside the box (if any exist besides the main one) */
+    div[data-testid="stVerticalBlockBorderWrapper"] h1,
+    div[data-testid="stVerticalBlockBorderWrapper"] h2,
+    div[data-testid="stVerticalBlockBorderWrapper"] h3,
+    div[data-testid="stVerticalBlockBorderWrapper"] h4 {
+        color: #FFFFFF !important;
+    }
     /* 5. METRIC & PLOT STYLING */
     [data-testid="stHorizontalBlock"] div, [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { 
         color: white !important; 
