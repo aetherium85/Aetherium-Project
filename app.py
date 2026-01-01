@@ -242,7 +242,7 @@ st.markdown(
     }
 
     section[data-testid="stSidebar"] {
-        background-color: #0e1117 !important; /* Matches Streamlit Dark Mode */
+        background-color: #FFFFFF !important; /* Matches Streamlit Dark Mode */
         background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
@@ -511,7 +511,7 @@ if act_json:
 # ==============================================================================
 # --- SECTION 7: TRAINING STATUS (WELLNESS) ---
 # ==============================================================================
-
+st.markdown("### ⚡ Your Current Training Status")
 if 'well_json' in locals() and well_json:
     df = pd.DataFrame(well_json)
     
@@ -586,7 +586,6 @@ if well_json:
             if col not in df.columns: df[col] = 0.0
         if (df['tsb'] == 0).all(): df['tsb'] = df['ctl'] - df['atl']
 
-        st.markdown("### ⚡ Your Current Training Status")
         latest = df.iloc[-1]
         s1, s2, s3 = st.columns(3)
         
