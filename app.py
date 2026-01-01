@@ -786,21 +786,36 @@ except:
 # 2. CONFIGURATION (Directly on page, no expander)
 st.markdown("### ⚙️ Workout Planner Settings")
 
-# Smart Defaults Logic
+# --- A. DETECT SPORT (Existing Logic) ---
 sports_options = ["Triathlon", "Running", "Cycling", "Swimming", "General Fitness"]
-default_index = 4
+default_sport_index = 4
 if 'act_json' in locals() and act_json:
     try:
         detected = infer_primary_sport(act_json)
-        if detected in sports_options: default_index = sports_options.index(detected)
+        if detected in sports_options: default_sport_index = sports_options.index(detected)
     except: pass
 
-# Layout - 3 Columns for inputs
+# --- B. DETECT GOAL (New Logic based on TSB) ---
+goal_options = ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max", "Recovery", "Race Prep"]
+default_goal_index = 0 # Default to Base Building
+
+if 'current_form' in locals():
+    # If very tired (< -20), suggest Recovery
+    if current_form < -20:
+        default_goal_index = 3 # Index of "Recovery"
+    # If fresh (> 10), suggest Threshold/Hard work
+    elif current_form > 10:
+        default_goal_index = 1 # Index of "Threshold / FTP"
+    # Otherwise (between -20 and 10), suggest Base Building
+    else:
+        default_goal_index = 0 # Index of "Base Building"
+
+# --- C. RENDER INPUTS ---
 c1, c2, c3 = st.columns(3)
 with c1:
-    selected_sport = st.selectbox("Sport Focus", sports_options, index=default_index, key="sport_select")
+    selected_sport = st.selectbox("Sport Focus", sports_options, index=default_sport_index, key="sport_select")
 with c2:
-    user_goal = st.selectbox("Goal", ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max", "Recovery", "Race Prep"], index=0, key="goal_select")
+    user_goal = st.selectbox("Goal", goal_options, index=default_goal_index, key="goal_select")
 with c3:
     time_avail = st.slider("Time (mins)", 30, 120, 60, step=15, key="time_select")
 
@@ -808,7 +823,6 @@ with c3:
 b1, b2, b3 = st.columns([1, 2, 1])
 
 with b2:
-    # Custom style to pull button up slightly
     st.markdown("""<style>div[data-testid="column"] { margin-top: 10px; }</style>""", unsafe_allow_html=True)
     generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
 
@@ -826,16 +840,11 @@ if generate_btn:
                     contents=ai_prompt
                 )
 
-                # 2. INJECT CSS (Flush left to prevent weird rectangles)
+                # 2. INJECT CSS
                 st.markdown("""
 <style>
-.ai-response {
-    color: white !important;
-}
-.ai-response p, .ai-response li, .ai-response strong {
-    color: white !important;
-    font-size: 0.9rem;
-}
+.ai-response { color: white !important; }
+.ai-response p, .ai-response li, .ai-response strong { color: white !important; font-size: 0.9rem; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -843,7 +852,7 @@ if generate_btn:
                 st.markdown("---")
                 st.markdown(f"### ⚡ Recommended Workout: {selected_sport}")
                 
-                # 4. DISPLAY RESULT (Flush left to fix the rectangle issue)
+                # 4. DISPLAY RESULT
                 st.markdown(f"""
 <div class="ai-response">
 {response.text}
@@ -851,11 +860,7 @@ if generate_btn:
 """, unsafe_allow_html=True)
 
             except Exception as e:
-                # Fallback logic for Rate Limits
-                if "429" in str(e):
-                    st.toast("⚠️ Primary model busy. Retrying...", icon="🔄")
-                else:
-                    st.error(f"Generation Failed: {e}")
+                st.error(f"Generation Failed: {e}")
 
 # # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD) ---
