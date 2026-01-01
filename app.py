@@ -634,7 +634,8 @@ if act_json:
     elegant_hero_item(h2, "⚡", "Impact", f"{load} pts")
     elegant_hero_item(h3, h3_icon, h3_label, h3_value)
     elegant_hero_item(h4, h4_icon, h4_label, h4_value)
-    st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
+
+st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 # ==============================================================================
 # --- SECTION 6: METRICS CALCULATION (The Math) ---
@@ -781,13 +782,13 @@ with st.expander("⚙️ Configure AI Workout Settings", expanded=False):
 # Removed st.markdown("###") to reduce the gap
 b1, b2, b3 = st.columns([1, 2, 1])
 
+st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
+
 with b2:
     # Added a custom style to remove top margin from the button column
     st.markdown("""<style>div[data-testid="column"] { margin-top: -10px; }</style>""", unsafe_allow_html=True)
     
     generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
-
-st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 if generate_btn:
     if not client:
