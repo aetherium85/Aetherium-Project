@@ -782,8 +782,6 @@ with st.expander("⚙️ Configure AI Workout Settings", expanded=False):
 # Removed st.markdown("###") to reduce the gap
 b1, b2, b3 = st.columns([1, 2, 1])
 
-st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
-
 with b2:
     # Added a custom style to remove top margin from the button column
     st.markdown("""<style>div[data-testid="column"] { margin-top: -10px; }</style>""", unsafe_allow_html=True)
@@ -812,6 +810,7 @@ if generate_btn:
 # ==============================================================================
         
         # --- 📈 Yearly Training Load Progression (NOW PROPERLY NESTED) ---
+        st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         st.markdown("### 📈 Yearly Training Load Progression")
 
         colors = {
