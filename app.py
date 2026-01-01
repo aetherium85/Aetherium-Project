@@ -699,44 +699,32 @@ if well_json:
 # We use st.expander to hide these details until needed
 with st.expander("⚙️ Configure AI Workout Settings", expanded=True):
     
-    # 1. LOGIC: Define the variable FIRST so it is never undefined
-    display_sport = "General" # Default fallback
-    
-    # Try to detect sport from history if available
+    # 1. LOGIC: Define the variable FIRST
+    display_sport = "General"
     if 'act_json' in locals() and act_json:
         try:
-            # We assume infer_primary_sport is defined in your utility functions
             display_sport = infer_primary_sport(act_json)
         except:
             display_sport = "Run/Bike"
 
-    # 2. LAYOUT: Now we render the columns using the variable
+    # 2. LAYOUT
     c1, c2, c3 = st.columns(3)
     
     with c1:
-        # THE FIXED CONTAINER (Darker, min-height, centered)
+        # NOTICE: I have pushed the HTML string all the way to the left.
+        # This prevents Streamlit from thinking it is a code block.
         st.markdown(f"""
-            <div style="
-                background-color: rgba(255,255,255,0.05); 
-                padding: 10px 15px; 
-                border-radius: 8px; 
-                border: 1px solid rgba(255,255,255,0.1);
-                min-height: 72px; 
-                display: flex; 
-                flex-direction: column; 
-                justify-content: center;">
-                
-                <span style="font-size: 0.7rem; color: #70C4B0; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px;">
-                    DETECTED SPORT
-                </span>
-                <span style="font-size: 1.1rem; color: white; font-family: 'Michroma'; text-transform: uppercase;">
-                    {display_sport}
-                </span>
-            </div>
-        """, unsafe_allow_html=True)
+<div style="background-color: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); min-height: 72px; display: flex; flex-direction: column; justify-content: center;">
+    <span style="font-size: 0.7rem; color: #70C4B0; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px;">
+        DETECTED SPORT
+    </span>
+    <span style="font-size: 1.1rem; color: white; font-family: 'Michroma'; text-transform: uppercase;">
+        {display_sport}
+    </span>
+</div>
+""", unsafe_allow_html=True)
         
     with c2:
-        # Added key to prevent "Duplicate Widget ID" errors
         user_goal = st.selectbox(
             "Current Training Focus",
             ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max / Speed", "Recovery / Taper", "Race Prep"],
