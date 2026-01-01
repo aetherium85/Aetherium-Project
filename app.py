@@ -799,7 +799,7 @@ default_goal_index = 0 # Default to Base Building
 
 # TEST LINE: Uncomment one of these to test the logic!
 # current_form = -30  # Should switch Goal to 'Recovery'
-current_form = 20   # Should switch Goal to 'Threshold / FTP'
+# current_form = 20   # Should switch Goal to 'Threshold / FTP'
 
 if 'current_form' in locals():
     # If very tired (< -20), suggest Recovery
