@@ -25,359 +25,357 @@ LOGO_BASE64 = "iVBORw0KGgoAAAANSUhEUgAABlcAAAZXCAYAAAD6rSYVAAAAAXNSR0IArs4c6QAAA
 
 # Custom CSS for Glassmorphism UI
 st.markdown(
-    """
-    <style>
-    /* 1. CLEAN IMPORT: Single line for both fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Michroma&display=swap');
+"""
+<style>
+/* 1. CLEAN IMPORT: Single line for both fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Michroma&display=swap');
 
-    /* 2. HEADER FIX: Makes the header transparent
-    header[data-testid="stHeader"] {
-        background: transparent !important;
-        backdrop-filter: none !important;
-    } */
+/* 2. HEADER FIX: Makes the header transparent
+header[data-testid="stHeader"] {
+background: transparent !important;
+backdrop-filter: none !important;
+} */
     
-    /* FIX: Make the "Hide Sidebar" arrow visible at all times */
-    button[data-testid="stSidebarCollapseButton"] {
-        color: white !important;
-        opacity: 1 !important;
-    }
-    button[data-testid="stSidebarCollapseButton"] svg {
-        fill: white !important;
-    }
+/* FIX: Make the "Hide Sidebar" arrow visible at all times */
+button[data-testid="stSidebarCollapseButton"] {
+color: white !important;
+opacity: 1 !important;
+}
+button[data-testid="stSidebarCollapseButton"] svg {
+fill: white !important;
+}
     
-    /* 3. BACKGROUND IMAGE */
-    .stApp::before {
-        content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
-                    url("https://images.unsplash.com/photo-1663104192417-6804188a9a8e");
-        background-size: cover; background-position: center;
-        background-attachment: fixed; filter: blur(2px); transform: scale(1.1); z-index: -1;
-    }
-    .stApp { background: transparent !important; }
+/* 3. BACKGROUND IMAGE */
+.stApp::before {
+content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+url("https://images.unsplash.com/photo-1663104192417-6804188a9a8e");
+background-size: cover; background-position: center;
+background-attachment: fixed; filter: blur(2px); transform: scale(1.1); z-index: -1;
+}
+.stApp { background: transparent !important; }
 
-    /* 4. TEXT DEFAULTS (RESTORED & FIXED) */
-    /* I removed 'li', 'ul' from here so they go back to the "smaller" standard size */
-    h1, h2, h3, h4, h5, h6, p, label, strong, b, .performance-row, .performance-row div, .performance-row b {
-        font-family: 'Inter', sans-serif !important; 
-        font-weight: 200 !important;
-        color: white !important; 
-        letter-spacing: 1px !important;
-    }
+/* 4. TEXT DEFAULTS (RESTORED & FIXED) */
+/* I removed 'li', 'ul' from here so they go back to the "smaller" standard size */
+h1, h2, h3, h4, h5, h6, p, label, strong, b, .performance-row, .performance-row div, .performance-row b {
+font-family: 'Inter', sans-serif !important; 
+font-weight: 200 !important;
+color: white !important; 
+letter-spacing: 1px !important;
+}
     
-    /* ... (Your h1, h2, h3 rules remain the same) ... */
+/* ... (Your h1, h2, h3 rules remain the same) ... */
 
-    h1 { font-size: 2.2rem !important; font-weight: 700 !important; color: white !important; }
-    h2 { font-size: 1.5rem !important; font-weight: 600 !important; margin-top: 20px !important; margin-bottom: 10px !important; }
-    h3 { font-size: 1.1rem !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: 2px !important; opacity: 0.9 !important; color: white !important; margin-top: 10px !important; }
+h1 { font-size: 2.2rem !important; font-weight: 700 !important; color: white !important; }
+h2 { font-size: 1.5rem !important; font-weight: 600 !important; margin-top: 20px !important; margin-bottom: 10px !important; }
+h3 { font-size: 1.1rem !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: 2px !important; opacity: 0.9 !important; color: white !important; margin-top: 10px !important; }
 
-    /* 🎯 TARGETED FIX FOR THE RESULT BOX (TITANIUM VERSION) */
+/* 🎯 TARGETED FIX FOR THE RESULT BOX (TITANIUM VERSION) */
     
-    /* 1. The Glass Container */
-    div[data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: rgba(0, 0, 0, 0.6) !important; /* Slightly darker for max contrast */
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 10px !important;
-    }
+/* 1. The Glass Container */
+div[data-testid="stVerticalBlockBorderWrapper"] {
+background-color: rgba(0, 0, 0, 0.6) !important; /* Slightly darker for max contrast */
+backdrop-filter: blur(10px);
+border: 1px solid rgba(255, 255, 255, 0.2) !important;
+border-radius: 10px !important;
+}
 
-    /* 2. THE TEXT OVERRIDE */
-    /* We use -webkit-text-fill-color to force the paint, and opacity to kill transparency */
-    div[data-testid="stVerticalBlockBorderWrapper"] * {
-        color: #FFFFFF !important;               /* Standard White */
-        -webkit-text-fill-color: #FFFFFF !important; /* Forces white even if browser wants grey */
-        opacity: 1 !important;                   /* Removes any "ghosting" or transparency */
+/* 2. THE TEXT OVERRIDE */
+/* We use -webkit-text-fill-color to force the paint, and opacity to kill transparency */
+div[data-testid="stVerticalBlockBorderWrapper"] * {
+color: #FFFFFF !important;               /* Standard White */
+-webkit-text-fill-color: #FFFFFF !important; /* Forces white even if browser wants grey */
+opacity: 1 !important;                   /* Removes any "ghosting" or transparency */
         
-        font-family: 'Inter', sans-serif !important;
-        font-size: 0.85rem !important;           /* Your requested small size */
-        font-weight: 400 !important;             /* Normal weight */
-        line-height: 1.5 !important;
-    }
+font-family: 'Inter', sans-serif !important;
+font-size: 0.85rem !important;           /* Your requested small size */
+font-weight: 400 !important;             /* Normal weight */
+line-height: 1.5 !important;
+}
 
-    /* 3. Headers (Teal) */
-    div[data-testid="stVerticalBlockBorderWrapper"] h3 {
-        color: #70C4B0 !important;
-        -webkit-text-fill-color: #70C4B0 !important;
-        font-size: 1.0rem !important;
-        font-weight: 600 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 2px !important;
-        margin-bottom: 10px !important;
-    }
+/* 3. Headers (Teal) */
+div[data-testid="stVerticalBlockBorderWrapper"] h3 {
+color: #70C4B0 !important;
+-webkit-text-fill-color: #70C4B0 !important;
+font-size: 1.0rem !important;
+font-weight: 600 !important;
+text-transform: uppercase !important;
+letter-spacing: 2px !important;
+margin-bottom: 10px !important;
+}
 
-    /* 4. Bold Text (White & Thick) */
-    div[data-testid="stVerticalBlockBorderWrapper"] strong,
-    div[data-testid="stVerticalBlockBorderWrapper"] b {
-        color: #FFFFFF !important;
-        -webkit-text-fill-color: #FFFFFF !important;
-        font-weight: 700 !important;
-    }
+/* 4. Bold Text (White & Thick) */
+div[data-testid="stVerticalBlockBorderWrapper"] strong,
+div[data-testid="stVerticalBlockBorderWrapper"] b {
+color: #FFFFFF !important;
+-webkit-text-fill-color: #FFFFFF !important;
+font-weight: 700 !important;
+}
 
-    /* 5. METRIC & PLOT STYLING */
-    [data-testid="stHorizontalBlock"] div, [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { 
-        color: white !important; 
-    }
+/* 5. METRIC & PLOT STYLING */
+[data-testid="stHorizontalBlock"] div, [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { 
+color: white !important; 
+}
     
-    div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart), .performance-row {
-        background-color: rgba(255, 255, 255, 0.03) !important; 
-        backdrop-filter: blur(10px) !important;
-        border-radius: 15px !important; 
-        padding: 20px !important; 
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        margin-bottom: 10px !important;
-    }
+div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart), .performance-row {
+background-color: rgba(255, 255, 255, 0.03) !important; 
+backdrop-filter: blur(10px) !important;
+border-radius: 15px !important; 
+padding: 20px !important; 
+border: 1px solid rgba(255, 255, 255, 0.1) !important;
+margin-bottom: 10px !important;
+}
 
-    .performance-row {
-        display: flex !important;
-        justify-content: space-between !important;
+.performance-row {
+display: flex !important;
+justify-content: space-between !important;
+
+/* CHANGE THIS LINE FROM 'center' TO 'flex-start' */
+align-items: flex-start !important; 
         
-        /* CHANGE THIS LINE FROM 'center' TO 'flex-start' */
-        align-items: flex-start !important; 
-        
-        background-color: rgba(255, 255, 255, 0.03) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 12px !important;
-        
-        /* Optional: Adjust padding if 'top' alignment looks too squeezed */
-        padding: 15px 25px !important; 
-        
-        margin-bottom: 12px !important;
-        transition: all 0.2s ease !important;
-    }
+background-color: rgba(255, 255, 255, 0.03) !important;
+border: 1px solid rgba(255, 255, 255, 0.1) !important;
+border-radius: 12px !important;
 
-    /* 6. EXPANDER STYLING */
-    .stExpander {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 10px !important;
-    }
-    .stExpander p, .stExpander span, .stExpander label, .stExpander table, .stExpander th, .stExpander td {
-        color: white !important;
-        background-color: transparent !important;
-    }
-    summary[data-testid="stExpanderSummary"] {
-        color: white !important; 
-    }
-    summary[data-testid="stExpanderSummary"]:hover {
-        color: #70C4B0 !important;
-    }
+/* Optional: Adjust padding if 'top' alignment looks too squeezed */
+padding: 15px 25px !important; 
 
-    /* 7. BRANDING */
-    .brand-wrapper {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        width: 100% !important;
-        margin-top: 30px !important;
-        margin-bottom: 80px !important;
-    }
+margin-bottom: 12px !important;
+transition: all 0.2s ease !important;
+}
 
-    .title-container {
-        display: flex !important;
-        flex-direction: column !important;
-        width: min-content !important; 
-    }
+/* 6. EXPANDER STYLING */
+.stExpander {
+background: rgba(255, 255, 255, 0.05) !important;
+border: 1px solid rgba(255, 255, 255, 0.1) !important;
+border-radius: 10px !important;
+}
+.stExpander p, .stExpander span, .stExpander label, .stExpander table, .stExpander th, .stExpander td {
+color: white !important;
+background-color: transparent !important;
+}
+summary[data-testid="stExpanderSummary"] {
+color: white !important; 
+}
+summary[data-testid="stExpanderSummary"]:hover {
+color: #70C4B0 !important;
+}
 
-    .title-main {
-        font-family: 'Michroma', sans-serif !important;
-        font-size: 3.2rem !important;
-        line-height: 1 !important;
-        color: #ffffff !important;
-        text-shadow: 0 0 15px rgba(112, 196, 176, 0.4) !important;
-        margin: 0 !important;
-        white-space: nowrap !important;
-    }
+/* 7. BRANDING */
+.brand-wrapper {
+display: flex !important;
+flex-direction: column !important;
+align-items: center !important;
+width: 100% !important;
+margin-top: 30px !important;
+margin-bottom: 80px !important;
+}
+.title-container {
+display: flex !important;
+flex-direction: column !important;
+width: min-content !important; 
+}
+.title-main {
+font-family: 'Michroma', sans-serif !important;
+font-size: 3.2rem !important;
+line-height: 1 !important;
+color: #ffffff !important;
+text-shadow: 0 0 15px rgba(112, 196, 176, 0.4) !important;
+margin: 0 !important;
+white-space: nowrap !important;
+}
 
-    .title-sub {
-        font-family: 'Inter', sans-serif !important;
-        font-size: 1rem !important;
-        font-weight: 200 !important;
-        letter-spacing: 8px !important;
-        color: #70C4B0 !important;
-        text-align: right !important; 
-        width: 100% !important;
-        margin-top: 4px !important;
-        text-transform: uppercase !important;
-    }
+.title-sub {
+font-family: 'Inter', sans-serif !important;
+font-size: 1rem !important;
+font-weight: 200 !important;
+letter-spacing: 8px !important;
+color: #70C4B0 !important;
+text-align: right !important; 
+width: 100% !important;
+margin-top: 4px !important;
+text-transform: uppercase !important;
+}
 
-    /* LOGIN BUTTON (Main Page) */
-    a[href*="intervals.icu"] {
-        display: block !important;
-        width: 100% !important;
-        margin: 5px auto 0 auto !important;
-        text-align: center !important;
-        background: linear-gradient(135deg, #70C4B0 0%, #008f7a 100%) !important;
-        color: white !important;
-        border: none !important;
-        padding: 15px 30px !important;
-        font-family: 'Inter', sans-serif !important;
-        font-weight: 600 !important;
-        font-size: 1.1rem !important;
-        text-decoration: none !important;
-        border-radius: 50px !important;
-        box-shadow: 0 4px 15px rgba(112, 196, 176, 0.3) !important;
-        transition: all 0.3s ease !important;
-        text-transform: uppercase !important;
-        letter-spacing: 1px !important;
-    }
-    a[href*="intervals.icu"]:hover {
-        transform: translateY(-3px) !important;
-        box-shadow: 0 8px 25px rgba(112, 196, 176, 0.5) !important;
-        background: linear-gradient(135deg, #82d8c2 0%, #00a892 100%) !important;
-        color: white !important;
-    }
+/* LOGIN BUTTON (Main Page) */
+a[href*="intervals.icu"] {
+display: block !important;
+width: 100% !important;
+margin: 5px auto 0 auto !important;
+text-align: center !important;
+background: linear-gradient(135deg, #70C4B0 0%, #008f7a 100%) !important;
+color: white !important;
+border: none !important;
+padding: 15px 30px !important;
+font-family: 'Inter', sans-serif !important;
+font-weight: 600 !important;
+font-size: 1.1rem !important;
+text-decoration: none !important;
+border-radius: 50px !important;
+box-shadow: 0 4px 15px rgba(112, 196, 176, 0.3) !important;
+transition: all 0.3s ease !important;
+text-transform: uppercase !important;
+letter-spacing: 1px !important;
+}
+a[href*="intervals.icu"]:hover {
+transform: translateY(-3px) !important;
+box-shadow: 0 8px 25px rgba(112, 196, 176, 0.5) !important;
+background: linear-gradient(135deg, #82d8c2 0%, #00a892 100%) !important;
+color: white !important;
+}
 
-    /* LOGOUT BUTTON (Sidebar Fix) */
-    /* This targets the standard Streamlit button in the sidebar */
-    section[data-testid="stSidebar"] .stButton button {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        transition: all 0.3s ease !important;
-    }
-    section[data-testid="stSidebar"] .stButton button:hover {
-        background-color: rgba(225, 108, 69, 0.8) !important; /* Orange hover to match theme */
-        border-color: #E16C45 !important;
-        color: white !important;
-    }
+/* LOGOUT BUTTON (Sidebar Fix) */
+/* This targets the standard Streamlit button in the sidebar */
+section[data-testid="stSidebar"] .stButton button {
+background-color: rgba(255, 255, 255, 0.1) !important;
+color: white !important;
+border: 1px solid rgba(255, 255, 255, 0.2) !important;
+transition: all 0.3s ease !important;
+}
+section[data-testid="stSidebar"] .stButton button:hover {
+background-color: rgba(225, 108, 69, 0.8) !important; /* Orange hover to match theme */
+border-color: #E16C45 !important;
+color: white !important;
+}
 
-    /* TABLE STYLING */
-    table {
-        color: white !important;
-        background-color: rgba(255, 255, 255, 0.03) !important;
-        border-collapse: collapse !important;
-        width: 100% !important;
-        border-radius: 10px !important;
-        overflow: hidden !important;
-    }
-    th {
-        background-color: rgba(112, 196, 176, 0.2) !important;
-        color: white !important;
-        font-family: 'Michroma', sans-serif !important;
-        font-size: 0.85rem !important;
-        font-weight: 400 !important;
-        text-transform: uppercase !important;
-        padding: 12px 15px !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
-    td {
-        color: rgba(255, 255, 255, 0.9) !important;
-        padding: 12px 15px !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-        font-family: 'Inter', sans-serif !important;
-        font-weight: 200 !important;
-    }
-    tr:nth-child(even) {
-        background-color: rgba(255, 255, 255, 0.02) !important;
-    }
-    [data-testid="stDataFrame"] {
-        background-color: rgba(255, 255, 255, 0.03) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
+/* TABLE STYLING */
+table {
+color: white !important;
+background-color: rgba(255, 255, 255, 0.03) !important;
+border-collapse: collapse !important;
+width: 100% !important;
+border-radius: 10px !important;
+overflow: hidden !important;
+}
+th {
+background-color: rgba(112, 196, 176, 0.2) !important;
+color: white !important;
+font-family: 'Michroma', sans-serif !important;
+font-size: 0.85rem !important;
+font-weight: 400 !important;
+text-transform: uppercase !important;
+padding: 12px 15px !important;
+border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+td {
+color: rgba(255, 255, 255, 0.9) !important;
+padding: 12px 15px !important;
+border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+font-family: 'Inter', sans-serif !important;
+font-weight: 200 !important;
+}
+tr:nth-child(even) {
+background-color: rgba(255, 255, 255, 0.02) !important;
+}
+[data-testid="stDataFrame"] {
+background-color: rgba(255, 255, 255, 0.03) !important;
+border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
 
-    /* SIDEBAR STYLING */
-    section[data-testid="stSidebar"] {
-        /* Dark Burnt Orange Base with Dark Gradient Overlay */
-        background-color: #3d1e10 !important; 
-        background-image: linear-gradient(180deg, rgba(30, 10, 5, 0.95), rgba(61, 30, 16, 0.8)) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
+/* SIDEBAR STYLING */
+section[data-testid="stSidebar"] {
+/* Dark Burnt Orange Base with Dark Gradient Overlay */
+background-color: #3d1e10 !important; 
+background-image: linear-gradient(180deg, rgba(30, 10, 5, 0.95), rgba(61, 30, 16, 0.8)) !important;
+border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
 
-    section[data-testid="stSidebar"] h1, 
-    section[data-testid="stSidebar"] h2, 
-    section[data-testid="stSidebar"] h3, 
-    section[data-testid="stSidebar"] label, 
-    section[data-testid="stSidebar"] span, 
-    section[data-testid="stSidebar"] p {
-        color: rgba(255, 255, 255, 0.95) !important;
-    }
+section[data-testid="stSidebar"] h1, 
+section[data-testid="stSidebar"] h2, 
+section[data-testid="stSidebar"] h3, 
+section[data-testid="stSidebar"] label, 
+section[data-testid="stSidebar"] span, 
+section[data-testid="stSidebar"] p {
+color: rgba(255, 255, 255, 0.95) !important;
+}
 
-    section[data-testid="stSidebar"] div[data-testid="stThumbValue"],
-    section[data-testid="stSidebar"] div[data-testid="stTickBarMin"],
-    section[data-testid="stSidebar"] div[data-testid="stTickBarMax"] {
-        color: white !important;
-    }
+section[data-testid="stSidebar"] div[data-testid="stThumbValue"],
+section[data-testid="stSidebar"] div[data-testid="stTickBarMin"],
+section[data-testid="stSidebar"] div[data-testid="stTickBarMax"] {
+color: white !important;
+}
    
-    /* The Main Expander Box */
-    div[data-testid="stExpander"] {
-        /* Darker glass background for better contrast */
-        background-color: rgba(30, 30, 30, 0.4) !important; 
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 12px !important;
-        margin-bottom: 20px !important;
-        overflow: hidden !important; /* Ensures header background doesn't overflow corners */
-    }
+/* The Main Expander Box */
+div[data-testid="stExpander"] {
+/* Darker glass background for better contrast */
+background-color: rgba(30, 30, 30, 0.4) !important; 
+border: 1px solid rgba(255, 255, 255, 0.1) !important;
+border-radius: 12px !important;
+margin-bottom: 20px !important;
+overflow: hidden !important; /* Ensures header background doesn't overflow corners */
+}
 
-    /* The Clickable Header */
-    .streamlit-expanderHeader {
-        background-color: rgba(255, 255, 255, 0.03) !important; /* Slight transparent tint */
-        color: white !important; /* Force text to be white */
-        font-family: 'Inter', sans-serif !important;
-        font-size: 1rem !important;
-        font-weight: 600 !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    /* Remove any default Streamlit background */
-    div[data-testid="stExpander"] details > summary {
-        background-color: transparent !important;
-        color: white !important;
-    }
-    
-    /* Ensure the SVG arrow icon is white */
-    .streamlit-expanderHeader svg {
-        fill: white !important;
-        color: white !important;
-    }
-    
-    /* Hover Effect for Header */
-    .streamlit-expanderHeader:hover {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        color: #70C4B0 !important; /* Teal glow on hover */
-    }
+/* The Clickable Header */
+.streamlit-expanderHeader {
+background-color: rgba(255, 255, 255, 0.03) !important; /* Slight transparent tint */
+color: white !important; /* Force text to be white */
+font-family: 'Inter', sans-serif !important;
+font-size: 1rem !important;
+font-weight: 600 !important;
+border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
 
-    /* The Content Inside the Expander */
-    div[data-testid="stExpander"] div[data-testid="stVerticalBlock"] {
-        color: white !important;
-        padding: 10px !important; /* Adds breathing room inside */
-    }
-    
-    /* The Selectbox Main Container (The box you click) */
-    div[data-baseweb="select"] > div {
-        background-color: rgba(0, 0, 0, 0.3) !important; /* Darker for input fields */
-        color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 8px !important;
-    }
+/* Remove any default Streamlit background */
+div[data-testid="stExpander"] details > summary {
+background-color: transparent !important;
+color: white !important;
+}
 
-    /* The Text Inside the Selectbox */
-    div[data-baseweb="select"] span {
-        color: white !important;
-    }
-    
-    /* The Dropdown Arrow Icon */
-    div[data-baseweb="select"] svg {
-        fill: white !important;
-    }
+/* Ensure the SVG arrow icon is white */
+.streamlit-expanderHeader svg {
+fill: white !important;
+color: white !important;
+}
 
-    /* The Dropdown Menu Options (The list that pops up) */
-    ul[data-baseweb="menu"] {
-        background-color: #1E1E1E !important; /* Solid dark background for readability */
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
-    
-    /* Individual Menu Items */
-    li[data-baseweb="menu-item"] {
-        color: rgba(255, 255, 255, 0.9) !important;
-    }
-    
-    /* Hover State for Menu Items */
-    li[data-baseweb="menu-item"]:hover {
-        background-color: #E16C45 !important; /* Orange Highlight */
-        color: white !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
+/* Hover Effect for Header */
+.streamlit-expanderHeader:hover {
+background-color: rgba(255, 255, 255, 0.1) !important;
+color: #70C4B0 !important; /* Teal glow on hover */
+}
+
+/* The Content Inside the Expander */
+div[data-testid="stExpander"] div[data-testid="stVerticalBlock"] {
+color: white !important;
+padding: 10px !important; /* Adds breathing room inside */
+}
+
+/* The Selectbox Main Container (The box you click) */
+div[data-baseweb="select"] > div {
+background-color: rgba(0, 0, 0, 0.3) !important; /* Darker for input fields */
+color: white !important;
+border: 1px solid rgba(255, 255, 255, 0.2) !important;
+border-radius: 8px !important;
+}
+
+/* The Text Inside the Selectbox */
+div[data-baseweb="select"] span {
+color: white !important;
+}
+
+/* The Dropdown Arrow Icon */
+div[data-baseweb="select"] svg {
+fill: white !important;
+}
+
+/* The Dropdown Menu Options (The list that pops up) */
+ul[data-baseweb="menu"] {
+background-color: #1E1E1E !important; /* Solid dark background for readability */
+border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Individual Menu Items */
+li[data-baseweb="menu-item"] {
+color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Hover State for Menu Items */
+li[data-baseweb="menu-item"]:hover {
+background-color: #E16C45 !important; /* Orange Highlight */
+color: white !important;
+}
+</style>
+""",
+unsafe_allow_html=True
 )
 
 # ==============================================================================
