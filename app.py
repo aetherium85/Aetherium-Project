@@ -659,7 +659,7 @@ st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;
 # ==============================================================================
 # We use st.expander to hide these details until needed
 with st.expander("⚙️ Training Setup", expanded=False):
-    
+    st.write("Debug: Is this visible?")
     # 1. Sport Detection Logic (Safe Fallback)
     current_sport = "General Fitness"
     if 'act_json' in locals() and act_json:
