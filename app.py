@@ -805,47 +805,54 @@ if generate_btn:
                     st.markdown(response.text)
             except Exception as e:
                 st.error(f"Generation Failed: {e}")
+
 # ==============================================================================
-# --- (NEXT SECTION: YEARLY TRAINING LOAD STARTS BELOW HERE) ---
+# --- (NEXT SECTION: YEARLY TRAINING LOAD) ---
 # ==============================================================================
-        
-        # --- 📈 Yearly Training Load Progression (NOW PROPERLY NESTED) ---
+# 🛑 CRITICAL FIX: Everything below this line is fully un-indented (aligned to the left)
+# This ensures the chart shows up immediately, not just when you click the button.
+
 st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 st.markdown("### 📈 Yearly Training Load Progression")
 
-colors = {
-            "Fitness (CTL)": "#70C4B0",
-            "Fatigue (ATL)": "#E16C45",
-            "Form (TSB)": "#4BD4B0"
-        }
+# Check if data exists before trying to plot
+if 'act_json' in locals() and act_json and not df.empty:
+    colors = {
+        "Fitness (CTL)": "#70C4B0",
+        "Fatigue (ATL)": "#E16C45",
+        "Form (TSB)": "#4BD4B0"
+    }
 
-fig = go.Figure()
+    fig = go.Figure()
 
-        # Manually add traces to ensure perfect control over colors and names
-for col in ['ctl', 'atl', 'tsb']:
-            full_name = pretty_labels.get(col, col)
-            fig.add_trace(go.Scatter(
-                x=df['date'], 
-                y=df[col],
-                mode='lines',
-                name=full_name,
-                line=dict(color=colors.get(full_name), width=3),
-                hovertemplate=f"<b>{full_name}</b>: %{{y:.1f}}<extra></extra>"
-            ))
+    # Manually add traces
+    for col in ['ctl', 'atl', 'tsb']:
+        full_name = pretty_labels.get(col, col)
+        fig.add_trace(go.Scatter(
+            x=df.index, # Use df.index since we set it to datetime earlier
+            y=df[col],
+            mode='lines',
+            name=full_name,
+            line=dict(color=colors.get(full_name), width=3),
+            hovertemplate=f"<b>{full_name}</b>: %{{y:.1f}}<extra></extra>"
+        ))
 
-fig.update_layout(
-            hovermode="x unified",
-            hoverlabel=dict(bgcolor="rgba(30, 30, 30, 0.9)", font_size=14, font_color="white"),
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="white"),
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font=dict(color="white")),
-            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white"), title=None, hoverformat="%b %d, %Y"),
-            yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white"), zeroline=True, 
-                       zerolinecolor="rgba(255, 255, 255, 0.5)", zerolinewidth=1.5, title="Score")
-        )
+    fig.update_layout(
+        hovermode="x unified",
+        hoverlabel=dict(bgcolor="rgba(30, 30, 30, 0.9)", font_size=14, font_color="white"),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font=dict(color="white")),
+        xaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white"), title=None, hoverformat="%b %d, %Y"),
+        yaxis=dict(gridcolor="rgba(255, 255, 255, 0.1)", tickfont=dict(color="white"), zeroline=True, 
+                   zerolinecolor="rgba(255, 255, 255, 0.5)", zerolinewidth=1.5, title="Score")
+    )
 
-st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.info("Not enough data to generate Training Load Chart.")
+
 st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 
@@ -887,7 +894,7 @@ if 'act_json' in locals() and act_json:
             </div>
         """, unsafe_allow_html=True)
 
-        # 2. THE DATA LOOP (Notice the HTML is pushed to the left)
+        # 2. THE DATA LOOP
         for _, row in monthly.iterrows():
             st.markdown(f"""
             <div class="performance-row">
