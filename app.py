@@ -55,8 +55,9 @@ st.markdown(
     }
     .stApp { background: transparent !important; }
 
-    /* 4. TEXT DEFAULTS */
-    h2, h3, p, label, .performance-row, .performance-row div, .performance-row b {
+    /* 4. TEXT DEFAULTS (UPDATED) */
+    /* Added 'li', 'ul', 'strong', 'b' to this list so AI bullet points are white */
+    h1, h2, h3, h4, h5, h6, p, label, li, ul, strong, b, .performance-row, .performance-row div, .performance-row b {
         font-family: 'Inter', sans-serif !important; 
         font-weight: 200 !important;
         color: white !important; 
@@ -84,6 +85,19 @@ st.markdown(
         opacity: 0.9 !important;
         color: white !important;
         margin-top: 10px !important;
+    }
+
+    /* NEW: Style the AI Result Box (Bordered Container) to be Glass */
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 10px !important;
+    }
+    
+    /* NEW: Force all text inside that box to be white */
+    div[data-testid="stVerticalBlockBorderWrapper"] * {
+        color: white !important;
     }
 
     /* 5. METRIC & PLOT STYLING */
