@@ -6,6 +6,7 @@ import urllib.parse
 import streamlit as st
 import base64
 import requests
+import json
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -856,7 +857,7 @@ b1, b2, b3 = st.columns([1, 2, 1])
 
 with b2:
     st.markdown("""<style>div[data-testid="column"] { margin-top: 10px; }</style>""", unsafe_allow_html=True)
-    generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
+    generate_btn = st.button("✨ GENERATE NEXT WORKOUT ✨", type="primary", use_container_width=True)
 
 if generate_btn:
     if not client:
