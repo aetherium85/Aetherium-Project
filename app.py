@@ -28,11 +28,20 @@ st.markdown(
     /* 1. CLEAN IMPORT: Single line for both fonts */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Michroma&display=swap');
 
-    /* 2. HEADER FIX: Makes the header transparent instead of squashing it 
+    /* 2. HEADER FIX: Makes the header transparent */
     header[data-testid="stHeader"] {
         background: transparent !important;
         backdrop-filter: none !important;
-    } */
+    }
+    
+    /* FIX: Make the "Hide Sidebar" arrow visible at all times */
+    button[data-testid="stSidebarCollapseButton"] {
+        color: white !important;
+        opacity: 1 !important;
+    }
+    button[data-testid="stSidebarCollapseButton"] svg {
+        fill: white !important;
+    }
     
     /* 3. BACKGROUND IMAGE */
     .stApp::before {
@@ -44,7 +53,7 @@ st.markdown(
     }
     .stApp { background: transparent !important; }
 
-    /* 4. TEXT DEFAULTS: Note that h1 is NOT included here */
+    /* 4. TEXT DEFAULTS */
     h2, h3, p, label, .performance-row, .performance-row div, .performance-row b {
         font-family: 'Inter', sans-serif !important; 
         font-weight: 200 !important;
@@ -55,9 +64,9 @@ st.markdown(
     h1 {
         font-size: 2.2rem !important;
         font-weight: 700 !important;
+        color: white !important;
     }
 
-    /* H2: Section Headers */
     h2 {
         font-size: 1.5rem !important;
         font-weight: 600 !important;
@@ -65,21 +74,20 @@ st.markdown(
         margin-bottom: 10px !important;
     }
 
-    /* H3: "### ⚡ Your Current Training Status" */
     h3 {
-        font-size: 1.1rem !important; /* Adjust this number to make it bigger/smaller */
+        font-size: 1.1rem !important;
         font-weight: 400 !important;
         text-transform: uppercase !important;
         letter-spacing: 2px !important;
         opacity: 0.9 !important;
         margin-top: 10px !important;
     }
+
     /* 5. METRIC & PLOT STYLING */
     [data-testid="stHorizontalBlock"] div, [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { 
         color: white !important; 
     }
     
-    /* Glassmorphism for containers */
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart), .performance-row {
         background-color: rgba(255, 255, 255, 0.05) !important; 
         backdrop-filter: blur(10px) !important;
@@ -99,7 +107,6 @@ st.markdown(
         color: white !important;
         background-color: transparent !important;
     }
-    /* Fixed: Changed this to white so it's readable */
     summary[data-testid="stExpanderSummary"] {
         color: white !important; 
     }
@@ -107,14 +114,14 @@ st.markdown(
         color: #70C4B0 !important;
     }
 
-    /* 7. BRANDING & MICHROMA FONT */
+    /* 7. BRANDING */
     .brand-wrapper {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         width: 100% !important;
         margin-top: 30px !important;
-        margin-bottom: 180px !important;
+        margin-bottom: 80px !important;
     }
 
     .title-container {
@@ -145,33 +152,26 @@ st.markdown(
         text-transform: uppercase !important;
     }
 
+    /* LOGIN BUTTON (Main Page) */
     a[href*="intervals.icu"] {
         display: block !important;
-        width: 100% !important;        /* Controls width so it doesn't span full screen */
-        margin: 5px auto 0 auto !important; /* 50px Top margin, Auto Left/Right centers it */
+        width: 100% !important;
+        margin: 5px auto 0 auto !important;
         text-align: center !important;
-        
-        /* The Teal Gradient */
         background: linear-gradient(135deg, #70C4B0 0%, #008f7a 100%) !important;
         color: white !important;
         border: none !important;
         padding: 15px 30px !important;
-        
-        /* Modern Typography */
         font-family: 'Inter', sans-serif !important;
         font-weight: 600 !important;
         font-size: 1.1rem !important;
-        text-decoration: none !important; /* Removes underline */
-        
-        /* Shape & Glow */
+        text-decoration: none !important;
         border-radius: 50px !important;
         box-shadow: 0 4px 15px rgba(112, 196, 176, 0.3) !important;
         transition: all 0.3s ease !important;
         text-transform: uppercase !important;
         letter-spacing: 1px !important;
     }
-
-    /* Hover Animation */
     a[href*="intervals.icu"]:hover {
         transform: translateY(-3px) !important;
         box-shadow: 0 8px 25px rgba(112, 196, 176, 0.5) !important;
@@ -179,29 +179,39 @@ st.markdown(
         color: white !important;
     }
 
-    /* Target standard HTML tables (st.table) */
+    /* LOGOUT BUTTON (Sidebar Fix) */
+    /* This targets the standard Streamlit button in the sidebar */
+    section[data-testid="stSidebar"] .stButton button {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        transition: all 0.3s ease !important;
+    }
+    section[data-testid="stSidebar"] .stButton button:hover {
+        background-color: rgba(225, 108, 69, 0.8) !important; /* Orange hover to match theme */
+        border-color: #E16C45 !important;
+        color: white !important;
+    }
+
+    /* TABLE STYLING */
     table {
         color: white !important;
-        background-color: rgba(255, 255, 255, 0.05) !important; /* Slight background */
+        background-color: rgba(255, 255, 255, 0.05) !important;
         border-collapse: collapse !important;
         width: 100% !important;
         border-radius: 10px !important;
-        overflow: hidden !important; /* Keeps border radius on corners */
+        overflow: hidden !important;
     }
-
-    /* Header Cells */
     th {
-        background-color: rgba(112, 196, 176, 0.2) !important; /* Teal tint header */
+        background-color: rgba(112, 196, 176, 0.2) !important;
         color: white !important;
-        font-family: 'Michroma', sans-serif !important; /* Use your brand font */
+        font-family: 'Michroma', sans-serif !important;
         font-size: 0.85rem !important;
         font-weight: 400 !important;
         text-transform: uppercase !important;
         padding: 12px 15px !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
-
-    /* Data Cells */
     td {
         color: rgba(255, 255, 255, 0.9) !important;
         padding: 12px 15px !important;
@@ -209,61 +219,36 @@ st.markdown(
         font-family: 'Inter', sans-serif !important;
         font-weight: 200 !important;
     }
-
-    /* Zebra Striping for readability */
     tr:nth-child(even) {
         background-color: rgba(255, 255, 255, 0.02) !important;
     }
-    
-    /* Fix for interactive st.dataframe (if you use that instead of st.table) */
     [data-testid="stDataFrame"] {
         background-color: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
 
-    /* STYLE FOR YOUR CUSTOM PERFORMANCE ROWS */
-    .performance-row {
-        display: flex !important;
-        justify-content: space-between !important; /* Spreads items across full width */
-        align-items: center !important;
-        background-color: rgba(255, 255, 255, 0.03) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 12px !important;
-        padding: 15px 25px !important;
-        margin-bottom: 12px !important;
-        transition: all 0.2s ease !important;
-    }
-
-    /* Hover effect to make it feel interactive */
-    .performance-row:hover {
-        background-color: rgba(255, 255, 255, 0.08) !important;
-        border-color: rgba(112, 196, 176, 0.3) !important; /* Subtle teal glow */
-        transform: translateX(5px) !important;
-    }
-
+    /* SIDEBAR STYLING */
     section[data-testid="stSidebar"] {
-        background-color: #FFFFFF !important; /* Matches Streamlit Dark Mode */
-        background-image: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.5)) !important;
+        /* Dark Burnt Orange Base with Dark Gradient Overlay */
+        background-color: #3d1e10 !important; 
+        background-image: linear-gradient(180deg, rgba(30, 10, 5, 0.95), rgba(61, 30, 16, 0.8)) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
 
-    /* Ensure all Sidebar Text is crisp White */
-        section[data-testid="stSidebar"] h1, 
-        section[data-testid="stSidebar"] h2, 
-        section[data-testid="stSidebar"] h3, 
-        section[data-testid="stSidebar"] label, 
-        section[data-testid="stSidebar"] span, 
-        section[data-testid="stSidebar"] p {
-            color: rgba(255, 255, 255, 0.9) !important;
+    section[data-testid="stSidebar"] h1, 
+    section[data-testid="stSidebar"] h2, 
+    section[data-testid="stSidebar"] h3, 
+    section[data-testid="stSidebar"] label, 
+    section[data-testid="stSidebar"] span, 
+    section[data-testid="stSidebar"] p {
+        color: rgba(255, 255, 255, 0.95) !important;
     }
 
-    /* Fix the Slider Colors in Sidebar */
-        section[data-testid="stSidebar"] div[data-testid="stThumbValue"],
-        section[data-testid="stSidebar"] div[data-testid="stTickBarMin"],
-        section[data-testid="stSidebar"] div[data-testid="stTickBarMax"] {
-            color: white !important;
+    section[data-testid="stSidebar"] div[data-testid="stThumbValue"],
+    section[data-testid="stSidebar"] div[data-testid="stTickBarMin"],
+    section[data-testid="stSidebar"] div[data-testid="stTickBarMax"] {
+        color: white !important;
     }
-
     </style>
     """,
     unsafe_allow_html=True
