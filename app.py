@@ -649,7 +649,7 @@ if 'act_json' in locals() and act_json:
         # --- C. RENDER UI ---
         st.markdown("### 📅 Monthly Performance History")
 
-        # 1. THE HEADER ROW (Fixed Alignment)
+        # 1. THE HEADER ROW (Alignment & Color)
         # Ratio: 2 (Month) : 1 (Sessions) : 1 (Load)
         st.markdown("""
             <div style="display: flex; justify-content: space-between; padding: 10px 25px; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1);">
@@ -659,11 +659,11 @@ if 'act_json' in locals() and act_json:
             </div>
         """, unsafe_allow_html=True)
 
-        # 2. THE DATA LOOP (Matches Header Ratio Exactly)
+        # 2. THE DATA LOOP (Matches Header Ratio & Restores Colors)
         for _, row in monthly.iterrows():
             st.markdown(textwrap.dedent(f"""
                 <div class="performance-row">
-                    <div style="flex: 2; text-align: left; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #ffffff;">
+                    <div style="flex: 2; text-align: left; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #70C4B0;">
                         {row['MonthDisplay']}
                     </div>
                     
