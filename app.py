@@ -105,7 +105,8 @@ st.markdown(
     div[data-testid="stVerticalBlockBorderWrapper"] h1,
     div[data-testid="stVerticalBlockBorderWrapper"] h2,
     div[data-testid="stVerticalBlockBorderWrapper"] h3,
-    div[data-testid="stVerticalBlockBorderWrapper"] h4 {
+    div[data-testid="stVerticalBlockBorderWrapper"] h4
+    div[data-testid="stVerticalBlockBorderWrapper"] h5 {
         color: #FFFFFF !important;
     }
     /* 5. METRIC & PLOT STYLING */
