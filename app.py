@@ -499,7 +499,7 @@ if act_json:
         hr = latest_act.get('average_heartrate') or 0
         h4_icon, h4_label, h4_value = "💓", "Avg. HR", f"{hr:.0f} bpm" if hr > 0 else "N/A"
 
-    st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')} — {display_type}")
+    st.markdown(f"### 🚀 Last Session: {latest_act.get('name', 'Workout')} ({display_type})")
     h1, h2, h3, h4 = st.columns(4)
     elegant_hero_item(h1, "⏱️", "Duration", duration_str)
     elegant_hero_item(h2, "⚡", "Impact", f"{load} pts")
