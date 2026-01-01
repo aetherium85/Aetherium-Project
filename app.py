@@ -512,58 +512,65 @@ if act_json:
 # --- SECTION 7: TRAINING STATUS (WELLNESS) ---
 # ==============================================================================
 
-if well_json and 'latest' in locals():
+if 'well_json' in locals() and well_json:
     df = pd.DataFrame(well_json)
-    latest = df.iloc[-1]
-    # 1. Get Form (TSB) from your existing 'latest' variable
-    current_form = latest.get('tsb', latest.get('ctl', 0) - latest.get('atl', 0))
     
-    # 2. Determine the Prescription
-    if current_form < -20:
-        rec_title = "🛑 RED ZONE: Rest & Recovery"
-        rec_desc = "Your fatigue is very high. Risk of injury is elevated. Recommended: Total Rest or 20-min mobility work."
-        rec_color = "#E16C45" # Red/Orange
+    # Safety check: Ensure the dataframe is not empty before grabbing the last row
+    if not df.empty:
+        latest = df.iloc[-1]
         
-    elif -20 <= current_form < -5:
-        rec_title = "🟠 GREY ZONE: Endurance Maintenance"
-        rec_desc = "You are carrying some fatigue. Keep intensity low. Recommended: Zone 2 Run (45-60 mins) or steady state cycling."
-        rec_color = "#ffa421" # Orange
+        # 1. Get Form (TSB)
+        # We use .get() to avoid crashing if a key is missing
+        fitness = latest.get('ctl', 0)
+        fatigue = latest.get('atl', 0)
+        current_form = latest.get('tsb', fitness - fatigue)
         
-    elif -5 <= current_form <= 15:
-        rec_title = "🟢 GREEN ZONE: Prime for Intensity"
-        rec_desc = "You are fresh and ready to absorb stress. Recommended: Threshold Intervals, Hill Repeats, or Heavy Strength Session."
-        rec_color = "#70C4B0" # Teal
-        
-    else: # > 15
-        rec_title = "⚪ FRESH ZONE: De-Training Warning"
-        rec_desc = "You are very fresh, but potentially losing fitness. You need a long, hard effort to spike your load."
-        rec_color = "#e0e0e0"
+        # 2. Determine the Prescription
+        if current_form < -20:
+            rec_title = "🛑 RED ZONE: Rest & Recovery"
+            rec_desc = "Your fatigue is very high. Risk of injury is elevated. Recommended: Total Rest or 20-min mobility work."
+            rec_color = "#E16C45" # Red/Orange
+            
+        elif -20 <= current_form < -5:
+            rec_title = "🟠 GREY ZONE: Endurance Maintenance"
+            rec_desc = "You are carrying some fatigue. Keep intensity low. Recommended: Zone 2 Run (45-60 mins) or steady state cycling."
+            rec_color = "#ffa421" # Orange
+            
+        elif -5 <= current_form <= 15:
+            rec_title = "🟢 GREEN ZONE: Prime for Intensity"
+            rec_desc = "You are fresh and ready to absorb stress. Recommended: Threshold Intervals, Hill Repeats, or Heavy Strength Session."
+            rec_color = "#70C4B0" # Teal
+            
+        else: # > 15
+            rec_title = "⚪ FRESH ZONE: De-Training Warning"
+            rec_desc = "You are very fresh, but potentially losing fitness. You need a long, hard effort to spike your load."
+            rec_color = "#e0e0e0"
 
-    # 3. Render the Glassmorphism Card
-    st.markdown(f"""
-        <div style="
-            background: rgba(255, 255, 255, 0.03); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-left: 5px solid {rec_color}; 
-            border-radius: 12px; 
-            padding: 25px; 
-            margin: 20px 0;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div>
-                    <h3 style="margin: 0 0 10px 0; color: white; font-family: 'Michroma'; font-size: 1.1rem; letter-spacing: 1px;">
-                        {rec_title}
-                    </h3>
-                    <p style="margin: 0; color: rgba(255,255,255,0.8); font-family: 'Inter'; font-weight: 200; font-size: 0.95rem;">
-                        {rec_desc}
-                    </p>
-                </div>
-                <div style="text-align: right; min-width: 80px;">
-                    <div style="font-size: 0.7rem; text-transform: uppercase; color: rgba(255,255,255,0.5);">FORM</div>
-                    <div style="font-size: 1.5rem; color: {rec_color}; font-family: 'Michroma';">{int(current_form)}</div>
+        # 3. Render the Glassmorphism Card
+        st.markdown(f"""
+            <div style="
+                background: rgba(255, 255, 255, 0.03); 
+                border: 1px solid rgba(255, 255, 255, 0.1); 
+                border-left: 5px solid {rec_color}; 
+                border-radius: 12px; 
+                padding: 25px; 
+                margin: 20px 0;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <h3 style="margin: 0 0 10px 0; color: white; font-family: 'Michroma'; font-size: 1.1rem; letter-spacing: 1px;">
+                            {rec_title}
+                        </h3>
+                        <p style="margin: 0; color: rgba(255,255,255,0.8); font-family: 'Inter'; font-weight: 200; font-size: 0.95rem;">
+                            {rec_desc}
+                        </p>
+                    </div>
+                    <div style="text-align: right; min-width: 80px;">
+                        <div style="font-size: 0.7rem; text-transform: uppercase; color: rgba(255,255,255,0.5);">FORM</div>
+                        <div style="font-size: 1.5rem; color: {rec_color}; font-family: 'Michroma';">{int(current_form)}</div>
+                    </div>
                 </div>
             </div>
-        </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
 if well_json:
     df = pd.DataFrame(well_json)
