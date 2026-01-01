@@ -507,21 +507,6 @@ if act_json:
     elegant_hero_item(h4, h4_icon, h4_label, h4_value)
     st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
-# In your sidebar section
-    st.sidebar.markdown("---")
-    st.sidebar.header("🎯 Your Goal")
-
-# 1. Detect Sport (Auto)
-    user_sport = infer_primary_sport(act_json) if act_json else "General"
-    st.sidebar.info(f"Detected Sport: **{user_sport}**")
-
-# 2. Ask Goal (Manual)
-    user_goal = st.sidebar.selectbox(
-        "Current Focus:",
-        ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max / Speed", "Recovery / Taper", "Race Prep"],
-        index=0
-)
-
 # ==============================================================================
 # --- SECTION 7: TRAINING STATUS (WELLNESS) ---
 # ==============================================================================
@@ -647,7 +632,41 @@ if well_json:
         st.plotly_chart(fig, use_container_width=True)
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
+st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
+# ==============================================================================
+# --- SECTION 7.1: AI TRAINER CONFIGURATION (COLLAPSIBLE) ---
+# ==============================================================================
+# We use st.expander to hide these details until needed
+with st.expander("⚙️ Training Setup", expanded=False):
+    
+    # 1. Detect Sport (Logic moved here)
+    # We check the activity history (act_json) to find the primary sport
+    user_sport = "General Fitness" # Default
+    if 'act_json' in locals() and act_json:
+        user_sport = infer_primary_sport(act_json)
+        
+    c1, c2, c3 = st.columns([1, 1, 1])
+    
+    with c1:
+        st.markdown(f"""
+            <div style="padding: 10px; border: 1px solid #70C4B0; border-radius: 8px; background: rgba(112, 196, 176, 0.1);">
+                <label style="font-size: 0.8rem; color: #70C4B0; text-transform: uppercase;">Detected Sport</label>
+                <div style="font-size: 1.2rem; font-weight: bold; color: white;">{user_sport.upper()}</div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    with c2:
+        # The Goal Selection
+        user_goal = st.selectbox(
+            "Current Training Focus",
+            ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max / Speed", "Recovery / Taper", "Race Prep"],
+            index=0
+        )
+        
+    with c3:
+        # The Time Slider
+        time_avail = st.slider("Time Available (mins)", 30, 120, 60, step=15)
 
 # ==============================================================================
 # --- SECTION 8: PERFORMANCE HISTORY ---
