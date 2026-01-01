@@ -637,6 +637,67 @@ if act_json:
     st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 # ==============================================================================
+# --- SECTION 6: METRICS CALCULATION (The Math) ---
+# ==============================================================================
+import pandas as pd
+from datetime import datetime, timedelta
+
+# 1. PREPARE DATA
+# We need to turn the JSON list into a Pandas DataFrame to do math
+if 'act_json' not in locals() or not act_json:
+    # Fallback if no data exists
+    current_fitness = 0
+    current_fatigue = 0
+    current_form = 0
+else:
+    df = pd.DataFrame(act_json)
+    
+    # Ensure date column is actual datetime objects
+    df['start_date_local'] = pd.to_datetime(df['start_date_local'])
+    df = df.sort_values('start_date_local') # Sort oldest to newest
+
+    # 2. CALCULATE DAILY LOAD (TSS Estimate)
+    # Strava doesn't always give TSS, so we estimate it from Suffer Score or time
+    def estimate_load(row):
+        # Priority 1: Use Strava's "Suffer Score" if available
+        if 'suffer_score' in row and row['suffer_score']:
+            return row['suffer_score']
+        # Priority 2: Estimate based on Moving Time (assuming moderate intensity)
+        # Rough rule: 1 hour moderate = 50 TSS
+        elif 'moving_time' in row:
+            hours = row['moving_time'] / 3600
+            return hours * 50 
+        return 0
+
+    df['TSS'] = df.apply(estimate_load, axis=1)
+
+    # 3. CALCULATE ATL, CTL, TSB (Bannister Model)
+    # Create a continuous daily timeline (filling missing days with 0)
+    # This is crucial because fatigue drops on rest days!
+    df = df.set_index('start_date_local')
+    daily_load = df['TSS'].resample('D').sum().fillna(0) # 'D' = Daily
+
+    # Constants for the math
+    ctl_decay = 42 # Fitness decays slowly (6 weeks)
+    atl_decay = 7  # Fatigue decays fast (1 week)
+
+    # Calculate Exponential Weighted Averages
+    ctl = daily_load.ewm(span=ctl_decay, adjust=False).mean()
+    atl = daily_load.ewm(span=atl_decay, adjust=False).mean()
+    tsb = ctl - atl # Form = Fitness - Fatigue
+
+    # 4. GET CURRENT VALUES (The very last numbers)
+    # We use these variables in Section 7
+    if not ctl.empty:
+        current_fitness = ctl.iloc[-1]
+        current_fatigue = atl.iloc[-1]
+        current_form = tsb.iloc[-1]
+    else:
+        current_fitness = 0
+        current_fatigue = 0
+        current_form = 0
+
+# ==============================================================================
 # --- SECTION 7: TRAINING STATUS DASHBOARD ---
 # ==============================================================================
 st.markdown("### ⚡ Your Current Training Status")
