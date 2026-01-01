@@ -776,7 +776,7 @@ render_metric_card(m3, "Form (TSB)", current_form, "Fresh" if current_form >= 0 
 # ==============================================================================
 # --- SECTION 7.1: AI WORKOUT PLANNER ---
 # ==============================================================================
-st.markdown("---") # Visual Separator between Data and Tools
+st.markdown("---") # Visual Separator
 
 # 1. SETUP CLIENT (Silent initialization)
 try:
@@ -785,33 +785,33 @@ try:
 except:
     client = None
 
-# 2. CONFIGURATION (Expander)
-with st.expander("⚙️ Configure AI Workout Settings", expanded=False):
-    
-    # Smart Defaults Logic
-    sports_options = ["Triathlon", "Running", "Cycling", "Swimming", "General Fitness"]
-    default_index = 4
-    if 'act_json' in locals() and act_json:
-        try:
-            detected = infer_primary_sport(act_json)
-            if detected in sports_options: default_index = sports_options.index(detected)
-        except: pass
+# 2. CONFIGURATION (Directly on page, no expander)
+st.markdown("### ⚙️ AI Coach Settings")
 
-    # Layout
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        selected_sport = st.selectbox("Sport Focus", sports_options, index=default_index, key="sport_select")
-    with c2:
-        user_goal = st.selectbox("Goal", ["Base Building (Zone 2)", "Threshold", "VO2 Max", "Recovery", "Race Prep"], index=0, key="goal_select")
-    with c3:
-        time_avail = st.slider("Time (mins)", 30, 120, 60, step=15, key="time_select")
+# Smart Defaults Logic
+sports_options = ["Triathlon", "Running", "Cycling", "Swimming", "General Fitness"]
+default_index = 4
+if 'act_json' in locals() and act_json:
+    try:
+        detected = infer_primary_sport(act_json)
+        if detected in sports_options: default_index = sports_options.index(detected)
+    except: pass
+
+# Layout - 3 Columns for inputs
+c1, c2, c3 = st.columns(3)
+with c1:
+    selected_sport = st.selectbox("Sport Focus", sports_options, index=default_index, key="sport_select")
+with c2:
+    user_goal = st.selectbox("Goal", ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max", "Recovery", "Race Prep"], index=0, key="goal_select")
+with c3:
+    time_avail = st.slider("Time (mins)", 30, 120, 60, step=15, key="time_select")
 
 # 3. GENERATION ACTION
 b1, b2, b3 = st.columns([1, 2, 1])
 
 with b2:
-    # Custom style to pull button up
-    st.markdown("""<style>div[data-testid="column"] { margin-top: -10px; }</style>""", unsafe_allow_html=True)
+    # Custom style to pull button up slightly
+    st.markdown("""<style>div[data-testid="column"] { margin-top: 10px; }</style>""", unsafe_allow_html=True)
     generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
 
 if generate_btn:
@@ -828,7 +828,7 @@ if generate_btn:
                     contents=ai_prompt
                 )
 
-                # 2. INJECT CSS (Flush left to be safe)
+                # 2. INJECT CSS (Flush left to prevent weird rectangles)
                 st.markdown("""
 <style>
 .ai-response {
@@ -842,10 +842,10 @@ if generate_btn:
 """, unsafe_allow_html=True)
 
                 # 3. DISPLAY HEADER
+                st.markdown("---")
                 st.markdown(f"### ⚡ Recommended Workout: {selected_sport}")
                 
-                # 4. DISPLAY RESULT (CRITICAL FIX BELOW)
-                # We remove ALL indentation inside the string to prevent the "Code Block" rectangle
+                # 4. DISPLAY RESULT (Flush left to fix the rectangle issue)
                 st.markdown(f"""
 <div class="ai-response">
 {response.text}
@@ -853,7 +853,11 @@ if generate_btn:
 """, unsafe_allow_html=True)
 
             except Exception as e:
-                st.error(f"Generation Failed: {e}")
+                # Fallback logic for Rate Limits
+                if "429" in str(e):
+                    st.toast("⚠️ Primary model busy. Retrying...", icon="🔄")
+                else:
+                    st.error(f"Generation Failed: {e}")
 
 # # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD) ---
