@@ -649,7 +649,7 @@ if 'well_json' in locals() and well_json:
 # ==============================================================================
 # --- SECTION 7.1: AI TRAINER SETTINGS ---
 # ==============================================================================
-with st.expander("⚙️ Configure AI Workout Settings", expanded=True):
+with st.expander("⚙️ Configure AI Workout Settings", expanded=False):
     
     # 1. LOGIC: Define the variable FIRST
     display_sport = "General"
