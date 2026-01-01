@@ -649,35 +649,32 @@ if 'act_json' in locals() and act_json:
         # --- C. RENDER UI ---
         st.markdown("### 📅 Monthly Performance History")
 
-        # 1. THE HEADER ROW (Alignment & Color)
-        # Ratio: 2 (Month) : 1 (Sessions) : 1 (Load)
+        # 1. THE HEADER ROW
         st.markdown("""
-            <div style="display: flex; justify-content: space-between; padding: 10px 25px; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <div style="flex: 2; text-align: left; color: #70C4B0; font-family: 'Michroma'; font-size: 0.8rem; letter-spacing: 2px;">MONTH</div>
-                <div style="flex: 1; text-align: center; color: rgba(255,255,255,0.6); font-family: 'Michroma'; font-size: 0.7rem; letter-spacing: 2px;">SESSIONS</div>
-                <div style="flex: 1; text-align: right; color: rgba(255,255,255,0.6); font-family: 'Michroma'; font-size: 0.7rem; letter-spacing: 2px;">LOAD</div>
-            </div>
-        """, unsafe_allow_html=True)
+<div style="display: flex; justify-content: space-between; padding: 10px 25px; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+    <div style="flex: 2; text-align: left; color: #70C4B0; font-family: 'Michroma'; font-size: 0.8rem; letter-spacing: 2px;">MONTH</div>
+    <div style="flex: 1; text-align: center; color: rgba(255,255,255,0.6); font-family: 'Michroma'; font-size: 0.7rem; letter-spacing: 2px;">SESSIONS</div>
+    <div style="flex: 1; text-align: right; color: rgba(255,255,255,0.6); font-family: 'Michroma'; font-size: 0.7rem; letter-spacing: 2px;">LOAD</div>
+</div>
+""", unsafe_allow_html=True)
 
-        # 2. THE DATA LOOP (Matches Header Ratio & Restores Colors)
+        # 2. THE DATA LOOP (Notice the HTML is pushed to the left)
         for _, row in monthly.iterrows():
-            st.markdown(textwrap.dedent(f"""
-                <div class="performance-row">
-                    <div style="flex: 2; text-align: left; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #70C4B0;">
-                        {row['MonthDisplay']}
-                    </div>
-                    
-                    <div style="flex: 1; text-align: center; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: white;">
-                        <span style="opacity: 0.6; margin-right: 5px;">🏃</span> 
-                        <b>{int(row['Sessions'])}</b>
-                    </div>
-                    
-                    <div style="flex: 1; text-align: right; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: white;">
-                        <span style="opacity: 0.6; margin-right: 5px;">🔥</span> 
-                        <b>{row['Total Load']:.0f}</b>
-                    </div>
-                </div>
-            """), unsafe_allow_html=True)
+            st.markdown(f"""
+<div class="performance-row">
+    <div style="flex: 2; text-align: left; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #70C4B0;">
+        {row['MonthDisplay']}
+    </div>
+    <div style="flex: 1; text-align: center; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: white;">
+        <span style="opacity: 0.6; margin-right: 5px;">🏃</span> 
+        <b>{int(row['Sessions'])}</b>
+    </div>
+    <div style="flex: 1; text-align: right; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: white;">
+        <span style="opacity: 0.6; margin-right: 5px;">🔥</span> 
+        <b>{row['Total Load']:.0f}</b>
+    </div>
+</div>
+""", unsafe_allow_html=True)
             
     else:
         st.warning("⚠️ Activity data found, but date information is missing.")
