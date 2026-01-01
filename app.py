@@ -787,6 +787,8 @@ with b2:
     
     generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
 
+st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
+
 if generate_btn:
     if not client:
         st.error("❌ AI Client not connected. Check API Key.")
@@ -804,9 +806,6 @@ if generate_btn:
                     st.markdown(response.text)
             except Exception as e:
                 st.error(f"Generation Failed: {e}")
-            
-            
-        st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD STARTS BELOW HERE) ---
 # ==============================================================================
