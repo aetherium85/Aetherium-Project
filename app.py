@@ -791,7 +791,7 @@ st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;
 
 if generate_btn:
     if not client:
-        st.error("❌ AI Client not connected. Check API Key.")
+        st.error("❌ AI Client not connected.")
     else:
         with st.spinner(f"Coach is designing your {selected_sport} session..."):
             ai_prompt = build_ai_prompt(selected_sport, user_goal, time_avail, current_form, act_json)
