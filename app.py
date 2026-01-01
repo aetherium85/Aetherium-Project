@@ -796,7 +796,7 @@ if 'act_json' in locals() and act_json:
     except: pass
 
 # --- B. DETECT GOAL (New Logic based on TSB) ---
-goal_options = ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max", "Recovery", "Race Prep"]
+goal_options = ["Base Building (Zone 2)", "Threshold", "VO2 Max", "Recovery", "Race Prep"]
 default_goal_index = 0 # Default to Base Building
 
 if 'current_form' in locals():
