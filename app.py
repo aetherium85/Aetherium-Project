@@ -697,33 +697,55 @@ if well_json:
 # --- SECTION 7.1: AI TRAINER CONFIGURATION (COLLAPSIBLE) ---
 # ==============================================================================
 # We use st.expander to hide these details until needed
-with st.expander("⚙️ Training Setup", expanded=False):
-    # 1. Sport Detection Logic (Safe Fallback)
-    current_sport = "General Fitness"
+with st.expander("⚙️ Configure AI Workout Settings", expanded=True):
+    
+    # 1. LOGIC: Define the variable FIRST so it is never undefined
+    display_sport = "General" # Default fallback
+    
+    # Try to detect sport from history if available
     if 'act_json' in locals() and act_json:
-        # Re-use your logic function
-        current_sport = infer_primary_sport(act_json)
-        
-    # 2. Layout Columns
-    c1, c2, c3 = st.columns([1, 1, 1])
+        try:
+            # We assume infer_primary_sport is defined in your utility functions
+            display_sport = infer_primary_sport(act_json)
+        except:
+            display_sport = "Run/Bike"
+
+    # 2. LAYOUT: Now we render the columns using the variable
+    c1, c2, c3 = st.columns(3)
     
     with c1:
+        # THE FIXED CONTAINER (Darker, min-height, centered)
         st.markdown(f"""
-            <div style="padding: 15px; border: 1px solid #70C4B0; border-radius: 8px; background: rgba(112, 196, 176, 0.1);">
-                <label style="font-size: 0.7rem; color: #70C4B0; text-transform: uppercase; letter-spacing: 1px;">Detected Sport</label>
-                <div style="font-size: 1.1rem; font-weight: 600; color: white; margin-top: 5px;">{current_sport.upper()}</div>
+            <div style="
+                background-color: rgba(255,255,255,0.05); 
+                padding: 10px 15px; 
+                border-radius: 8px; 
+                border: 1px solid rgba(255,255,255,0.1);
+                min-height: 72px; 
+                display: flex; 
+                flex-direction: column; 
+                justify-content: center;">
+                
+                <span style="font-size: 0.7rem; color: #70C4B0; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px;">
+                    DETECTED SPORT
+                </span>
+                <span style="font-size: 1.1rem; color: white; font-family: 'Michroma'; text-transform: uppercase;">
+                    {display_sport}
+                </span>
             </div>
         """, unsafe_allow_html=True)
         
     with c2:
+        # Added key to prevent "Duplicate Widget ID" errors
         user_goal = st.selectbox(
             "Current Training Focus",
             ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max / Speed", "Recovery / Taper", "Race Prep"],
-            index=0
+            index=0,
+            key="goal_select_box" 
         )
         
     with c3:
-        time_avail = st.slider("Time Available (mins)", 30, 120, 60, step=15)
+        time_avail = st.slider("Time Available (mins)", 30, 120, 60, step=15, key="time_slider_box")
 
 st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 # ==============================================================================
