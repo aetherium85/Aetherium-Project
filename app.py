@@ -82,6 +82,7 @@ st.markdown(
         text-transform: uppercase !important;
         letter-spacing: 2px !important;
         opacity: 0.9 !important;
+        color: white !important;
         margin-top: 10px !important;
     }
 
