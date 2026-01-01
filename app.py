@@ -643,28 +643,24 @@ st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;
 import pandas as pd
 from datetime import datetime, timedelta
 
-# 1. PREPARE DATA
-# We need to turn the JSON list into a Pandas DataFrame to do math
+# # 1. PREPARE DATA
 if 'act_json' not in locals() or not act_json:
     # Fallback if no data exists
     current_fitness = 0
     current_fatigue = 0
     current_form = 0
+    df_daily = pd.DataFrame() # Create empty DF to prevent errors
 else:
     df = pd.DataFrame(act_json)
     
     # Ensure date column is actual datetime objects
     df['start_date_local'] = pd.to_datetime(df['start_date_local'])
-    df = df.sort_values('start_date_local') # Sort oldest to newest
+    df = df.sort_values('start_date_local')
 
     # 2. CALCULATE DAILY LOAD (TSS Estimate)
-    # Strava doesn't always give TSS, so we estimate it from Suffer Score or time
     def estimate_load(row):
-        # Priority 1: Use Strava's "Suffer Score" if available
         if 'suffer_score' in row and row['suffer_score']:
             return row['suffer_score']
-        # Priority 2: Estimate based on Moving Time (assuming moderate intensity)
-        # Rough rule: 1 hour moderate = 50 TSS
         elif 'moving_time' in row:
             hours = row['moving_time'] / 3600
             return hours * 50 
@@ -672,23 +668,31 @@ else:
 
     df['TSS'] = df.apply(estimate_load, axis=1)
 
-    # 3. CALCULATE ATL, CTL, TSB (Bannister Model)
-    # Create a continuous daily timeline (filling missing days with 0)
-    # This is crucial because fatigue drops on rest days!
-    df = df.set_index('start_date_local')
-    daily_load = df['TSS'].resample('D').sum().fillna(0) # 'D' = Daily
+    # 3. CALCULATE ATL, CTL, TSB
+    # We set index to date to resample daily
+    df_indexed = df.set_index('start_date_local')
+    daily_load = df_indexed['TSS'].resample('D').sum().fillna(0)
 
-    # Constants for the math
-    ctl_decay = 42 # Fitness decays slowly (6 weeks)
-    atl_decay = 7  # Fatigue decays fast (1 week)
+    # Constants
+    ctl_decay = 42 
+    atl_decay = 7 
 
     # Calculate Exponential Weighted Averages
     ctl = daily_load.ewm(span=ctl_decay, adjust=False).mean()
     atl = daily_load.ewm(span=atl_decay, adjust=False).mean()
-    tsb = ctl - atl # Form = Fitness - Fatigue
+    tsb = ctl - atl
 
-    # 4. GET CURRENT VALUES (The very last numbers)
-    # We use these variables in Section 7
+    # 4. SAVE TO A DEDICATED PLOTTING DATAFRAME (The Fix)
+    # We create a new DataFrame specifically for the chart
+    df_daily = pd.DataFrame({
+        'ctl': ctl,
+        'atl': atl,
+        'tsb': tsb
+    })
+    # The index is already the date, let's make it a column for easier plotting
+    df_daily['date'] = df_daily.index
+
+    # 5. GET CURRENT VALUES (For the top dashboard cards)
     if not ctl.empty:
         current_fitness = ctl.iloc[-1]
         current_fatigue = atl.iloc[-1]
@@ -806,17 +810,14 @@ if generate_btn:
             except Exception as e:
                 st.error(f"Generation Failed: {e}")
 
-# ==============================================================================
+# # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD) ---
 # ==============================================================================
-# 🛑 CRITICAL FIX: Everything below this line is fully un-indented (aligned to the left)
-# This ensures the chart shows up immediately, not just when you click the button.
-
 st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 st.markdown("### 📈 Yearly Training Load Progression")
 
-# Check if data exists before trying to plot
-if 'act_json' in locals() and act_json and not df.empty:
+# Check if our new 'df_daily' exists and has data
+if 'df_daily' in locals() and not df_daily.empty:
     colors = {
         "Fitness (CTL)": "#70C4B0",
         "Fatigue (ATL)": "#E16C45",
@@ -825,12 +826,11 @@ if 'act_json' in locals() and act_json and not df.empty:
 
     fig = go.Figure()
 
-    # Manually add traces
     for col in ['ctl', 'atl', 'tsb']:
         full_name = pretty_labels.get(col, col)
         fig.add_trace(go.Scatter(
-            x=df.index, # Use df.index since we set it to datetime earlier
-            y=df[col],
+            x=df_daily['date'],  # <--- Uses the correct Daily dataframe
+            y=df_daily[col],     # <--- Uses the correct columns
             mode='lines',
             name=full_name,
             line=dict(color=colors.get(full_name), width=3),
@@ -854,7 +854,6 @@ else:
     st.info("Not enough data to generate Training Load Chart.")
 
 st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
-
 
 # ==============================================================================
 # --- SECTION 8: PERFORMANCE HISTORY ---
