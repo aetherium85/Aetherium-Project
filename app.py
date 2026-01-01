@@ -268,65 +268,79 @@ st.markdown(
         color: white !important;
     }
 
+/* =========================================
+       1. EXPANDER & CONTAINERS
+       ========================================= */
+    
+    /* The Main Expander Box */
     div[data-testid="stExpander"] {
-        background-color: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 8px !important;
+        /* Darker glass background for better contrast */
+        background-color: rgba(30, 30, 30, 0.4) !important; 
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
         margin-bottom: 20px !important;
+        overflow: hidden !important; /* Ensures header background doesn't overflow corners */
     }
 
     /* The Clickable Header */
     .streamlit-expanderHeader {
+        background-color: rgba(255, 255, 255, 0.05) !important; /* Subtle highlight */
         color: white !important;
         font-family: 'Inter', sans-serif !important;
         font-size: 1rem !important;
-        background-color: transparent !important;
+        font-weight: 600 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Separator line */
     }
     
-    /* The Content Inside */
+    /* Hover Effect for Header */
+    .streamlit-expanderHeader:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: #70C4B0 !important; /* Teal glow on hover */
+    }
+
+    /* The Content Inside the Expander */
     div[data-testid="stExpander"] div[data-testid="stVerticalBlock"] {
         color: white !important;
-    }
-
-    /* 1. The Selectbox Main Container (The box you click) */
-    div[data-baseweb="select"] > div {
-        background-color: rgba(255, 255, 255, 0.05) !important;
-        color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    }
-
-    /* 2. The Text Inside the Selectbox */
-    div[data-baseweb="select"] span {
-        color: white !important;
-    }
-
-    /* 3. The Dropdown Menu Options (The list that pops up) */
-    ul[data-baseweb="menu"] {
-        background-color: #262730 !important; /* Dark Background */
-    }
-    li[data-baseweb="menu-item"] {
-        color: white !important; /* White Text */
-    }
-    li[data-baseweb="menu-item"]:hover {
-        background-color: #E16C45 !important; /* Orange Highlight */
+        padding: 10px !important; /* Adds breathing room inside */
     }
 
     /* =========================================
-       FIX: EXPANDER HEADER
+       2. FORM INPUTS & DROPDOWNS
        ========================================= */
     
-    /* Force the header to have a dark background ALWAYS, not just on hover */
-    .streamlit-expanderHeader {
-        background-color: rgba(0, 0, 0, 0.6) !important;
+    /* The Selectbox Main Container (The box you click) */
+    div[data-baseweb="select"] > div {
+        background-color: rgba(0, 0, 0, 0.3) !important; /* Darker for input fields */
         color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 8px !important;
-        font-weight: 600 !important;
+    }
+
+    /* The Text Inside the Selectbox */
+    div[data-baseweb="select"] span {
+        color: white !important;
     }
     
-    /* Remove the default white background that might be bleeding through */
-    div[data-testid="stExpander"] {
-        background-color: transparent !important;
-        border: none !important;
+    /* The Dropdown Arrow Icon */
+    div[data-baseweb="select"] svg {
+        fill: white !important;
+    }
+
+    /* The Dropdown Menu Options (The list that pops up) */
+    ul[data-baseweb="menu"] {
+        background-color: #1E1E1E !important; /* Solid dark background for readability */
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Individual Menu Items */
+    li[data-baseweb="menu-item"] {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    /* Hover State for Menu Items */
+    li[data-baseweb="menu-item"]:hover {
+        background-color: #E16C45 !important; /* Orange Highlight */
+        color: white !important;
     }
     </style>
     """,
