@@ -810,19 +810,19 @@ if generate_btn:
 # ==============================================================================
         
         # --- 📈 Yearly Training Load Progression (NOW PROPERLY NESTED) ---
-        st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
-        st.markdown("### 📈 Yearly Training Load Progression")
+st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
+st.markdown("### 📈 Yearly Training Load Progression")
 
-        colors = {
+colors = {
             "Fitness (CTL)": "#70C4B0",
             "Fatigue (ATL)": "#E16C45",
             "Form (TSB)": "#4BD4B0"
         }
 
-        fig = go.Figure()
+fig = go.Figure()
 
         # Manually add traces to ensure perfect control over colors and names
-        for col in ['ctl', 'atl', 'tsb']:
+for col in ['ctl', 'atl', 'tsb']:
             full_name = pretty_labels.get(col, col)
             fig.add_trace(go.Scatter(
                 x=df['date'], 
@@ -833,7 +833,7 @@ if generate_btn:
                 hovertemplate=f"<b>{full_name}</b>: %{{y:.1f}}<extra></extra>"
             ))
 
-        fig.update_layout(
+fig.update_layout(
             hovermode="x unified",
             hoverlabel=dict(bgcolor="rgba(30, 30, 30, 0.9)", font_size=14, font_color="white"),
             paper_bgcolor="rgba(0,0,0,0)",
@@ -845,8 +845,8 @@ if generate_btn:
                        zerolinecolor="rgba(255, 255, 255, 0.5)", zerolinewidth=1.5, title="Score")
         )
 
-        st.plotly_chart(fig, use_container_width=True)
-        st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
+st.plotly_chart(fig, use_container_width=True)
+st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 
 # ==============================================================================
