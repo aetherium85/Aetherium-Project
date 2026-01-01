@@ -881,74 +881,82 @@ else:
 # ==============================================================================
 st.markdown("---") # Visual separator
 
-# Center the button using columns
+# 1. SETUP THE CLIENT (Must happen before clicking the button)
+# -----------------------------------------------------------
+try:
+    # Try getting key from Streamlit secrets (Cloud)
+    api_key = st.secrets["GEMINI_API_KEY"]
+except:
+    # Fallback to local environment variable
+    api_key = os.environ.get("GEMINI_API_KEY")
+
+if not api_key:
+    st.warning("⚠️ Gemini API Key not found. Please add it to secrets.toml or environment variables.")
+    # Create a dummy client to prevent 'client not defined' error if key is missing
+    client = None
+else:
+    try:
+        client = genai.Client(api_key=api_key)
+    except Exception as e:
+        st.error(f"Error initializing AI client: {e}")
+        client = None
+
+# 2. THE UI (Button & Logic)
+# -----------------------------------------------------------
 b1, b2, b3 = st.columns([1, 2, 1])
 
 with b2:
-    # A big, wide button
-    generate_btn = st.button("✨ Generate Next Workout", type="primary", use_container_width=True)
+    generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
 
 if generate_btn:
-    # 1. Show a loading spinner while AI "thinks"
-    with st.spinner(f"Analyzing your recent training & {selected_sport} goals..."):
-        
-        # 2. Build the Prompt using the function we made
-        # We use the variables from Section 7 (current_form) and Section 7.1 (selected_sport, etc)
-        ai_prompt = build_ai_prompt(
-            sport=selected_sport,
-            goal=user_goal,
-            time=time_avail,
-            form=current_form, # From Section 7
-            recent_activities=act_json # From Section 4/5
-        )
-        
-        # ---------------------------------------------------------
-        # TODO: CONNECT YOUR LLM HERE (OpenAI, Gemini, Claude, etc.)
-        # ---------------------------------------------------------
-        # Example pseudo-code:
-        client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    
+    if not client:
+        st.error("❌ Cannot generate workout: AI Client is not connected.")
+    else:
+        # A. DEBUG: CHECK AVAILABLE MODELS (Optional - delete later)
+        # st.info("🔍 checking available models...")
+        # try:
+        #     available_models = client.models.list()
+        #     valid_names = [m.name for m in available_models if "generateContent" in m.supported_generation_methods]
+        #     st.write("✅ VALID MODELS:", valid_names)
+        # except Exception as e:
+        #     st.write(f"Debug failed: {e}")
 
-        response = client.models.generate_content(
-            model="gemini-1.5-flash",
-            contents="Write a haiku about coding."
-        )
-
-        print(response.text)
-        
-        # FOR NOW: Simulating a response so you can see the UI working
-        import time
-        time.sleep(1.5) # Fake delay
-        result_text = f"""
-### 🚴 {selected_sport} Power Builder
-**Focus:** {user_goal} | **Duration:** {time_avail} mins
-
-**Warm Up (10 mins):**
-- 5 mins easy spinning / jogging (Zone 1)
-- 3 x 1 min Fast Pedaling / Strides (100+ rpm)
-
-**Main Set (40 mins):**
-- 3 x 8 mins @ Threshold Power (Zone 4)
-- *Rest: 4 mins easy between intervals*
-
-**Cool Down (10 mins):**
-- Easy spinning, bringing HR down.
-
-**Coach's Logic:**
-Your TSB is {int(current_form)}, indicating you are fresh enough for intensity. Since you did a long slow distance yesterday, today is perfect for threshold work to boost your FTP.
-        """
-        # ---------------------------------------------------------
-
-        # 3. Display the Result in a Styling Box
-        st.markdown(f"""
-            <div style="
-                background-color: rgba(0,0,0,0.3); 
-                border: 1px solid #70C4B0; 
-                border-radius: 10px; 
-                padding: 25px; 
-                margin-top: 20px;">
-                <h3 style="color: #70C4B0; margin-top: 0; font-family: 'Michroma';">⚡ COACH'S RECOMMENDATION</h3>
-                <div style="color: white; font-family: 'Inter'; line-height: 1.6;">
-                    {result_text.replace(chr(10), '<br>')} 
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
+        # B. RUN THE GENERATION
+        with st.spinner(f"Analyzing your recent training & {selected_sport} goals..."):
+            
+            # Build the prompt
+            ai_prompt = build_ai_prompt(
+                sport=selected_sport,
+                goal=user_goal,
+                time=time_avail,
+                form=current_form, 
+                recent_activities=act_json 
+            )
+            
+            try:
+                # Use the specific model version to avoid 404s
+                response = client.models.generate_content(
+                    model="gemini-1.5-flash-001", 
+                    contents=ai_prompt
+                )
+                
+                result_text = response.text
+                
+                # Render the result
+                st.markdown(f"""
+                    <div style="
+                        background-color: rgba(0,0,0,0.3); 
+                        border: 1px solid #70C4B0; 
+                        border-radius: 10px; 
+                        padding: 25px; 
+                        margin-top: 20px;">
+                        <h3 style="color: #70C4B0; margin-top: 0; font-family: 'Michroma';">⚡ COACH'S RECOMMENDATION</h3>
+                        <div style="color: white; font-family: 'Inter'; line-height: 1.6;">
+                            {result_text.replace(chr(10), '<br>')} 
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
+                
+            except Exception as e:
+                st.error(f"Generation Failed: {e}")
