@@ -807,13 +807,11 @@ with st.expander("⚙️ Configure AI Workout Settings", expanded=False):
         time_avail = st.slider("Time (mins)", 30, 120, 60, step=15, key="time_select")
 
 # 3. GENERATION ACTION
-# Removed st.markdown("###") to reduce the gap
 b1, b2, b3 = st.columns([1, 2, 1])
 
 with b2:
-    # Added a custom style to remove top margin from the button column
+    # Custom style to pull button up
     st.markdown("""<style>div[data-testid="column"] { margin-top: -10px; }</style>""", unsafe_allow_html=True)
-    
     generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
 
 if generate_btn:
@@ -822,15 +820,33 @@ if generate_btn:
     else:
         with st.spinner(f"Coach is designing your {selected_sport} session..."):
             ai_prompt = build_ai_prompt(selected_sport, user_goal, time_avail, current_form, act_json)
+            
             try:
-                # Use your working model
-                response = client.models.generate_content(model="gemini-2.0-flash-lite", contents=ai_prompt)
-                
+                # 1. Try Primary Model (Fastest)
+                try:
+                    response = client.models.generate_content(
+                        model="gemini-2.0-flash-lite", 
+                        contents=ai_prompt
+                    )
+                except Exception as e:
+                    # 2. If Quota Limit (429), Try Backup Model
+                    if "429" in str(e) or "Resource exhausted" in str(e):
+                        st.toast("⚠️ Primary model busy. Switching to backup...", icon="🔄")
+                        response = client.models.generate_content(
+                            model="gemini-2.0-flash-lite-preview-02-05", 
+                            contents=ai_prompt
+                        )
+                    else:
+                        raise e # Re-raise other errors
+
                 # Result Display
                 st.markdown("---")
+                
+                # We wrap the result in the container to apply our CSS text fixes
                 with st.container(border=True):
                     st.markdown(f"### ⚡ Recommended Workout: {selected_sport}")
                     st.markdown(response.text)
+                    
             except Exception as e:
                 st.error(f"Generation Failed: {e}")
 
