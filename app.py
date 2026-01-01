@@ -106,7 +106,7 @@ st.markdown(
         text-transform: uppercase !important;
         letter-spacing: 2px !important;
         margin-bottom: 10px !important;
-        color: #70C4B0 !important;          /* Matches your theme teal */
+        color: #70C4B0 !important;
     }
 
     /* 5. METRIC & PLOT STYLING */
