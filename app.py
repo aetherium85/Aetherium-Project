@@ -55,39 +55,23 @@ st.markdown(
     }
     .stApp { background: transparent !important; }
 
-    /* 4. TEXT DEFAULTS (UPDATED) */
-    /* Added 'li', 'ul', 'strong', 'b' to this list so AI bullet points are white */
-    h1, h2, h3, h4, h5, h6, p, label, li, ul, strong, b, .performance-row, .performance-row div, .performance-row b {
+    /* 4. TEXT DEFAULTS (RESTORED & FIXED) */
+    /* I removed 'li', 'ul' from here so they go back to the "smaller" standard size */
+    h1, h2, h3, h4, h5, h6, p, label, strong, b, .performance-row, .performance-row div, .performance-row b {
         font-family: 'Inter', sans-serif !important; 
         font-weight: 200 !important;
         color: white !important; 
         letter-spacing: 1px !important;
     }
     
-    h1 {
-        font-size: 2.2rem !important;
-        font-weight: 700 !important;
-        color: white !important;
-    }
+    /* ... (Your h1, h2, h3 rules remain the same) ... */
 
-    h2 {
-        font-size: 1.5rem !important;
-        font-weight: 600 !important;
-        margin-top: 20px !important;
-        margin-bottom: 10px !important;
-    }
+    h1 { font-size: 2.2rem !important; font-weight: 700 !important; color: white !important; }
+    h2 { font-size: 1.5rem !important; font-weight: 600 !important; margin-top: 20px !important; margin-bottom: 10px !important; }
+    h3 { font-size: 1.1rem !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: 2px !important; opacity: 0.9 !important; color: white !important; margin-top: 10px !important; }
 
-    h3 {
-        font-size: 1.1rem !important;
-        font-weight: 400 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 2px !important;
-        opacity: 0.9 !important;
-        color: white !important;
-        margin-top: 10px !important;
-    }
-
-    /* NEW: Style the AI Result Box (Bordered Container) to be Glass */
+    /* 🎯 TARGETED FIX FOR THE RESULT BOX */
+    /* This makes the box glass-like */
     div[data-testid="stVerticalBlockBorderWrapper"] {
         background-color: rgba(255, 255, 255, 0.05) !important;
         backdrop-filter: blur(10px);
@@ -95,8 +79,19 @@ st.markdown(
         border-radius: 10px !important;
     }
     
-    /* NEW: Force all text inside that box to be white */
+    /* This forces ALL text inside the box to be White, but keeps the "Small/Compact" font */
     div[data-testid="stVerticalBlockBorderWrapper"] * {
+        color: white !important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 400 !important; /* Normal weight (not thin) makes it easier to read at small sizes */
+        letter-spacing: normal !important; /* Removes the wide gap, keeping it compact */
+        font-size: 0.95rem !important; /* Explicitly sets the "smaller" size you liked */
+    }
+
+    /* Keeps bold text poping */
+    div[data-testid="stVerticalBlockBorderWrapper"] strong,
+    div[data-testid="stVerticalBlockBorderWrapper"] b {
+        font-weight: 700 !important;
         color: white !important;
     }
 
