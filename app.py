@@ -287,6 +287,47 @@ st.markdown(
     div[data-testid="stExpander"] div[data-testid="stVerticalBlock"] {
         color: white !important;
     }
+
+    /* 1. The Selectbox Main Container (The box you click) */
+    div[data-baseweb="select"] > div {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* 2. The Text Inside the Selectbox */
+    div[data-baseweb="select"] span {
+        color: white !important;
+    }
+
+    /* 3. The Dropdown Menu Options (The list that pops up) */
+    ul[data-baseweb="menu"] {
+        background-color: #262730 !important; /* Dark Background */
+    }
+    li[data-baseweb="menu-item"] {
+        color: white !important; /* White Text */
+    }
+    li[data-baseweb="menu-item"]:hover {
+        background-color: #E16C45 !important; /* Orange Highlight */
+    }
+
+    /* =========================================
+       FIX: EXPANDER HEADER
+       ========================================= */
+    
+    /* Force the header to have a dark background ALWAYS, not just on hover */
+    .streamlit-expanderHeader {
+        background-color: rgba(0, 0, 0, 0.6) !important;
+        color: white !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Remove the default white background that might be bleeding through */
+    div[data-testid="stExpander"] {
+        background-color: transparent !important;
+        border: none !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
@@ -683,6 +724,7 @@ with st.expander("⚙️ Training Setup", expanded=False):
         
     with c3:
         time_avail = st.slider("Time Available (mins)", 30, 120, 60, step=15)
+
 st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 # ==============================================================================
 # --- SECTION 8: PERFORMANCE HISTORY ---
