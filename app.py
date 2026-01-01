@@ -28,11 +28,11 @@ st.markdown(
     /* 1. CLEAN IMPORT: Single line for both fonts */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Michroma&display=swap');
 
-    /* 2. HEADER FIX: Makes the header transparent instead of squashing it */
+    /* 2. HEADER FIX: Makes the header transparent instead of squashing it 
     header[data-testid="stHeader"] {
         background: transparent !important;
         backdrop-filter: none !important;
-    }
+    } */
     
     /* 3. BACKGROUND IMAGE */
     .stApp::before {
