@@ -71,44 +71,39 @@ st.markdown(
     h3 { font-size: 1.1rem !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: 2px !important; opacity: 0.9 !important; color: white !important; margin-top: 10px !important; }
 
     /* 🎯 TARGETED FIX FOR THE RESULT BOX */
-    /* 1. Make the box glass-like */
+    
+    /* 1. The Glass Container */
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: rgba(0, 0, 0, 0.4) !important; /* Slightly darker background for contrast */
+        background-color: rgba(0, 0, 0, 0.4) !important;
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 10px !important;
     }
 
-    /* 2. FORCE TEXT COLORS - Explicitly targeting paragraph and list tags */
-    div[data-testid="stVerticalBlockBorderWrapper"] p,
-    div[data-testid="stVerticalBlockBorderWrapper"] li, 
-    div[data-testid="stVerticalBlockBorderWrapper"] ul, 
-    div[data-testid="stVerticalBlockBorderWrapper"] ol,
-    div[data-testid="stVerticalBlockBorderWrapper"] span,
-    div[data-testid="stVerticalBlockBorderWrapper"] div {
-        color: #FFFFFF !important; /* Pure White */
+    /* 2. THE NUCLEAR TEXT FIX */
+    /* We target the Markdown Container explicitly to override Streamlit's defaults */
+    div[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdownContainer"] > p,
+    div[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdownContainer"] > ul > li,
+    div[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdownContainer"] > ol > li,
+    div[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdownContainer"] li,
+    div[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdownContainer"] p {
+        color: #FFFFFF !important; /* Force Pure White */
         font-family: 'Inter', sans-serif !important;
         font-weight: 400 !important;
-        font-size: 0.95rem !important;
-        line-height: 1.6 !important; /* Improves readability */
-        text-shadow: 0 1px 2px rgba(0,0,0,0.5); /* Adds a tiny shadow to make text pop against background */
+        font-size: 0.95rem !important; /* Keep your preferred small size */
+        line-height: 1.5 !important;
+        opacity: 1 !important; /* Ensure no transparency */
     }
 
-    /* 3. Ensure Bold text is also white */
-    div[data-testid="stVerticalBlockBorderWrapper"] strong,
-    div[data-testid="stVerticalBlockBorderWrapper"] b {
-        color: #FFFFFF !important;
-        font-weight: 700 !important;
-    }
-
-    /* 4. Fix headers inside the box (if any exist besides the main one) */
+    /* 3. Headers inside the box */
     div[data-testid="stVerticalBlockBorderWrapper"] h1,
     div[data-testid="stVerticalBlockBorderWrapper"] h2,
     div[data-testid="stVerticalBlockBorderWrapper"] h3,
-    div[data-testid="stVerticalBlockBorderWrapper"] h4
-    div[data-testid="stVerticalBlockBorderWrapper"] h5 {
+    div[data-testid="stVerticalBlockBorderWrapper"] strong,
+    div[data-testid="stVerticalBlockBorderWrapper"] b {
         color: #FFFFFF !important;
     }
+
     /* 5. METRIC & PLOT STYLING */
     [data-testid="stHorizontalBlock"] div, [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { 
         color: white !important; 
@@ -550,47 +545,45 @@ def get_ytd_data():
 def build_ai_prompt(sport, goal, time, form, recent_activities):
     """
     Constructs the prompt for the AI.
-    - sport: User selected sport (e.g. "Triathlon")
-    - form: TSB Score (e.g. -10)
-    - recent_activities: List of last 3 activity dicts
     """
-    
-    # 1. Summarize last 3 days (To prevent repetition)
-    recent_context = ""
+    # 1. Summarize last 3 workouts
+    recent_context = "None"
     if recent_activities:
-        # Take only the last 3
-        last_3 = recent_activities[:3] 
-        recent_context = "Recent History (Do NOT repeat these):"
-        for act in last_3:
+        sorted_acts = sorted(recent_activities, key=lambda x: x['start_date_local'], reverse=True)[:3]
+        recent_context = ""
+        for act in sorted_acts:
             name = act.get('name', 'Unknown')
             type_ = act.get('type', 'Workout')
             date = act.get('start_date_local', '')[:10]
-            recent_context += f"\n- {date}: {type_} ({name})"
+            recent_context += f"- {date}: {type_} ({name})\n"
 
     # 2. Determine Biological State
     bio_state = "Neutral"
-    if form < -20: bio_state = "High Fatigue (Needs Recovery)"
-    elif form > 15: bio_state = "Very Fresh (Ready for Hard Effort)"
+    if form < -20: bio_state = "High Fatigue"
+    elif -20 <= form < -5: bio_state = "Fatigued"
+    elif -5 <= form <= 15: bio_state = "Fresh"
+    elif form > 15: bio_state = "Very Fresh"
     
-    # 3. The Prompt
+    # 3. The Strict Prompt
     prompt = f"""
-    Act as an elite {sport} coach. Design the single best workout for today.
+    Act as an elite {sport} coach. Write a workout for today.
     
-    **Athlete Context:**
-    - Primary Sport: {sport}
-    - Current Goal: {goal}
-    - Time Available: {time} minutes
-    - Biological State (TSB): {form} ({bio_state})
+    **Context:**
+    - Sport: {sport}
+    - Goal: {goal}
+    - Time: {time} mins
+    - Status: {int(form)} ({bio_state})
+    - History: {recent_context}
     
-    {recent_context}
-    
-    **Instructions:**
-    1. If the user is a Triathlete, look at Recent History to balance disciplines (e.g., if they ran yesterday, suggest a Bike or Swim).
-    2. Adjust intensity based on Biological State.
-    3. Output format: 
-       - Workout Title
-       - Main Set (Specific Intervals)
-       - "Why this workout?" (Explain the logic based on my recent history).
+    **Strict Output Rules:**
+    1. NO conversational filler (Do not say "Here is your workout" or "Good luck").
+    2. BE CONCISE. Use short bullet points.
+    3. Format exactly like this:
+       **Workout Name**
+       **Warm Up** (Bullet points)
+       **Main Set** (Bullet points, concise intervals)
+       **Cool Down** (Bullet points)
+       **Coach's Logic** (1 sentence explaining why)
     """
     return prompt
 
