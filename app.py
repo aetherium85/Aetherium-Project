@@ -539,7 +539,7 @@ if 'well_json' in locals() and well_json:
                 border-left: 5px solid {rec_color}; 
                 border-radius: 12px; 
                 /* CHANGE THIS LINE: Top, Right, Bottom, Left */
-                padding: 10px 25px 25px 25px; 
+                padding: 5px 25px 25px 25px; 
                 margin: 20px 0;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div>
@@ -549,10 +549,6 @@ if 'well_json' in locals() and well_json:
                         <p style="margin: 0; color: rgba(255,255,255,0.8); font-family: 'Inter'; font-weight: 200; font-size: 0.95rem;">
                             {rec_desc}
                         </p>
-                    </div>
-                    <div style="text-align: right; min-width: 80px;">
-                        <div style="font-size: 0.7rem; text-transform: uppercase; color: rgba(255,255,255,0.5);">FORM</div>
-                        <div style="font-size: 1.5rem; color: {rec_color}; font-family: 'Michroma';">{int(current_form)}</div>
                     </div>
                 </div>
             </div>
