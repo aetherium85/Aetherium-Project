@@ -97,6 +97,24 @@ st.markdown(
         margin-bottom: 10px !important;
     }
 
+    .performance-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        
+        /* CHANGE THIS LINE FROM 'center' TO 'flex-start' */
+        align-items: flex-start !important; 
+        
+        background-color: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        
+        /* Optional: Adjust padding if 'top' alignment looks too squeezed */
+        padding: 15px 25px !important; 
+        
+        margin-bottom: 12px !important;
+        transition: all 0.2s ease !important;
+    }
+
     /* 6. EXPANDER STYLING */
     .stExpander {
         background: rgba(255, 255, 255, 0.05) !important;
