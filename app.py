@@ -652,8 +652,6 @@ if well_json:
         st.plotly_chart(fig, use_container_width=True)
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
-st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
-
 # ==============================================================================
 # --- SECTION 7.1: AI TRAINER CONFIGURATION (COLLAPSIBLE) ---
 # ==============================================================================
@@ -685,7 +683,7 @@ with st.expander("⚙️ Training Setup", expanded=False):
         
     with c3:
         time_avail = st.slider("Time Available (mins)", 30, 120, 60, step=15)
-
+st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 # ==============================================================================
 # --- SECTION 8: PERFORMANCE HISTORY ---
 # ==============================================================================
