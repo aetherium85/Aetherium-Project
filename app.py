@@ -774,52 +774,82 @@ render_metric_card(m3, "Form (TSB)", current_form, "Fresh" if current_form >= 0 
 # ==============================================================================
 # --- SECTION 7.1: AI WORKOUT PLANNER ---
 # ==============================================================================
-# 1. SETUP CLIENT (Silent initialization)
+st.markdown("---") # Visual Separator
+
+# 1. SETUP CLIENT
 try:
     api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
     client = genai.Client(api_key=api_key) if api_key else None
 except:
     client = None
 
-# 2. CONFIGURATION (Directly on page, no expander)
-st.markdown("### ⚙️ Workout Planner Settings")
+# 2. CONFIGURATION (Smart Defaults)
+st.markdown("### ⚙️ AI Coach Settings")
 
-# --- A. DETECT SPORT (Existing Logic) ---
-sports_options = ["Triathlon", "Running", "Cycling", "Swimming", "General Fitness"]
-default_sport_index = 4
+# --- A. EXPANDED SPORTS LIST ---
+# We added specific Gym and Mobility options here
+sports_options = [
+    "Triathlon", 
+    "Running", 
+    "Cycling", 
+    "Swimming", 
+    "Strength Training",  # <-- Better than 'Gym'
+    "CrossFit / HIIT",    # <-- For high intensity gym
+    "Yoga / Mobility",    # <-- For active recovery
+    "General Fitness"
+]
+default_sport_index = 7 # Default to "General Fitness" (last item)
+
+# --- B. SMART AUTO-DETECT SPORT ---
 if 'act_json' in locals() and act_json:
     try:
-        detected = infer_primary_sport(act_json)
-        if detected in sports_options: default_sport_index = sports_options.index(detected)
+        # We need to map Strava types to our new nice names
+        detected_raw = infer_primary_sport(act_json)
+        
+        # Map internal names to dropdown names
+        mapping_correction = {
+            "Strength": "Strength Training",
+            "WeightTraining": "Strength Training",
+            "Yoga": "Yoga / Mobility",
+            "Workout": "General Fitness"
+        }
+        
+        # Get the corrected name, or stick with the raw one
+        detected = mapping_correction.get(detected_raw, detected_raw)
+        
+        if detected in sports_options: 
+            default_sport_index = sports_options.index(detected)
     except: pass
 
-# --- B. DETECT GOAL (New Logic based on TSB) ---
-goal_options = ["Base Building (Zone 2)", "Threshold", "VO2 Max", "Recovery", "Race Prep"]
-default_goal_index = 0 # Default to Base Building
-
-# TEST LINE: Uncomment one of these to test the logic!
-# current_form = -30  # Should switch Goal to 'Recovery'
-# current_form = 20   # Should switch Goal to 'Threshold / FTP'
+# --- C. DETECT GOAL (Aligned with Insight Box) ---
+goal_options = ["Base Building (Zone 2)", "Threshold", "VO2 Max", "Recovery", "Race Prep", "Hypertrophy (Muscle Gain)", "Strength / Power"]
+default_goal_index = 0 
 
 if 'current_form' in locals():
-    # If very tired (< -20), suggest Recovery
-    if current_form < -20:
-        default_goal_index = 3 # Index of "Recovery"
-    # If fresh (> 10), suggest Threshold/Hard work
-    elif current_form > 10:
-        default_goal_index = 1 # Index of "Threshold / FTP"
-    # Otherwise (between -20 and 10), suggest Base Building
+    # 1. TIRED (Red Zone) -> Recovery
+    if current_form < -10:
+        default_goal_index = 3 # "Recovery"
+        
+    # 2. FRESH (Green Zone) -> Threshold or Strength
+    elif current_form >= 0:
+        # If the user selected a Gym sport, default to Hypertrophy/Power
+        if sports_options[default_sport_index] in ["Strength Training", "CrossFit / HIIT"]:
+            default_goal_index = 6 # "Strength / Power"
+        else:
+            default_goal_index = 1 # "Threshold"
+        
+    # 3. NEUTRAL (Amber Zone) -> Base Building
     else:
-        default_goal_index = 0 # Index of "Base Building"
+        default_goal_index = 0 # "Base Building"
 
-# --- C. RENDER INPUTS ---
+# --- D. RENDER INPUTS ---
 c1, c2, c3 = st.columns(3)
 with c1:
     selected_sport = st.selectbox("Sport Focus", sports_options, index=default_sport_index, key="sport_select")
 with c2:
     user_goal = st.selectbox("Goal", goal_options, index=default_goal_index, key="goal_select")
 with c3:
-    time_avail = st.slider("Time (mins)", 30, 120, 60, step=15, key="time_select")
+    time_avail = st.slider("Time (mins)", 30, 90, 60, step=15, key="time_select")
 
 # 3. GENERATION ACTION
 b1, b2, b3 = st.columns([1, 2, 1])
@@ -862,7 +892,10 @@ if generate_btn:
 """, unsafe_allow_html=True)
 
             except Exception as e:
-                st.error(f"Generation Failed: {e}")
+                if "429" in str(e):
+                    st.toast("⚠️ Primary model busy. Retrying...", icon="🔄")
+                else:
+                    st.error(f"Generation Failed: {e}")
 
 # # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD) ---
