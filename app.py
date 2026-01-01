@@ -877,7 +877,7 @@ else:
     st.info("No activity history found for this year.")
 
 # ==============================================================================
-# --- SECTION 9: DIAGNOSTIC MODE ---
+# --- SECTION 9: DIAGNOSTIC MODE (SAFE VERSION) ---
 # ==============================================================================
 st.markdown("---") 
 
@@ -902,23 +902,26 @@ if debug_btn and client:
     st.info("Querying Google API for available models...")
     try:
         # Get all models
-        all_models = client.models.list()
+        # We convert the iterator to a list to ensure we have data
+        all_models = list(client.models.list())
         
-        # Filter for models that can generate text (Chat)
-        # We look for 'generateContent' capability
-        chat_models = []
-        for m in all_models:
-            if "generateContent" in m.supported_generation_methods:
-                # We strip the 'models/' prefix to get the clean name
-                clean_name = m.name.replace("models/", "")
-                chat_models.append(clean_name)
-        
-        if chat_models:
-            st.success("✅ SUCCESS! Your API Key supports these models:")
-            st.code("\n".join(chat_models), language="text")
-            st.warning("👉 Copy one of the names above (like 'gemini-1.5-flash-002') and use that in your code.")
+        if all_models:
+            st.success(f"✅ FOUND {len(all_models)} MODELS:")
+            
+            # extract names safely
+            model_names = []
+            for m in all_models:
+                # Try to get the name, or fall back to the object string
+                name = getattr(m, 'name', str(m))
+                # Cleanup: Remove 'models/' prefix if present
+                clean_name = name.replace("models/", "")
+                model_names.append(clean_name)
+            
+            # Show them clearly
+            st.code("\n".join(model_names), language="text")
+            st.warning("👉 Copy one of the names starting with 'gemini-' (e.g. gemini-1.5-flash)")
         else:
-            st.error("No text-generation models found for this API key.")
+            st.error("API returned an empty list. Check your API key permissions.")
             
     except Exception as e:
         st.error(f"Error connecting to Google: {e}")
