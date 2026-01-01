@@ -696,83 +696,100 @@ if 'well_json' in locals() and well_json:
         """, unsafe_allow_html=True)
 
 # ==============================================================================
-# --- SECTION 7.1: AI TRAINER SETTINGS ---
+# --- SECTION 7.1: AI TRAINER & GENERATION ---
 # ==============================================================================
+
+# 1. INITIALIZE AI CLIENT (Safe Setup)
+# -----------------------------------------------------------
+try:
+    # Try Streamlit Secrets first (Cloud), then Environment Variable (Local)
+    api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
+    if api_key:
+        client = genai.Client(api_key=api_key)
+    else:
+        client = None
+except Exception as e:
+    client = None
+
+# 2. CONFIGURATION (The Expander)
+# -----------------------------------------------------------
 with st.expander("⚙️ Configure AI Workout Settings", expanded=False):
     
-    # 1. DEFINE AVAILABLE SPORTS
-    # These are the options the user can manually select
+    # A. Smart Defaults
     sports_options = ["Triathlon", "Running", "Cycling", "Swimming", "General Fitness"]
+    default_index = 4 # Default to General
     
-    # 2. SMART DETECTION LOGIC
-    # We try to detect the sport to set the "Default" index of the dropdown
-    detected_sport = "General Fitness" # Fallback
-    default_index = 4 # Default to "General Fitness" (index 4)
-    
+    # Try to auto-detect from recent history
     if 'act_json' in locals() and act_json:
         try:
-            detected = infer_primary_sport(act_json) # e.g., returns "Triathlon"
-            
-            # Map the detected string to our options list
-            # This handles cases like "Ride" mapping to "Cycling"
-            if detected == "Triathlon": detected_sport = "Triathlon"
-            elif detected == "Cycling": detected_sport = "Cycling"
-            elif detected == "Running": detected_sport = "Running"
-            elif detected == "Swimming": detected_sport = "Swimming"
-            
-            # Find the index in the list so we can pre-select it
-            if detected_sport in sports_options:
-                default_index = sports_options.index(detected_sport)
+            detected = infer_primary_sport(act_json)
+            if detected in sports_options:
+                default_index = sports_options.index(detected)
         except:
-            pass # Keep defaults if detection fails
+            pass
 
-    # 3. LAYOUT
+    # B. Layout Inputs
     c1, c2, c3 = st.columns(3)
     
     with c1:
-        # THE MANUAL SELECTOR (With Smart Default)
-        selected_sport = st.selectbox(
-            "Sport Focus",
-            options=sports_options,
-            index=default_index, # <--- This makes it "Smart"
-            key="sport_selector"
-        )
-        
+        selected_sport = st.selectbox("Sport Focus", sports_options, index=default_index, key="sport_selector")
     with c2:
-        user_goal = st.selectbox(
-            "Current Training Focus",
-            ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max / Speed", "Recovery / Taper", "Race Prep"],
-            index=0,
-            key="goal_select_box" 
-        )
-        
+        user_goal = st.selectbox("Current Focus", ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max", "Recovery", "Race Prep"], index=0, key="goal_selector")
     with c3:
-        time_avail = st.slider("Time Available (mins)", 30, 120, 60, step=15, key="time_slider_box")
+        time_avail = st.slider("Time (mins)", 30, 120, 60, step=15, key="time_slider")
 
-if well_json:
-    df = pd.DataFrame(well_json)
-    if not df.empty:
-        # 1. Data Cleanup
-        date_col = next((c for c in ['timestamp', 'id', 'date'] if c in df.columns), None)
-        if date_col:
-            df = df.rename(columns={date_col: 'date'})
-            df['date'] = pd.to_datetime(df['date'])
+# 3. GENERATION BUTTON & OUTPUT (Placed directly below Expander)
+# -----------------------------------------------------------
+st.markdown("###") # Small spacing
 
-        # 2. Fitness Metrics Logic
-        for col in ['ctl', 'atl', 'tsb']:
-            if col not in df.columns: df[col] = 0.0
-        if (df['tsb'] == 0).all(): df['tsb'] = df['ctl'] - df['atl']
+# Center the button
+b1, b2, b3 = st.columns([1, 2, 1])
+with b2:
+    generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
 
-        latest = df.iloc[-1]
-        s1, s2, s3 = st.columns(3)
-        
-        # Display the Stat Boxes
-        elegant_stat(s1, "Fitness", latest.get('ctl', 0), "#70C4B0")
-        elegant_stat(s2, "Fatigue", latest.get('atl', 0), "#E16C45")
-        
-        tsb_val = latest.get('tsb', 0)
-        tsb_color = "#4BD4B0" if tsb_val > -10 else "#E16C45"
-        elegant_stat(s3, "Form", tsb_val, tsb_color)
+# 4. ACTION LOGIC
+if generate_btn:
+    
+    # Validation
+    if not client:
+        st.error("❌ AI Client not connected. Please check your API Key.")
+    
+    else:
+        # Show loading spinner
+        with st.spinner(f"Designing {selected_sport} workout..."):
+            
+            # A. Build Prompt
+            ai_prompt = build_ai_prompt(
+                sport=selected_sport,
+                goal=user_goal,
+                time=time_avail,
+                form=current_form, # Ensure this variable exists from Section 7
+                recent_activities=act_json # Ensure this exists from Section 4
+            )
+            
+            # B. Call Gemini
+            try:
+                # Using your specific working model
+                response = client.models.generate_content(
+                    model="gemini-2.0-flash-lite", 
+                    contents=ai_prompt
+                )
+                
+                # C. Display Result (FIXED: Uses Native Container for Markdown)
+                st.markdown("---") # Separator
+                
+                # This container creates the visual box, but allows Markdown to render inside
+                with st.container(border=True):
+                    st.markdown(f"### ⚡ Coach's Recommendation: {selected_sport}")
+                    # This line renders the Bold (**text**) and lists correctly
+                    st.markdown(response.text)
+                    
+            except Exception as e:
+                st.error(f"AI Generation Failed: {e}")
+
+# ==============================================================================
+# --- (NEXT SECTION: YEARLY TRAINING LOAD STARTS BELOW HERE) ---
+# ==============================================================================
         
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         
@@ -875,68 +892,3 @@ if 'act_json' in locals() and act_json:
         st.warning("⚠️ Activity data found, but date information is missing.")
 else:
     st.info("No activity history found for this year.")
-
-# ==============================================================================
-# --- SECTION 9: AI WORKOUT GENERATOR ---
-# ==============================================================================
-st.markdown("---") 
-
-# 1. SETUP CLIENT
-try:
-    api_key = st.secrets["GEMINI_API_KEY"]
-except:
-    api_key = os.environ.get("GEMINI_API_KEY")
-
-if not api_key:
-    st.error("❌ No API Key found.")
-    client = None
-else:
-    client = genai.Client(api_key=api_key)
-
-# 2. THE UI
-b1, b2, b3 = st.columns([1, 2, 1])
-
-with b2:
-    generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
-
-if generate_btn:
-    if not client:
-        st.error("❌ AI Client is not connected.")
-    else:
-        with st.spinner(f"Analyzing your recent training & {selected_sport} goals..."):
-            
-            # Build the prompt
-            ai_prompt = build_ai_prompt(
-                sport=selected_sport,
-                goal=user_goal,
-                time=time_avail,
-                form=current_form, 
-                recent_activities=act_json 
-            )
-            
-            try:
-                # WE ARE USING YOUR SPECIFIC "LITE" MODEL HERE
-                response = client.models.generate_content(
-                    model="gemini-2.0-flash-lite", 
-                    contents=ai_prompt
-                )
-                
-                result_text = response.text
-                
-                # Render the result
-                st.markdown(f"""
-                    <div style="
-                        background-color: rgba(0,0,0,0.3); 
-                        border: 1px solid #70C4B0; 
-                        border-radius: 10px; 
-                        padding: 25px; 
-                        margin-top: 20px;">
-                        <h3 style="color: #70C4B0; margin-top: 0; font-family: 'Michroma';">⚡ COACH'S RECOMMENDATION</h3>
-                        <div style="color: white; font-family: 'Inter'; line-height: 1.6;">
-                            {result_text.replace(chr(10), '<br>')} 
-                        </div>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-            except Exception as e:
-                st.error(f"Generation Failed: {e}")
