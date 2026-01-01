@@ -877,86 +877,48 @@ else:
     st.info("No activity history found for this year.")
 
 # ==============================================================================
-# --- SECTION 9: AI WORKOUT GENERATOR ---
+# --- SECTION 9: DIAGNOSTIC MODE ---
 # ==============================================================================
-st.markdown("---") # Visual separator
+st.markdown("---") 
 
-# 1. SETUP THE CLIENT (Must happen before clicking the button)
-# -----------------------------------------------------------
+# 1. SETUP CLIENT
 try:
-    # Try getting key from Streamlit secrets (Cloud)
     api_key = st.secrets["GEMINI_API_KEY"]
 except:
-    # Fallback to local environment variable
     api_key = os.environ.get("GEMINI_API_KEY")
 
 if not api_key:
-    st.warning("⚠️ Gemini API Key not found. Please add it to secrets.toml or environment variables.")
-    # Create a dummy client to prevent 'client not defined' error if key is missing
+    st.error("❌ No API Key found.")
     client = None
 else:
-    try:
-        client = genai.Client(api_key=api_key)
-    except Exception as e:
-        st.error(f"Error initializing AI client: {e}")
-        client = None
+    client = genai.Client(api_key=api_key)
 
-# 2. THE UI (Button & Logic)
-# -----------------------------------------------------------
+# 2. DEBUG BUTTON
 b1, b2, b3 = st.columns([1, 2, 1])
-
 with b2:
-    generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
+    debug_btn = st.button("🛠️ FIND MY AVAILABLE MODELS", type="primary")
 
-if generate_btn:
-    
-    if not client:
-        st.error("❌ Cannot generate workout: AI Client is not connected.")
-    else:
-        # A. DEBUG: CHECK AVAILABLE MODELS (Optional - delete later)
-        # st.info("🔍 checking available models...")
-        # try:
-        #     available_models = client.models.list()
-        #     valid_names = [m.name for m in available_models if "generateContent" in m.supported_generation_methods]
-        #     st.write("✅ VALID MODELS:", valid_names)
-        # except Exception as e:
-        #     st.write(f"Debug failed: {e}")
-
-        # B. RUN THE GENERATION
-        with st.spinner(f"Analyzing your recent training & {selected_sport} goals..."):
+if debug_btn and client:
+    st.info("Querying Google API for available models...")
+    try:
+        # Get all models
+        all_models = client.models.list()
+        
+        # Filter for models that can generate text (Chat)
+        # We look for 'generateContent' capability
+        chat_models = []
+        for m in all_models:
+            if "generateContent" in m.supported_generation_methods:
+                # We strip the 'models/' prefix to get the clean name
+                clean_name = m.name.replace("models/", "")
+                chat_models.append(clean_name)
+        
+        if chat_models:
+            st.success("✅ SUCCESS! Your API Key supports these models:")
+            st.code("\n".join(chat_models), language="text")
+            st.warning("👉 Copy one of the names above (like 'gemini-1.5-flash-002') and use that in your code.")
+        else:
+            st.error("No text-generation models found for this API key.")
             
-            # Build the prompt
-            ai_prompt = build_ai_prompt(
-                sport=selected_sport,
-                goal=user_goal,
-                time=time_avail,
-                form=current_form, 
-                recent_activities=act_json 
-            )
-            
-            try:
-                # Use the specific model version to avoid 404s
-                response = client.models.generate_content(
-                    model="gemini-1.5-flash-001", 
-                    contents=ai_prompt
-                )
-                
-                result_text = response.text
-                
-                # Render the result
-                st.markdown(f"""
-                    <div style="
-                        background-color: rgba(0,0,0,0.3); 
-                        border: 1px solid #70C4B0; 
-                        border-radius: 10px; 
-                        padding: 25px; 
-                        margin-top: 20px;">
-                        <h3 style="color: #70C4B0; margin-top: 0; font-family: 'Michroma';">⚡ COACH'S RECOMMENDATION</h3>
-                        <div style="color: white; font-family: 'Inter'; line-height: 1.6;">
-                            {result_text.replace(chr(10), '<br>')} 
-                        </div>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-            except Exception as e:
-                st.error(f"Generation Failed: {e}")
+    except Exception as e:
+        st.error(f"Error connecting to Google: {e}")
