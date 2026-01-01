@@ -840,20 +840,23 @@ if generate_btn:
                         raise e # Re-raise other errors
 
                 # Result Display
-                st.markdown("---")
-                
-                # We wrap the result in the container to apply our CSS text fixes
-                with st.container(border=True):
+                with st.container():
                     st.markdown(f"### ⚡ Recommended Workout: {selected_sport}")
+    
                     st.markdown(f"""
                         <div style="
-                            color: white !important;
-                            -webkit-text-fill-color: white !important;
-                            background-color: rgba(0,0,0,0.0);
-                            padding: 10px;
-                            border-radius: 10px;
+                            color: white !important; 
+                            -webkit-text-fill-color: white !important; 
                         ">
-                            {response.text}
+                            <style>
+                                div.ai-response * {{
+                                    color: white !important;
+                                    -webkit-text-fill-color: white !important;
+                                }}
+                            </style>
+                            <div class="ai-response">
+                                {response.text}
+                            </div>
                         </div>
                     """, unsafe_allow_html=True)
                     
