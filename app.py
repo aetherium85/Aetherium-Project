@@ -645,7 +645,7 @@ if 'well_json' in locals() and well_json:
 # ==============================================================================
 # --- SECTION 7.1: AI TRAINER CONFIGURATION (COLLAPSIBLE) ---
 # ==============================================================================
-with st.expander("⚙️ Configure AI Workout Settings", expanded=True):
+with st.expander("⚙️ Configure Workout Planning Settings", expanded=True):
     
     # 1. LOGIC: Define the variable FIRST
     display_sport = "General"
