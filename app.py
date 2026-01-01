@@ -778,7 +778,7 @@ with st.expander("⚙️ Configure AI Workout Settings", expanded=False):
     with c1:
         selected_sport = st.selectbox("Sport Focus", sports_options, index=default_index, key="sport_select")
     with c2:
-        user_goal = st.selectbox("Goal", ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max", "Recovery", "Race Prep"], index=0, key="goal_select")
+        user_goal = st.selectbox("Goal", ["Base Building (Zone 2)", "Threshold", "VO2 Max", "Recovery", "Race Prep"], index=0, key="goal_select")
     with c3:
         time_avail = st.slider("Time (mins)", 30, 120, 60, step=15, key="time_select")
 
