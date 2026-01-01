@@ -538,7 +538,6 @@ if 'well_json' in locals() and well_json:
                 border: 1px solid rgba(255, 255, 255, 0.1); 
                 border-left: 5px solid {rec_color}; 
                 border-radius: 12px; 
-                /* CHANGE THIS LINE: Top, Right, Bottom, Left */
                 padding: 5px 25px 25px 25px; 
                 margin: 20px 0;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -650,44 +649,29 @@ if 'act_json' in locals() and act_json:
         # --- C. RENDER UI ---
         st.markdown("### 📅 Monthly Performance History")
 
-        # 1. THE HEADER ROW (NEW)
-        # We use the same 'flex' ratios (2, 1, 1) as the data rows so they align perfectly.
+        # 1. THE HEADER ROW (Fixed Alignment)
+        # Ratio: 2 (Month) : 1 (Sessions) : 1 (Load)
         st.markdown("""
             <div style="display: flex; justify-content: space-between; padding: 10px 25px; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <div style="flex: 1; color: #70C4B0; font-family: 'Michroma', sans-serif; font-size: 0.8rem; letter-spacing: 2px;">MONTH</div>
-                <div style="flex: 1; text-align: center; color: rgba(255,255,255,0.6); font-family: 'Michroma', sans-serif; font-size: 0.7rem; letter-spacing: 2px;">SESSIONS</div>
-                <div style="flex: 1; text-align: right; color: rgba(255,255,255,0.6); font-family: 'Michroma', sans-serif; font-size: 0.7rem; letter-spacing: 2px;">LOAD</div>
+                <div style="flex: 1; text-align: left; color: #70C4B0; font-family: 'Michroma'; font-size: 0.8rem; letter-spacing: 2px;">MONTH</div>
+                <div style="flex: 1; text-align: center; color: rgba(255,255,255,0.6); font-family: 'Michroma'; font-size: 0.7rem; letter-spacing: 2px;">SESSIONS</div>
+                <div style="flex: 1; text-align: right; color: rgba(255,255,255,0.6); font-family: 'Michroma'; font-size: 0.7rem; letter-spacing: 2px;">LOAD</div>
             </div>
         """, unsafe_allow_html=True)
 
-        # 2. THE DATA LOOP
+        # 2. THE DATA LOOP (Matches Header Ratio Exactly)
         for _, row in monthly.iterrows():
-            st.markdown(f"""
-    <div class="performance-row">
-        <div style="flex: 1; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #ffffff;">
-            {row['MonthDisplay']}
-        </div>
-        <div style="flex: 1; text-align: center; font-family: 'Michroma', sans-serif; font-size: 0.9rem;">
-            <span style="opacity: 0.6; margin-right: 5px;">🏃</span> 
-            <b>{int(row['Sessions'])}</b>
-        </div>
-        <div style="flex: 1; text-align: right; font-family: 'Michroma', sans-serif; font-size: 0.9rem;">
-            <span style="opacity: 0.6; margin-right: 5px;">🔥</span> 
-            <b>{row['Total Load']:.0f}</b>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-        for _, row in monthly.iterrows():
-        # textwrap.dedent fixes the indentation issue automatically
             st.markdown(textwrap.dedent(f"""
                 <div class="performance-row">
-                    <div style="flex: 1; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #ffffff;">
+                    <div style="flex: 2; text-align: left; font-family: 'Michroma', sans-serif; font-size: 0.9rem; color: #ffffff;">
                         {row['MonthDisplay']}
                     </div>
+                    
                     <div style="flex: 1; text-align: center; font-family: 'Michroma', sans-serif; font-size: 0.9rem;">
                         <span style="opacity: 0.6; margin-right: 5px;">🏃</span> 
                         <b>{int(row['Sessions'])}</b>
                     </div>
+                    
                     <div style="flex: 1; text-align: right; font-family: 'Michroma', sans-serif; font-size: 0.9rem;">
                         <span style="opacity: 0.6; margin-right: 5px;">🔥</span> 
                         <b>{row['Total Load']:.0f}</b>
