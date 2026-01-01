@@ -790,6 +790,31 @@ if generate_btn:
 # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD STARTS BELOW HERE) ---
 # ==============================================================================
+
+if well_json:
+    df = pd.DataFrame(well_json)
+    if not df.empty:
+        # 1. Data Cleanup
+        date_col = next((c for c in ['timestamp', 'id', 'date'] if c in df.columns), None)
+        if date_col:
+            df = df.rename(columns={date_col: 'date'})
+            df['date'] = pd.to_datetime(df['date'])
+
+        # 2. Fitness Metrics Logic
+        for col in ['ctl', 'atl', 'tsb']:
+            if col not in df.columns: df[col] = 0.0
+        if (df['tsb'] == 0).all(): df['tsb'] = df['ctl'] - df['atl']
+
+        latest = df.iloc[-1]
+        s1, s2, s3 = st.columns(3)
+        
+        # Display the Stat Boxes
+        elegant_stat(s1, "Fitness", latest.get('ctl', 0), "#70C4B0")
+        elegant_stat(s2, "Fatigue", latest.get('atl', 0), "#E16C45")
+        
+        tsb_val = latest.get('tsb', 0)
+        tsb_color = "#4BD4B0" if tsb_val > -10 else "#E16C45"
+        elegant_stat(s3, "Form", tsb_val, tsb_color)
         
         st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
         
