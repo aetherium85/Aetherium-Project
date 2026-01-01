@@ -642,48 +642,6 @@ if 'well_json' in locals() and well_json:
             </div>
         """, unsafe_allow_html=True)
 
-# ==============================================================================
-# --- SECTION 7.1: AI TRAINER CONFIGURATION (COLLAPSIBLE) ---
-# ==============================================================================
-with st.expander("⚙️ Configure Workout Planning Settings", expanded=True):
-    
-    # 1. LOGIC: Define the variable FIRST
-    display_sport = "General"
-    if 'act_json' in locals() and act_json:
-        try:
-            display_sport = infer_primary_sport(act_json)
-        except:
-            display_sport = "Run/Bike"
-
-    # 2. LAYOUT
-    c1, c2, c3 = st.columns(3)
-    
-    with c1:
-        # NOTICE: I have pushed the HTML string all the way to the left.
-        # This prevents Streamlit from thinking it is a code block.
-        st.markdown(f"""
-<div style="background-color: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); min-height: 72px; display: flex; flex-direction: column; justify-content: center;">
-    <span style="font-size: 0.7rem; color: #70C4B0; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px;">
-        DETECTED SPORT
-    </span>
-    <span style="font-size: 1.1rem; color: white; font-family: 'Michroma'; text-transform: uppercase;">
-        {display_sport}
-    </span>
-</div>
-""", unsafe_allow_html=True)
-        
-    with c2:
-        user_goal = st.selectbox(
-            "Current Training Focus",
-            ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max / Speed", "Recovery / Taper", "Race Prep"],
-            index=0,
-            key="goal_select_box" 
-        )
-        
-    with c3:
-        time_avail = st.slider("Time Available (mins)", 30, 120, 60, step=15, key="time_slider_box")
-
-st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 if well_json:
     df = pd.DataFrame(well_json)
