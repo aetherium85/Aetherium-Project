@@ -89,7 +89,7 @@ st.markdown(
     }
     
     div[data-testid="stVerticalBlock"] > div:has(div.stPlotlyChart), .performance-row {
-        background-color: rgba(255, 255, 255, 0.05) !important; 
+        background-color: rgba(255, 255, 255, 0.03) !important; 
         backdrop-filter: blur(10px) !important;
         border-radius: 15px !important; 
         padding: 20px !important; 
@@ -214,7 +214,7 @@ st.markdown(
     /* TABLE STYLING */
     table {
         color: white !important;
-        background-color: rgba(255, 255, 255, 0.05) !important;
+        background-color: rgba(255, 255, 255, 0.03) !important;
         border-collapse: collapse !important;
         width: 100% !important;
         border-radius: 10px !important;
@@ -241,7 +241,7 @@ st.markdown(
         background-color: rgba(255, 255, 255, 0.02) !important;
     }
     [data-testid="stDataFrame"] {
-        background-color: rgba(255, 255, 255, 0.05) !important;
+        background-color: rgba(255, 255, 255, 0.03) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
 
@@ -280,7 +280,7 @@ st.markdown(
 
     /* The Clickable Header */
     .streamlit-expanderHeader {
-        background-color: rgba(255, 255, 255, 0.05) !important; /* Slight transparent tint */
+        background-color: rgba(255, 255, 255, 0.03) !important; /* Slight transparent tint */
         color: white !important; /* Force text to be white */
         font-family: 'Inter', sans-serif !important;
         font-size: 1rem !important;
