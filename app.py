@@ -808,7 +808,7 @@ if generate_btn:
 # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD STARTS BELOW HERE) ---
 # ==============================================================================
-
+st.markdown("###")
 if well_json:
     df = pd.DataFrame(well_json)
     if not df.empty:
