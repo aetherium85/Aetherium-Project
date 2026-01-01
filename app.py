@@ -243,7 +243,7 @@ st.markdown(
 
     section[data-testid="stSidebar"] {
         background-color: #FFFFFF !important; /* Matches Streamlit Dark Mode */
-        background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)) !important;
+        background-image: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.5)) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
 
