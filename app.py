@@ -267,6 +267,26 @@ st.markdown(
     section[data-testid="stSidebar"] div[data-testid="stTickBarMax"] {
         color: white !important;
     }
+
+    div[data-testid="stExpander"] {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 8px !important;
+        margin-bottom: 20px !important;
+    }
+
+    /* The Clickable Header */
+    .streamlit-expanderHeader {
+        color: white !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 1rem !important;
+        background-color: transparent !important;
+    }
+    
+    /* The Content Inside */
+    div[data-testid="stExpander"] div[data-testid="stVerticalBlock"] {
+        color: white !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
