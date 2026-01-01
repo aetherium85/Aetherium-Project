@@ -637,156 +637,111 @@ if act_json:
     st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 # ==============================================================================
-# --- SECTION 7: TRAINING STATUS (WELLNESS) ---
+# --- SECTION 7: TRAINING STATUS DASHBOARD ---
 # ==============================================================================
 st.markdown("### ⚡ Your Current Training Status")
-if 'well_json' in locals() and well_json:
-    df = pd.DataFrame(well_json)
-    
-    # Safety check: Ensure the dataframe is not empty before grabbing the last row
-    if not df.empty:
-        latest = df.iloc[-1]
-        
-        # 1. Get Form (TSB)
-        # We use .get() to avoid crashing if a key is missing
-        fitness = latest.get('ctl', 0)
-        fatigue = latest.get('atl', 0)
-        current_form = latest.get('tsb', fitness - fatigue)
-        
-        # 2. Determine the Prescription
-        if current_form < -20:
-            rec_title = "🛑 RED ZONE: Rest & Recovery"
-            rec_desc = "Your fatigue is very high. Risk of injury is elevated. Recommended: Total Rest or 20-min mobility work."
-            rec_color = "#E16C45" # Red/Orange
-            
-        elif -20 <= current_form < -5:
-            rec_title = "🟠 GREY ZONE: Endurance Maintenance"
-            rec_desc = "You are carrying some fatigue. Keep intensity low. Recommended: Zone 2 Run (45-60 mins) or steady state cycling."
-            rec_color = "#ffa421" # Orange
-            
-        elif -5 <= current_form <= 15:
-            rec_title = "🟢 GREEN ZONE: Prime for Intensity"
-            rec_desc = "You are fresh and ready to absorb stress. Recommended: Threshold Intervals, Hill Repeats, or Heavy Strength Session."
-            rec_color = "#70C4B0" # Teal
-            
-        else: # > 15
-            rec_title = "⚪ FRESH ZONE: De-Training Warning"
-            rec_desc = "You are very fresh, but potentially losing fitness. You need a long, hard effort to spike your load."
-            rec_color = "#e0e0e0"
 
-        # 3. Render the Glassmorphism Card
+# 1. THE INSIGHT BOX (The "Green Zone" Box)
+# -----------------------------------------------------------
+# (This logic remains the same as your previous code)
+if current_form >= 5:
+    status_color = "#4CAF50" # Green
+    status_title = "PRIME FOR INTENSITY"
+    status_msg = "You are fresh and ready to absorb stress. Recommended: Threshold Intervals, Hill Repeats, or Heavy Strength Session."
+elif -10 < current_form < 5:
+    status_color = "#FFC107" # Amber
+    status_title = "MAINTENANCE / PRODUCTIVE"
+    status_msg = "You are in the sweet spot. Keep training consistent. Recommended: Zone 2 Base, Tempo work, or Technique drills."
+else:
+    status_color = "#FF5252" # Red
+    status_title = "HIGH FATIGUE WARNING"
+    status_msg = "Your fatigue is high. Risk of overtraining or injury. Recommended: Active Recovery, Yoga, or a Complete Rest Day."
+
+st.markdown(f"""
+    <div style="background-color: rgba(255,255,255,0.05); border-left: 4px solid {status_color}; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <strong style="color: {status_color}; letter-spacing: 1px;">{status_title}</strong><br>
+        <span style="font-size: 0.9rem; color: #ddd;">{status_msg}</span>
+    </div>
+""", unsafe_allow_html=True)
+
+# 2. THE METRICS CARDS (Moved UP to be visible immediately)
+# -----------------------------------------------------------
+m1, m2, m3 = st.columns(3)
+
+def render_metric_card(col, title, value, subtext, color="#70C4B0"):
+    with col:
         st.markdown(f"""
-            <div style="
-                background: rgba(255, 255, 255, 0.03); 
-                border: 1px solid rgba(255, 255, 255, 0.1); 
-                border-left: 5px solid {rec_color}; 
-                border-radius: 12px; 
-                padding: 5px 25px 25px 25px; 
-                margin: 20px 0;">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div>
-                        <h3 style="margin: 0 0 10px 0; color: white; font-family: 'Michroma'; font-size: 1.1rem; letter-spacing: 1px;">
-                            {rec_title}
-                        </h3>
-                        <p style="margin: 0; color: rgba(255,255,255,0.8); font-family: 'Michroma'; font-weight: 200; font-size: 0.95rem;">
-                            {rec_desc}
-                        </p>
-                    </div>
-                </div>
+            <div style="background-color: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; text-align: center;">
+                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px;">{title}</div>
+                <div style="font-size: 2rem; font-weight: 700; color: white; margin: 5px 0;">{int(value)}</div>
+                <div style="font-size: 0.7rem; color: {color}; font-weight: 600; text-transform: uppercase;">● {subtext}</div>
             </div>
         """, unsafe_allow_html=True)
 
-# ==============================================================================
-# --- SECTION 7.1: AI TRAINER & GENERATION ---
-# ==============================================================================
+render_metric_card(m1, "Fitness (CTL)", current_fitness, "Building")
+render_metric_card(m2, "Fatigue (ATL)", current_fatigue, "Productive")
+render_metric_card(m3, "Form (TSB)", current_form, "Fresh" if current_form >= 0 else "Tired", color=status_color)
 
-# 1. INITIALIZE AI CLIENT (Safe Setup)
-# -----------------------------------------------------------
+
+# ==============================================================================
+# --- SECTION 7.1: AI WORKOUT PLANNER ---
+# ==============================================================================
+st.markdown("---") # Visual Separator between Data and Tools
+
+# 1. SETUP CLIENT (Silent initialization)
 try:
-    # Try Streamlit Secrets first (Cloud), then Environment Variable (Local)
     api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
-    if api_key:
-        client = genai.Client(api_key=api_key)
-    else:
-        client = None
-except Exception as e:
+    client = genai.Client(api_key=api_key) if api_key else None
+except:
     client = None
 
-# 2. CONFIGURATION (The Expander)
-# -----------------------------------------------------------
+# 2. CONFIGURATION (Expander)
 with st.expander("⚙️ Configure AI Workout Settings", expanded=False):
     
-    # A. Smart Defaults
+    # Smart Defaults Logic
     sports_options = ["Triathlon", "Running", "Cycling", "Swimming", "General Fitness"]
-    default_index = 4 # Default to General
-    
-    # Try to auto-detect from recent history
+    default_index = 4
     if 'act_json' in locals() and act_json:
         try:
             detected = infer_primary_sport(act_json)
-            if detected in sports_options:
-                default_index = sports_options.index(detected)
-        except:
-            pass
+            if detected in sports_options: default_index = sports_options.index(detected)
+        except: pass
 
-    # B. Layout Inputs
+    # Layout
     c1, c2, c3 = st.columns(3)
-    
     with c1:
-        selected_sport = st.selectbox("Sport Focus", sports_options, index=default_index, key="sport_selector")
+        selected_sport = st.selectbox("Sport Focus", sports_options, index=default_index, key="sport_select")
     with c2:
-        user_goal = st.selectbox("Current Focus", ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max", "Recovery", "Race Prep"], index=0, key="goal_selector")
+        user_goal = st.selectbox("Goal", ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max", "Recovery", "Race Prep"], index=0, key="goal_select")
     with c3:
-        time_avail = st.slider("Time (mins)", 30, 120, 60, step=15, key="time_slider")
+        time_avail = st.slider("Time (mins)", 30, 120, 60, step=15, key="time_select")
 
-# 3. GENERATION BUTTON & OUTPUT (Placed directly below Expander)
-# -----------------------------------------------------------
-st.markdown("###") # Small spacing
-
-# Center the button
+# 3. GENERATION ACTION
+# We use a centered layout for the button to make it distinct
+st.markdown("###") # Vertical spacer
 b1, b2, b3 = st.columns([1, 2, 1])
+
 with b2:
+    # Primary action button
     generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
 
-# 4. ACTION LOGIC
 if generate_btn:
-    
-    # Validation
     if not client:
-        st.error("❌ AI Client not connected. Please check your API Key.")
-    
+        st.error("❌ AI Client not connected. Check API Key.")
     else:
-        # Show loading spinner
-        with st.spinner(f"Designing {selected_sport} workout..."):
-            
-            # A. Build Prompt
-            ai_prompt = build_ai_prompt(
-                sport=selected_sport,
-                goal=user_goal,
-                time=time_avail,
-                form=current_form, # Ensure this variable exists from Section 7
-                recent_activities=act_json # Ensure this exists from Section 4
-            )
-            
-            # B. Call Gemini
+        with st.spinner(f"Coach is designing your {selected_sport} session..."):
+            ai_prompt = build_ai_prompt(selected_sport, user_goal, time_avail, current_form, act_json)
             try:
-                # Using your specific working model
-                response = client.models.generate_content(
-                    model="gemini-2.0-flash-lite", 
-                    contents=ai_prompt
-                )
+                # Use your working model
+                response = client.models.generate_content(model="gemini-2.0-flash-lite", contents=ai_prompt)
                 
-                # C. Display Result (FIXED: Uses Native Container for Markdown)
-                st.markdown("---") # Separator
-                
-                # This container creates the visual box, but allows Markdown to render inside
+                # Result Display
+                st.markdown("---")
                 with st.container(border=True):
-                    st.markdown(f"### ⚡ Coach's Recommendation: {selected_sport}")
-                    # This line renders the Bold (**text**) and lists correctly
+                    st.markdown(f"### ⚡ Recommended Workout: {selected_sport}")
                     st.markdown(response.text)
-                    
             except Exception as e:
-                st.error(f"AI Generation Failed: {e}")
+                st.error(f"Generation Failed: {e}")
 
 # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD STARTS BELOW HERE) ---
