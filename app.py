@@ -666,15 +666,15 @@ with st.expander("⚙️ Configure AI Workout Settings", expanded=True):
         # NOTICE: I have pushed the HTML string all the way to the left.
         # This prevents Streamlit from thinking it is a code block.
         st.markdown(f"""
-<div style="background-color: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); min-height: 72px; display: flex; flex-direction: column; justify-content: center;">
-    <span style="font-size: 0.7rem; color: #70C4B0; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px;">
-        DETECTED SPORT
-    </span>
-    <span style="font-size: 1.1rem; color: white; font-family: 'Michroma'; text-transform: uppercase;">
-        {display_sport}
-    </span>
-</div>
-""", unsafe_allow_html=True)
+            <div style="background-color: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); min-height: 72px; display: flex; flex-direction: column; justify-content: center;">
+                <span style="font-size: 0.7rem; color: #70C4B0; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px;">
+                    DETECTED SPORT
+                </span>
+                <span style="font-size: 1.1rem; color: white; font-family: 'Michroma'; text-transform: uppercase;">
+                    {display_sport}
+                </span>
+            </div>
+            """, unsafe_allow_html=True)
         
     with c2:
         user_goal = st.selectbox(
