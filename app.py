@@ -70,43 +70,45 @@ st.markdown(
     h2 { font-size: 1.5rem !important; font-weight: 600 !important; margin-top: 20px !important; margin-bottom: 10px !important; }
     h3 { font-size: 1.1rem !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: 2px !important; opacity: 0.9 !important; color: white !important; margin-top: 10px !important; }
 
-    /* 🎯 TARGETED FIX FOR THE RESULT BOX (NUCLEAR OPTION) */
+    /* 🎯 TARGETED FIX FOR THE RESULT BOX (HIGH SPECIFICITY VERSION) */
     
     /* 1. The Glass Container */
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: rgba(0, 0, 0, 0.5) !important; /* Darker for better contrast */
+        background-color: rgba(0, 0, 0, 0.5) !important;
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 10px !important;
     }
 
-    /* 2. THE UNIVERSAL TEXT RESET */
-    /* The '*' selector targets EVERY single element inside the box */
-    div[data-testid="stVerticalBlockBorderWrapper"],
-    div[data-testid="stVerticalBlockBorderWrapper"] * {
-        color: #FFFFFF !important;          /* Force Pure White */
-        fill: #FFFFFF !important;           /* Force Icons to White */
+    /* 2. SPECIFIC OVERRIDES (This beats the default theme) */
+    /* We list every text element specifically to force the browser to listen */
+    div[data-testid="stVerticalBlockBorderWrapper"] p,
+    div[data-testid="stVerticalBlockBorderWrapper"] li,
+    div[data-testid="stVerticalBlockBorderWrapper"] ul,
+    div[data-testid="stVerticalBlockBorderWrapper"] ol,
+    div[data-testid="stVerticalBlockBorderWrapper"] div,
+    div[data-testid="stVerticalBlockBorderWrapper"] span {
+        color: #FFFFFF !important;       /* Pure White */
         font-family: 'Inter', sans-serif !important;
-        font-size: 0.85rem !important;      /* SMALLER SIZE (was 0.95rem) */
-        line-height: 1.4 !important;        /* Tighter spacing */
-        font-weight: 300 !important;        /* Thinner/Cleaner look */
+        font-size: 0.85rem !important;   /* Small & Compact */
+        line-height: 1.5 !important;
+        font-weight: 400 !important;     /* Normal weight (300 can look grey on dark backgrounds) */
     }
 
-    /* 3. Exception for Bold Text (So it stands out) */
+    /* 3. Headers (Teal) */
+    div[data-testid="stVerticalBlockBorderWrapper"] h1,
+    div[data-testid="stVerticalBlockBorderWrapper"] h2,
+    div[data-testid="stVerticalBlockBorderWrapper"] h3, 
+    div[data-testid="stVerticalBlockBorderWrapper"] h4 {
+        color: #70C4B0 !important;
+        font-weight: 600 !important;
+    }
+
+    /* 4. Bold Text (White) */
     div[data-testid="stVerticalBlockBorderWrapper"] strong,
     div[data-testid="stVerticalBlockBorderWrapper"] b {
-        font-weight: 700 !important;        /* Keep bold text thick */
-        color: #70C4B0 !important;          /* Optional: Make keywords Teal to pop? (Or delete to keep white) */
-    }
-
-    /* 4. Exception for Headers (So they are slightly bigger) */
-    div[data-testid="stVerticalBlockBorderWrapper"] h3 {
-        font-size: 1.0rem !important;
-        font-weight: 600 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 2px !important;
-        margin-bottom: 10px !important;
-        color: #70C4B0 !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
     }
 
     /* 5. METRIC & PLOT STYLING */
