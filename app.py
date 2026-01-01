@@ -70,38 +70,43 @@ st.markdown(
     h2 { font-size: 1.5rem !important; font-weight: 600 !important; margin-top: 20px !important; margin-bottom: 10px !important; }
     h3 { font-size: 1.1rem !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: 2px !important; opacity: 0.9 !important; color: white !important; margin-top: 10px !important; }
 
-    /* 🎯 TARGETED FIX FOR THE RESULT BOX */
+    /* 🎯 TARGETED FIX FOR THE RESULT BOX (NUCLEAR OPTION) */
     
     /* 1. The Glass Container */
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: rgba(0, 0, 0, 0.4) !important;
+        background-color: rgba(0, 0, 0, 0.5) !important; /* Darker for better contrast */
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 10px !important;
     }
 
-    /* 2. THE NUCLEAR TEXT FIX */
-    /* We target the Markdown Container explicitly to override Streamlit's defaults */
-    div[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdownContainer"] > p,
-    div[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdownContainer"] > ul > li,
-    div[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdownContainer"] > ol > li,
-    div[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdownContainer"] li,
-    div[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stMarkdownContainer"] p {
-        color: #FFFFFF !important; /* Force Pure White */
+    /* 2. THE UNIVERSAL TEXT RESET */
+    /* The '*' selector targets EVERY single element inside the box */
+    div[data-testid="stVerticalBlockBorderWrapper"],
+    div[data-testid="stVerticalBlockBorderWrapper"] * {
+        color: #FFFFFF !important;          /* Force Pure White */
+        fill: #FFFFFF !important;           /* Force Icons to White */
         font-family: 'Inter', sans-serif !important;
-        font-weight: 400 !important;
-        font-size: 0.95rem !important; /* Keep your preferred small size */
-        line-height: 1.5 !important;
-        opacity: 1 !important; /* Ensure no transparency */
+        font-size: 0.85rem !important;      /* SMALLER SIZE (was 0.95rem) */
+        line-height: 1.4 !important;        /* Tighter spacing */
+        font-weight: 300 !important;        /* Thinner/Cleaner look */
     }
 
-    /* 3. Headers inside the box */
-    div[data-testid="stVerticalBlockBorderWrapper"] h1,
-    div[data-testid="stVerticalBlockBorderWrapper"] h2,
-    div[data-testid="stVerticalBlockBorderWrapper"] h3,
+    /* 3. Exception for Bold Text (So it stands out) */
     div[data-testid="stVerticalBlockBorderWrapper"] strong,
     div[data-testid="stVerticalBlockBorderWrapper"] b {
-        color: #FFFFFF !important;
+        font-weight: 700 !important;        /* Keep bold text thick */
+        color: #70C4B0 !important;          /* Optional: Make keywords Teal to pop? (Or delete to keep white) */
+    }
+
+    /* 4. Exception for Headers (So they are slightly bigger) */
+    div[data-testid="stVerticalBlockBorderWrapper"] h3 {
+        font-size: 1.0rem !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 2px !important;
+        margin-bottom: 10px !important;
+        color: #70C4B0 !important;          /* Matches your theme teal */
     }
 
     /* 5. METRIC & PLOT STYLING */
