@@ -546,7 +546,7 @@ if 'well_json' in locals() and well_json:
                         <h3 style="margin: 0 0 10px 0; color: white; font-family: 'Michroma'; font-size: 1.1rem; letter-spacing: 1px;">
                             {rec_title}
                         </h3>
-                        <p style="margin: 0; color: rgba(255,255,255,0.8); font-family: 'Inter'; font-weight: 200; font-size: 0.95rem;">
+                        <p style="margin: 0; color: rgba(255,255,255,0.8); font-family: 'Michroma'; font-weight: 200; font-size: 0.95rem;">
                             {rec_desc}
                         </p>
                     </div>
