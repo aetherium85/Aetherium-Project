@@ -778,12 +778,13 @@ with st.expander("⚙️ Configure AI Workout Settings", expanded=False):
         time_avail = st.slider("Time (mins)", 30, 120, 60, step=15, key="time_select")
 
 # 3. GENERATION ACTION
-# We use a centered layout for the button to make it distinct
-st.markdown("###") # Vertical spacer
+# Removed st.markdown("###") to reduce the gap
 b1, b2, b3 = st.columns([1, 2, 1])
 
 with b2:
-    # Primary action button
+    # Added a custom style to remove top margin from the button column
+    st.markdown("""<style>div[data-testid="column"] { margin-top: -10px; }</style>""", unsafe_allow_html=True)
+    
     generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
 
 if generate_btn:
