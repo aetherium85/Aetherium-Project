@@ -71,37 +71,28 @@ st.markdown(
     h3 { font-size: 1.1rem !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: 2px !important; opacity: 0.9 !important; color: white !important; margin-top: 10px !important; }
 
     /* 🎯 TARGETED FIX FOR THE RESULT BOX (TITANIUM VERSION) */
-    
-    /* 1. The Glass Container */
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: rgba(0, 0, 0, 0.6) !important; /* Slightly darker for max contrast */
+        background-color: rgba(0, 0, 0, 0.6) !important;
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 10px !important;
     }
 
-    /* 2. THE TEXT OVERRIDE */
-    /* We use -webkit-text-fill-color to force the paint, and opacity to kill transparency */
+    /* FORCE TEXT WHITE */
     div[data-testid="stVerticalBlockBorderWrapper"] * {
-        color: #FFFFFF !important;               /* Standard White */
-        -webkit-text-fill-color: #FFFFFF !important; /* Forces white even if browser wants grey */
-        opacity: 1 !important;                   /* Removes any "ghosting" or transparency */
-        
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
+        opacity: 1 !important;
         font-family: 'Inter', sans-serif !important;
-        font-size: 0.85rem !important;           /* Your requested small size */
-        font-weight: 400 !important;             /* Normal weight */
+        font-size: 0.85rem !important;
+        font-weight: 400 !important;
         line-height: 1.5 !important;
     }
-
-    /* 3. Headers (Teal) */
+    
+    /* KEEP HEADERS TEAL */
     div[data-testid="stVerticalBlockBorderWrapper"] h3 {
         color: #70C4B0 !important;
         -webkit-text-fill-color: #70C4B0 !important;
-        font-size: 1.0rem !important;
-        font-weight: 600 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 2px !important;
-        margin-bottom: 10px !important;
     }
 
     /* 4. Bold Text (White & Thick) */
@@ -807,6 +798,7 @@ with st.expander("⚙️ Configure AI Workout Settings", expanded=False):
         time_avail = st.slider("Time (mins)", 30, 120, 60, step=15, key="time_select")
 
 # 3. GENERATION ACTION
+# 3. GENERATION ACTION
 b1, b2, b3 = st.columns([1, 2, 1])
 
 with b2:
@@ -822,35 +814,34 @@ if generate_btn:
             ai_prompt = build_ai_prompt(selected_sport, user_goal, time_avail, current_form, act_json)
             
             try:
-                response = client.models.generate_content(
-                    model="gemini-2.0-flash-lite", 
-                    contents=ai_prompt
-                )
+                # 1. Try Primary Model (Fastest)
+                try:
+                    response = client.models.generate_content(
+                        model="gemini-2.0-flash-lite", 
+                        contents=ai_prompt
+                    )
+                except Exception as e:
+                    # 2. If Quota Limit (429), Try Backup Model
+                    if "429" in str(e) or "Resource exhausted" in str(e):
+                        st.toast("⚠️ Primary model busy. Switching to backup...", icon="🔄")
+                        response = client.models.generate_content(
+                            model="gemini-2.0-flash-lite-preview-02-05", 
+                            contents=ai_prompt
+                        )
+                    else:
+                        raise e # Re-raise other errors if it's not a quota issue
 
-                # ✅ Place style outside of the <div> container
-                st.markdown("""
-                    <style>
-                        .ai-response, 
-                        .ai-response * {
-                            color: white !important;
-                        }
-                        .ai-response li {
-                            margin-bottom: 0.5em;
-                        }
-                    </style>
-                """, unsafe_allow_html=True)
-
-                st.markdown(f"### ⚡ Recommended Workout: {selected_sport}")
+                # Result Display
+                st.markdown("---")
                 
-                st.markdown(f"""
-                    <div class="ai-response">
-                        {response.text}
-                    </div>
-                """, unsafe_allow_html=True)
-
+                # We use the native Streamlit container. 
+                # Our "Titanium CSS" in Section 1 targets this specifically.
+                with st.container(border=True):
+                    st.markdown(f"### ⚡ Recommended Workout: {selected_sport}")
+                    st.markdown(response.text)
+                    
             except Exception as e:
                 st.error(f"Generation Failed: {e}")
-
 
 # # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD) ---
