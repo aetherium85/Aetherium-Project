@@ -28,11 +28,11 @@ st.markdown(
     /* 1. CLEAN IMPORT: Single line for both fonts */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Michroma&display=swap');
 
-    /* 2. HEADER FIX: Makes the header transparent */
+    /* 2. HEADER FIX: Makes the header transparent
     header[data-testid="stHeader"] {
         background: transparent !important;
         backdrop-filter: none !important;
-    }
+    } */
     
     /* FIX: Make the "Hide Sidebar" arrow visible at all times */
     button[data-testid="stSidebarCollapseButton"] {
@@ -49,7 +49,7 @@ st.markdown(
         background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
                     url("https://images.unsplash.com/photo-1663104192417-6804188a9a8e");
         background-size: cover; background-position: center;
-        background-attachment: fixed; filter: blur(4px); transform: scale(1.1); z-index: -1;
+        background-attachment: fixed; filter: blur(8px); transform: scale(1.1); z-index: -1;
     }
     .stApp { background: transparent !important; }
 
@@ -538,7 +538,8 @@ if 'well_json' in locals() and well_json:
                 border: 1px solid rgba(255, 255, 255, 0.1); 
                 border-left: 5px solid {rec_color}; 
                 border-radius: 12px; 
-                padding: 25px; 
+                /* CHANGE THIS LINE: Top, Right, Bottom, Left */
+                padding: 10px 25px 25px 25px; 
                 margin: 20px 0;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div>
