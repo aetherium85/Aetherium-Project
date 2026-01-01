@@ -70,44 +70,45 @@ st.markdown(
     h2 { font-size: 1.5rem !important; font-weight: 600 !important; margin-top: 20px !important; margin-bottom: 10px !important; }
     h3 { font-size: 1.1rem !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: 2px !important; opacity: 0.9 !important; color: white !important; margin-top: 10px !important; }
 
-    /* 🎯 TARGETED FIX FOR THE RESULT BOX (HIGH SPECIFICITY VERSION) */
+    /* 🎯 TARGETED FIX FOR THE RESULT BOX (TITANIUM VERSION) */
     
     /* 1. The Glass Container */
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: rgba(0, 0, 0, 0.5) !important;
+        background-color: rgba(0, 0, 0, 0.6) !important; /* Slightly darker for max contrast */
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 10px !important;
     }
 
-    /* 2. SPECIFIC OVERRIDES (This beats the default theme) */
-    /* We list every text element specifically to force the browser to listen */
-    div[data-testid="stVerticalBlockBorderWrapper"] p,
-    div[data-testid="stVerticalBlockBorderWrapper"] li,
-    div[data-testid="stVerticalBlockBorderWrapper"] ul,
-    div[data-testid="stVerticalBlockBorderWrapper"] ol,
-    div[data-testid="stVerticalBlockBorderWrapper"] div,
-    div[data-testid="stVerticalBlockBorderWrapper"] span {
-        color: #FFFFFF !important;       /* Pure White */
+    /* 2. THE TEXT OVERRIDE */
+    /* We use -webkit-text-fill-color to force the paint, and opacity to kill transparency */
+    div[data-testid="stVerticalBlockBorderWrapper"] * {
+        color: #FFFFFF !important;               /* Standard White */
+        -webkit-text-fill-color: #FFFFFF !important; /* Forces white even if browser wants grey */
+        opacity: 1 !important;                   /* Removes any "ghosting" or transparency */
+        
         font-family: 'Inter', sans-serif !important;
-        font-size: 0.85rem !important;   /* Small & Compact */
+        font-size: 0.85rem !important;           /* Your requested small size */
+        font-weight: 400 !important;             /* Normal weight */
         line-height: 1.5 !important;
-        font-weight: 400 !important;     /* Normal weight (300 can look grey on dark backgrounds) */
     }
 
     /* 3. Headers (Teal) */
-    div[data-testid="stVerticalBlockBorderWrapper"] h1,
-    div[data-testid="stVerticalBlockBorderWrapper"] h2,
-    div[data-testid="stVerticalBlockBorderWrapper"] h3, 
-    div[data-testid="stVerticalBlockBorderWrapper"] h4 {
+    div[data-testid="stVerticalBlockBorderWrapper"] h3 {
         color: #70C4B0 !important;
+        -webkit-text-fill-color: #70C4B0 !important;
+        font-size: 1.0rem !important;
         font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 2px !important;
+        margin-bottom: 10px !important;
     }
 
-    /* 4. Bold Text (White) */
+    /* 4. Bold Text (White & Thick) */
     div[data-testid="stVerticalBlockBorderWrapper"] strong,
     div[data-testid="stVerticalBlockBorderWrapper"] b {
         color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
         font-weight: 700 !important;
     }
 
