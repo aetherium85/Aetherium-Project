@@ -822,46 +822,35 @@ if generate_btn:
             ai_prompt = build_ai_prompt(selected_sport, user_goal, time_avail, current_form, act_json)
             
             try:
-                # 1. Try Primary Model (Fastest)
-                try:
-                    response = client.models.generate_content(
-                        model="gemini-2.0-flash-lite", 
-                        contents=ai_prompt
-                    )
-                except Exception as e:
-                    # 2. If Quota Limit (429), Try Backup Model
-                    if "429" in str(e) or "Resource exhausted" in str(e):
-                        st.toast("⚠️ Primary model busy. Switching to backup...", icon="🔄")
-                        response = client.models.generate_content(
-                            model="gemini-2.0-flash-lite-preview-02-05", 
-                            contents=ai_prompt
-                        )
-                    else:
-                        raise e # Re-raise other errors
+                response = client.models.generate_content(
+                    model="gemini-2.0-flash-lite", 
+                    contents=ai_prompt
+                )
 
-                # Result Display
-                with st.container():
-                    st.markdown(f"### ⚡ Recommended Workout: {selected_sport}")
-    
-                    st.markdown(f"""
-                        <div style="
-                            color: white !important; 
-                            -webkit-text-fill-color: white !important; 
-                        ">
-                            <style>
-                                div.ai-response * {{
-                                    color: white !important;
-                                    -webkit-text-fill-color: white !important;
-                                }}
-                            </style>
-                            <div class="ai-response">
-                                {response.text}
-                            </div>
-                        </div>
-                    """, unsafe_allow_html=True)
-                    
+                # ✅ Place style outside of the <div> container
+                st.markdown("""
+                    <style>
+                        .ai-response, 
+                        .ai-response * {
+                            color: white !important;
+                        }
+                        .ai-response li {
+                            margin-bottom: 0.5em;
+                        }
+                    </style>
+                """, unsafe_allow_html=True)
+
+                st.markdown(f"### ⚡ Recommended Workout: {selected_sport}")
+                
+                st.markdown(f"""
+                    <div class="ai-response">
+                        {response.text}
+                    </div>
+                """, unsafe_allow_html=True)
+
             except Exception as e:
                 st.error(f"Generation Failed: {e}")
+
 
 # # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD) ---
