@@ -747,6 +747,8 @@ render_metric_card(m3, "Form (TSB)", current_form, "Fresh" if current_form >= 0 
 # ==============================================================================
 # --- SECTION 7.1: AI WORKOUT PLANNER ---
 # ==============================================================================
+st.markdown("---") # Visual Separator between Data and Tools
+
 # 1. SETUP CLIENT (Silent initialization)
 try:
     api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
