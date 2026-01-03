@@ -564,7 +564,7 @@ def get_ytd_data():
         st.error(f"Fetch failed: {e}")
         return None, None, None
 
-def build_ai_prompt(sport, discipline, goal, time, form, recent_activities):
+def build_ai_prompt(sport, discipline, goal, time_str, form, recent_activities):
     """
     Constructs the prompt for the AI, now including the specific Discipline.
     """
@@ -585,8 +585,16 @@ def build_ai_prompt(sport, discipline, goal, time, form, recent_activities):
     elif -20 <= form < -5: bio_state = "Fatigued"
     elif -5 <= form <= 15: bio_state = "Fresh"
     elif form > 15: bio_state = "Very Fresh"
+
+    # 1. Handle Time String
+    if str(time_str).lower() == "no limit":
+        time_text = "Unlimited (Design the optimal duration for this specific workout)"
+    else:
+        # Strip " mins" from the string if it exists to get just the number
+        clean_time = str(time_str).replace(" mins", "")
+        time_text = f"{clean_time} minutes"
     
-    # 3. The Strict Prompt
+    # 2. The Strict Prompt (Update the 'Time Available' line)
     prompt = f"""
     Act as an elite {sport} coach. Write a specific {discipline} workout for today.
     
@@ -594,7 +602,7 @@ def build_ai_prompt(sport, discipline, goal, time, form, recent_activities):
     - Macro Sport: {sport}
     - Specific Discipline: {discipline}
     - Goal: {goal}
-    - Time Available: {time} mins
+    - Time Available: {time_text}
     - Athlete Status: {int(form)} ({bio_state})
     - Recent History:
     {recent_context}
@@ -926,8 +934,16 @@ with c3:
     user_goal = st.selectbox("Goal", available_goals, index=default_goal_idx, key="goal_select")
 
 with c4:
-    # 4. TIME SELECTOR
-    time_avail = st.slider("Time (mins)", 30, 90, 60, step=15, key="time_select")
+    # 4. TIME SELECTOR (Custom Options)
+    # We use select_slider to allow for text like "No Limit"
+    time_options = ["30 mins", "45 mins", "60 mins", "75 mins", "90 mins", "120 mins", "No Limit"]
+    
+    time_avail = st.select_slider(
+        "Time Available", 
+        options=time_options, 
+        value="60 mins",  # Default
+        key="time_select"
+    )
 
 # 3. GENERATION ACTION
 b1, b2, b3 = st.columns([1, 2, 1])
