@@ -564,9 +564,9 @@ def get_ytd_data():
         st.error(f"Fetch failed: {e}")
         return None, None, None
 
-def build_ai_prompt(sport, goal, time, form, recent_activities):
+def build_ai_prompt(sport, discipline, goal, time, form, recent_activities):
     """
-    Constructs the prompt for the AI.
+    Constructs the prompt for the AI, now including the specific Discipline.
     """
     # 1. Summarize last 3 workouts
     recent_context = "None"
@@ -588,24 +588,26 @@ def build_ai_prompt(sport, goal, time, form, recent_activities):
     
     # 3. The Strict Prompt
     prompt = f"""
-    Act as an elite {sport} coach. Write a workout for today.
+    Act as an elite {sport} coach. Write a specific {discipline} workout for today.
     
     **Context:**
-    - Sport: {sport}
+    - Macro Sport: {sport}
+    - Specific Discipline: {discipline}
     - Goal: {goal}
-    - Time: {time} mins
-    - Status: {int(form)} ({bio_state})
-    - History: {recent_context}
+    - Time Available: {time} mins
+    - Athlete Status: {int(form)} ({bio_state})
+    - Recent History:
+    {recent_context}
     
     **Strict Output Rules:**
-    1. NO conversational filler (Do not say "Here is your workout" or "Good luck").
+    1. NO conversational filler.
     2. BE CONCISE. Use short bullet points.
     3. Format exactly like this:
        **Workout Name**
        **Warm Up** (Bullet points)
-       **Main Set** (Bullet points, concise intervals)
+       **Main Set** (Bullet points, specific intervals)
        **Cool Down** (Bullet points)
-       **Coach's Logic** (1 sentence explaining why)
+       **Coach's Logic** (1 sentence explaining why this fits the history/status)
     """
     return prompt
 
@@ -694,7 +696,7 @@ if act_json:
 st.markdown("<hr style='border-top: 1px solid white; opacity: 1; margin: 2rem 0;'>", unsafe_allow_html=True)
 
 # ==============================================================================
-# --- SECTION 6: METRICS CALCULATION (The Math) ---
+# --- SECTION 6.1: METRICS CALCULATION (The Math) ---
 # ==============================================================================
 import pandas as pd
 from datetime import datetime, timedelta
@@ -817,96 +819,108 @@ try:
 except:
     client = None
 
-# 2. CONFIGURATION (Smart Defaults)
+# 2. CONFIGURATION & MAPPINGS
 st.markdown("### ⚙️ AI Coach Settings")
 
-# --- A. EXPANDED SPORTS LIST ---
-# We added specific Gym and Mobility options here
-sports_options = [
-    "Triathlon", 
-    "Running", 
-    "Cycling", 
-    "Swimming", 
-    "Strength Training",  # <-- Better than 'Gym'
-    "CrossFit / HIIT",    # <-- For high intensity gym
-    "Yoga / Mobility",    # <-- For active recovery
-    "General Fitness"
-]
-default_sport_index = 7 # Default to "General Fitness" (last item)
+# --- A. SPORT TO DISCIPLINE MAPPING ---
+# This dictionary defines what options appear in the second dropdown
+SPORT_DISCIPLINES = {
+    "Triathlon": ["Bike", "Run", "Swim", "Brick (Bike+Run)", "Strength / Core"],
+    "Hyrox / Functional": ["Hyrox Sim (Run+Station)", "Sled Work", "MetCon / HIIT", "Engine (Running)", "Strength"],
+    "Running": ["Road Run", "Track / Intervals", "Trail Run", "Long Run", "Strength / Plyos"],
+    "Cycling": ["Road Ride", "Indoor Trainer", "Gravel / MTB", "Strength"],
+    "Swimming": ["Pool Session", "Open Water", "Dryland Strength"],
+    "General Fitness": ["Full Body Strength", "Upper Body", "Lower Body", "Cardio / Zone 2", "Mobility / Yoga"]
+}
 
 # --- B. SMART AUTO-DETECT SPORT ---
+# Default to "Triathlon" if nothing detected
+default_sport_index = 0
 if 'act_json' in locals() and act_json:
     try:
-        # We need to map Strava types to our new nice names
         detected_raw = infer_primary_sport(act_json)
-        
-        # Map internal names to dropdown names
-        mapping_correction = {
-            "Strength": "Strength Training",
-            "WeightTraining": "Strength Training",
-            "Yoga": "Yoga / Mobility",
-            "Workout": "General Fitness"
+        # Map Strava types to our keys
+        mapping_map = {
+            "Run": "Running", "Ride": "Cycling", "Swim": "Swimming",
+            "WeightTraining": "General Fitness", "CrossFit": "Hyrox / Functional"
         }
+        detected = mapping_map.get(detected_raw, detected_raw)
         
-        # Get the corrected name, or stick with the raw one
-        detected = mapping_correction.get(detected_raw, detected_raw)
-        
-        if detected in sports_options: 
-            default_sport_index = sports_options.index(detected)
+        # If the detected sport exists in our keys, set it as default
+        sport_keys = list(SPORT_DISCIPLINES.keys())
+        if detected in sport_keys:
+            default_sport_index = sport_keys.index(detected)
     except: pass
 
-# --- C. DETECT GOAL (Aligned with Insight Box) ---
-goal_options = ["Base Building (Zone 2)", "Threshold", "VO2 Max", "Recovery", "Race Prep", "Hypertrophy (Muscle Gain)", "Strength / Power"]
-default_goal_index = 0 
+# --- C. RENDER INPUTS (4 Columns Layout) ---
+# We use 4 columns now to fit the extra dropdown nicely
+c1, c2, c3, c4 = st.columns([1.2, 1.2, 1.2, 0.8])
 
-if 'current_form' in locals():
-    # 1. TIRED (Red Zone) -> Recovery
-    if current_form < -10:
-        default_goal_index = 3 # "Recovery"
-        
-    # 2. FRESH (Green Zone) -> Threshold or Strength
-    elif current_form >= 0:
-        # If the user selected a Gym sport, default to Hypertrophy/Power
-        if sports_options[default_sport_index] in ["Strength Training", "CrossFit / HIIT"]:
-            default_goal_index = 6 # "Strength / Power"
-        else:
-            default_goal_index = 1 # "Threshold"
-        
-    # 3. NEUTRAL (Amber Zone) -> Base Building
-    else:
-        default_goal_index = 0 # "Base Building"
-
-# --- D. RENDER INPUTS ---
-c1, c2, c3 = st.columns(3)
 with c1:
-    selected_sport = st.selectbox("Sport Focus", sports_options, index=default_sport_index, key="sport_select")
+    # 1. PRIMARY SPORT SELECTOR
+    selected_sport = st.selectbox(
+        "Sport Focus", 
+        list(SPORT_DISCIPLINES.keys()), 
+        index=default_sport_index, 
+        key="sport_select"
+    )
+
 with c2:
-    user_goal = st.selectbox("Goal", goal_options, index=default_goal_index, key="goal_select")
+    # 2. DYNAMIC DISCIPLINE SELECTOR
+    # This list updates automatically based on 'selected_sport'
+    discipline_options = SPORT_DISCIPLINES[selected_sport]
+    selected_discipline = st.selectbox(
+        "Discipline", 
+        discipline_options, 
+        index=0, 
+        key="disc_select"
+    )
+
 with c3:
+    # 3. GOAL SELECTOR (Smart Logic)
+    goal_options = ["Base (Zone 2)", "Threshold / FTP", "VO2 Max", "Recovery", "Race Pace", "Hypertrophy", "Power"]
+    default_goal_index = 0
+    
+    # Auto-select goal based on TSB
+    if 'current_form' in locals():
+        if current_form < -10: default_goal_index = 3 # Recovery
+        elif current_form >= 0:
+            # If Strength discipline, default to Power
+            if "Strength" in selected_discipline or "Sled" in selected_discipline:
+                default_goal_index = 6 
+            else:
+                default_goal_index = 1 # Threshold
+        else:
+            default_goal_index = 0 # Base
+
+    user_goal = st.selectbox("Goal", goal_options, index=default_goal_index, key="goal_select")
+
+with c4:
+    # 4. TIME SELECTOR
     time_avail = st.slider("Time (mins)", 30, 90, 60, step=15, key="time_select")
 
 # 3. GENERATION ACTION
 b1, b2, b3 = st.columns([1, 2, 1])
 
 with b2:
-    st.markdown("""<style>div[data-testid="column"] { margin-top: 10px; }</style>""", unsafe_allow_html=True)
-    generate_btn = st.button("✨ GENERATE NEXT WORKOUT ✨", type="primary", use_container_width=True)
+    st.markdown("""<style>div[data-testid="column"] { margin-top: 15px; }</style>""", unsafe_allow_html=True)
+    generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
 
 if generate_btn:
     if not client:
         st.error("❌ AI Client not connected.")
     else:
-        with st.spinner(f"Coach is designing your {selected_sport} session..."):
-            ai_prompt = build_ai_prompt(selected_sport, user_goal, time_avail, current_form, act_json)
+        with st.spinner(f"Designing {selected_sport} ({selected_discipline}) session..."):
+            # We pass the new 'selected_discipline' to the prompt builder
+            ai_prompt = build_ai_prompt(selected_sport, selected_discipline, user_goal, time_avail, current_form, act_json)
             
             try:
-                # 1. GENERATE CONTENT
                 response = client.models.generate_content(
                     model="gemini-2.0-flash-lite", 
                     contents=ai_prompt
                 )
 
-                # 2. INJECT CSS
+                # INJECT CSS
                 st.markdown("""
 <style>
 .ai-response { color: white !important; }
@@ -914,11 +928,10 @@ if generate_btn:
 </style>
 """, unsafe_allow_html=True)
 
-                # 3. DISPLAY HEADER
+                # DISPLAY RESULT
                 st.markdown("---")
-                st.markdown(f"### ⚡ Recommended Workout: {selected_sport}")
+                st.markdown(f"### ⚡ Recommended: {selected_discipline}")
                 
-                # 4. DISPLAY RESULT
                 st.markdown(f"""
 <div class="ai-response">
 {response.text}
