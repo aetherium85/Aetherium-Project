@@ -822,8 +822,7 @@ except:
 # 2. CONFIGURATION & MAPPINGS
 st.markdown("### ⚙️ AI Coach Settings")
 
-# --- A. SPORT TO DISCIPLINE MAPPING ---
-# This dictionary defines what options appear in the second dropdown
+# --- A. SPORT & DISCIPLINE DEFINITIONS ---
 SPORT_DISCIPLINES = {
     "Triathlon": ["Bike", "Run", "Swim", "Brick (Bike+Run)", "Strength / Core"],
     "Hyrox / Functional": ["Hyrox Sim (Run+Station)", "Sled Work", "MetCon / HIIT", "Engine (Running)", "Strength"],
@@ -833,31 +832,55 @@ SPORT_DISCIPLINES = {
     "General Fitness": ["Full Body Strength", "Upper Body", "Lower Body", "Cardio / Zone 2", "Mobility / Yoga"]
 }
 
-# --- B. SMART AUTO-DETECT SPORT ---
-# Default to "Triathlon" if nothing detected
+# --- B. GOAL CATEGORIES ---
+# We define distinct lists so the dropdown is always relevant
+GOAL_SETS = {
+    "Cardio": ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max", "Race Pace Intervals", "Recovery"],
+    "Strength": ["Hypertrophy (Muscle Gain)", "Max Strength (Low Reps)", "Power / Explosiveness", "Muscular Endurance", "Recovery / Mobility"],
+    "Swim": ["Technique / Drills", "Aerobic Endurance", "CSS / Threshold", "Sprints / Anaerobic", "Recovery"],
+    "Hyrox": ["Race Simulation", "Sled Power", "Running Engine", "Muscular Endurance", "Technique"]
+}
+
+# --- C. HELPER: GET GOALS FOR SELECTION ---
+def get_relevant_goals(sport, discipline):
+    """Returns the correct list of goals based on the chosen activity."""
+    d = discipline.lower()
+    
+    # 1. Detect Strength/Gym Context
+    if "strength" in d or "plyo" in d or "upper" in d or "lower" in d:
+        return GOAL_SETS["Strength"]
+    
+    # 2. Detect Swim Context
+    if "swim" in d or "pool" in d:
+        return GOAL_SETS["Swim"]
+    
+    # 3. Detect Hyrox Specifics
+    if "hyrox" in d or "sled" in d or "metcon" in d:
+        return GOAL_SETS["Hyrox"]
+    
+    # 4. Default to Cardio (Run/Bike/Row)
+    return GOAL_SETS["Cardio"]
+
+# --- D. SMART AUTO-DETECT DEFAULTS ---
 default_sport_index = 0
 if 'act_json' in locals() and act_json:
     try:
         detected_raw = infer_primary_sport(act_json)
-        # Map Strava types to our keys
         mapping_map = {
             "Run": "Running", "Ride": "Cycling", "Swim": "Swimming",
             "WeightTraining": "General Fitness", "CrossFit": "Hyrox / Functional"
         }
         detected = mapping_map.get(detected_raw, detected_raw)
-        
-        # If the detected sport exists in our keys, set it as default
         sport_keys = list(SPORT_DISCIPLINES.keys())
         if detected in sport_keys:
             default_sport_index = sport_keys.index(detected)
     except: pass
 
-# --- C. RENDER INPUTS (4 Columns Layout) ---
-# We use 4 columns now to fit the extra dropdown nicely
+# --- E. RENDER INPUTS (4 Columns) ---
 c1, c2, c3, c4 = st.columns([1.2, 1.2, 1.2, 0.8])
 
 with c1:
-    # 1. PRIMARY SPORT SELECTOR
+    # 1. SPORT SELECTOR
     selected_sport = st.selectbox(
         "Sport Focus", 
         list(SPORT_DISCIPLINES.keys()), 
@@ -866,8 +889,7 @@ with c1:
     )
 
 with c2:
-    # 2. DYNAMIC DISCIPLINE SELECTOR
-    # This list updates automatically based on 'selected_sport'
+    # 2. DISCIPLINE SELECTOR
     discipline_options = SPORT_DISCIPLINES[selected_sport]
     selected_discipline = st.selectbox(
         "Discipline", 
@@ -877,23 +899,31 @@ with c2:
     )
 
 with c3:
-    # 3. GOAL SELECTOR (Smart Logic)
-    goal_options = ["Base (Zone 2)", "Threshold / FTP", "VO2 Max", "Recovery", "Race Pace", "Hypertrophy", "Power"]
-    default_goal_index = 0
+    # 3. DYNAMIC GOAL SELECTOR
+    # Get the filtered list based on the discipline selected above
+    available_goals = get_relevant_goals(selected_sport, selected_discipline)
     
-    # Auto-select goal based on TSB
+    # Auto-Select Logic based on TSB (Fatigue)
+    default_goal_idx = 0
     if 'current_form' in locals():
-        if current_form < -10: default_goal_index = 3 # Recovery
+        # A. RECOVERY (High Fatigue)
+        if current_form < -10: 
+            # Find the item containing "Recovery"
+            for i, g in enumerate(available_goals):
+                if "Recovery" in g: default_goal_idx = i; break
+        
+        # B. INTENSITY (Fresh)
         elif current_form >= 0:
-            # If Strength discipline, default to Power
-            if "Strength" in selected_discipline or "Sled" in selected_discipline:
-                default_goal_index = 6 
-            else:
-                default_goal_index = 1 # Threshold
+            # Pick the "Hard" option based on category
+            keywords = ["Threshold", "Max Strength", "Race Simulation", "CSS"]
+            for i, g in enumerate(available_goals):
+                if any(k in g for k in keywords): default_goal_idx = i; break
+        
+        # C. BASE (Neutral) -> Defaults to index 0 (usually Base/Hypertrophy)
         else:
-            default_goal_index = 0 # Base
+            default_goal_idx = 0
 
-    user_goal = st.selectbox("Goal", goal_options, index=default_goal_index, key="goal_select")
+    user_goal = st.selectbox("Goal", available_goals, index=default_goal_idx, key="goal_select")
 
 with c4:
     # 4. TIME SELECTOR
@@ -911,7 +941,8 @@ if generate_btn:
         st.error("❌ AI Client not connected.")
     else:
         with st.spinner(f"Designing {selected_sport} ({selected_discipline}) session..."):
-            # We pass the new 'selected_discipline' to the prompt builder
+            # Update build_ai_prompt to accept the discipline!
+            # Ensure you updated the function definition in Section 3 as discussed previously.
             ai_prompt = build_ai_prompt(selected_sport, selected_discipline, user_goal, time_avail, current_form, act_json)
             
             try:
