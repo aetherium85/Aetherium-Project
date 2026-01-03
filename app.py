@@ -657,9 +657,6 @@ with st.sidebar:
         st.session_state.token_data = None
         st.rerun()
 
-# 3. Available Time
-time_avail = st.sidebar.slider("Time Available (mins)", 30, 120, 60, step=15)
-
 well_json, act_json, ath_json = get_ytd_data()
 
 if act_json:
