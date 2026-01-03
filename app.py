@@ -522,6 +522,21 @@ def get_access_token(auth_code):
     response = requests.post(token_url, data=payload)
     return response.json() if response.status_code == 200 else {}
 
+# --- PERSISTENCE HELPERS ---
+TOKEN_FILE = "auth_token.json"
+
+def save_token_to_disk(token_data):
+    """Saves the token to a local JSON file."""
+    with open(TOKEN_FILE, "w") as f:
+        json.dump(token_data, f)
+
+def load_token_from_disk():
+    """Loads the token from disk if it exists."""
+    if os.path.exists(TOKEN_FILE):
+        with open(TOKEN_FILE, "r") as f:
+            return json.load(f)
+    return None
+
 def get_ytd_data():
     if "token_data" not in st.session_state or st.session_state.token_data is None:
         return None, None, None
@@ -600,15 +615,30 @@ def build_ai_prompt(sport, goal, time, form, recent_activities):
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
+# 1. CHECK DISK: Try to load a saved token first
+if not st.session_state.authenticated:
+    saved_token = load_token_from_disk()
+    if saved_token:
+        st.session_state.authenticated = True
+        st.session_state.token_data = saved_token
+        # Optional: You could add logic here to check if the token is expired
+        # and refresh it, but for now, this persists the session.
+
+# 2. CHECK URL: Handle new login via OAuth Redirect
 query_params = st.query_params
 if "code" in query_params and not st.session_state.authenticated:
     token_response = get_access_token(query_params["code"])
     if "access_token" in token_response:
         st.session_state.authenticated = True
         st.session_state.token_data = token_response
+        
+        # SAVE TO DISK for next time
+        save_token_to_disk(token_response)
+        
         st.query_params.clear()
         st.rerun()
 
+# 3. SHOW LOGIN: If still not authenticated, stop here
 if not st.session_state.authenticated:
     show_login_screen()
     st.stop()
@@ -618,7 +648,13 @@ if not st.session_state.authenticated:
 # ==============================================================================
 with st.sidebar:
     if st.button("Logout"):
+        # 1. Remove the persistent file
+        if os.path.exists(TOKEN_FILE):
+            os.remove(TOKEN_FILE)
+            
+        # 2. Clear Session State
         st.session_state.authenticated = False
+        st.session_state.token_data = None
         st.rerun()
 
 # 3. Available Time
