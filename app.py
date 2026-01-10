@@ -545,21 +545,41 @@ def get_ytd_data():
     headers = {"Authorization": f"Bearer {token}"}
     base_url = "https://intervals.icu/api/v1/athlete/0" 
     
-    # --- CHANGED LOGIC HERE ---
-    # Old: datetime(datetime.now().year, 1, 1)  (Jan 1st of this year)
-    # New: datetime.now() - timedelta(days=365) (Exactly 1 year ago today)
-    start_date = datetime.now() - timedelta(days=365)
-    
+    # Check last 90 days first (shorter range is faster/safer for testing)
+    start_date = datetime.now() - timedelta(days=90)
     params = {
         'oldest': start_date.strftime('%Y-%m-%d'), 
         'newest': datetime.now().strftime('%Y-%m-%d')
     }
     
     try:
-        well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
+        # DEBUG: Print what we are sending
+        st.write(f"🔍 DEBUG: Requesting data with Token: {token[:10]}...")
+        
         act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
+        
+        # DEBUG: Print the exact status code
+        st.write(f"📡 DEBUG: Activities Status Code: {act_res.status_code}")
+        
+        if act_res.status_code != 200:
+            st.error(f"❌ API Error: {act_res.text}")
+            return None, None, None
+            
+        activities = act_res.json()
+        
+        # DEBUG: Check if list is empty
+        if len(activities) == 0:
+            st.warning("⚠️ API returned 200 OK, but the activity list is EMPTY.")
+            st.write("Check: Does your Intervals.icu account actually have workouts in the last 90 days?")
+        else:
+            st.success(f"✅ Found {len(activities)} activities!")
+
+        # Fetch the rest
+        well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
         ath_res = requests.get(base_url, headers=headers)
-        return well_res.json(), act_res.json(), ath_res.json()
+        
+        return well_res.json(), activities, ath_res.json()
+
     except Exception as e:
         st.error(f"Fetch failed: {e}")
         return None, None, None
