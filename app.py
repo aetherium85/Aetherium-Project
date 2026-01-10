@@ -549,15 +549,13 @@ def get_ytd_data():
     # Old: datetime(datetime.now().year, 1, 1)  (Jan 1st of this year)
     # New: datetime.now() - timedelta(days=365) (Exactly 1 year ago today)
     start_date = datetime.now() - timedelta(days=365)
-    
+    end_date = datetime.now() + timedelta(days=1)
     params = {
         'oldest': start_date.strftime('%Y-%m-%d'), 
-        'newest': datetime.now().strftime('%Y-%m-%d')
+        'newest': end_date.strftime('%Y-%m-%d')
     }
     
     try:
-        # DEBUG: Print what we are sending
-        st.write(f"🔍 DEBUG: Requesting data with Token: {token[:10]}...")
         well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
         act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
         ath_res = requests.get(base_url, headers=headers)
