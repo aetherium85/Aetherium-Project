@@ -1049,30 +1049,30 @@ if generate_btn:
 
                 # 3. FORCE WHITE TEXT (The Fix)
                 st.markdown("""
-                <style>
-                /* 1. Target the Wrapper */
-                div[data-testid="stVerticalBlockBorderWrapper"] {
-                    --text-color: #ffffff !important; 
-                    color: #ffffff !important;
-                }
+<style>
+/* 1. Target the Wrapper */
+div[data-testid="stVerticalBlockBorderWrapper"] {
+--text-color: #ffffff !important; 
+color: #ffffff !important;
+}
                 
-                /* 2. Target Every Possible Text Element Inside It */
-                div[data-testid="stVerticalBlockBorderWrapper"] p, 
-                div[data-testid="stVerticalBlockBorderWrapper"] span,
-                div[data-testid="stVerticalBlockBorderWrapper"] li,
-                div[data-testid="stVerticalBlockBorderWrapper"] h1,
-                div[data-testid="stVerticalBlockBorderWrapper"] h2,
-                div[data-testid="stVerticalBlockBorderWrapper"] h3,
-                div[data-testid="stVerticalBlockBorderWrapper"] strong,
-                div[data-testid="stVerticalBlockBorderWrapper"] em,
-                div[data-testid="stVerticalBlockBorderWrapper"] b,
-                div[data-testid="stVerticalBlockBorderWrapper"] div {
-                    color: #ffffff !important;
-                    -webkit-text-fill-color: #ffffff !important;
-                    opacity: 1 !important;
-                }
-                </style>
-                """, unsafe_allow_html=True)
+/* 2. Target Every Possible Text Element Inside It */
+div[data-testid="stVerticalBlockBorderWrapper"] p, 
+div[data-testid="stVerticalBlockBorderWrapper"] span,
+div[data-testid="stVerticalBlockBorderWrapper"] li,
+div[data-testid="stVerticalBlockBorderWrapper"] h1,
+div[data-testid="stVerticalBlockBorderWrapper"] h2,
+div[data-testid="stVerticalBlockBorderWrapper"] h3,
+div[data-testid="stVerticalBlockBorderWrapper"] strong,
+div[data-testid="stVerticalBlockBorderWrapper"] em,
+div[data-testid="stVerticalBlockBorderWrapper"] b,
+div[data-testid="stVerticalBlockBorderWrapper"] div {
+color: #ffffff !important;
+-webkit-text-fill-color: #ffffff !important;
+opacity: 1 !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
                 # 4. DISPLAY RESULT
                 st.markdown("---")
