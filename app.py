@@ -42,7 +42,7 @@ st.markdown(
     }
     .stApp { background: transparent !important; }
 
-    /* 3. THE "RESULT BOX" FIX (Dark Glass Container) */
+    /* 3. THE "RESULT BOX" FIX */
     div[data-testid="stVerticalBlockBorderWrapper"] {
         background-color: rgba(0, 0, 0, 0.75) !important;
         backdrop-filter: blur(10px);
@@ -53,7 +53,7 @@ st.markdown(
         color: #FFFFFF !important;
     }
 
-    /* 4. BUTTON FIX (Dark Background for Visibility) */
+    /* 4. BUTTON FIX */
     div[data-testid="stVerticalBlockBorderWrapper"] .stButton > button {
         background-color: #222222 !important;
         color: #FFFFFF !important;
@@ -66,37 +66,37 @@ st.markdown(
         border-color: #FFFFFF !important;
     }
 
-    /* 5. SUPER-NUCLEAR DROPDOWN FIX (The Fix) */
+    /* 5. SIMPLIFIED DROPDOWN FIX (Targeting the List directly) */
     
-    /* Target the Popover Container (The expanded box) */
-    div[data-baseweb="popover"],
-    div[data-baseweb="popover"] > div,
-    ul[data-baseweb="menu"] {
-        background-color: #1E1E1E !important; /* Dark Background */
-        border: none !important;
+    /* The Clickable Box */
+    div[data-baseweb="select"] > div {
+        background-color: #262626 !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
 
-    /* Target the List Items (The Options) */
+    /* The Expanded Menu List (The White Box) - TARGETING 'ul' DIRECTLY */
+    ul[data-baseweb="menu"] {
+        background-color: #1E1E1E !important; /* Force Dark Grey */
+        border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+
+    /* The Options inside the list */
     li[data-baseweb="menu-item"] {
         background-color: #1E1E1E !important;
         color: white !important;
     }
 
-    /* CRITICAL: Target ALL children inside the option (spans, divs) */
-    /* This overrides the inner text elements that were staying white/black */
-    li[data-baseweb="menu-item"] * {
-        background-color: transparent !important; 
-        color: #FFFFFF !important;
+    /* The Text inside the options */
+    div[data-baseweb="select"] span, 
+    li[data-baseweb="menu-item"] span {
+        color: white !important;
     }
 
-    /* Hover State */
+    /* Hover Effects */
     li[data-baseweb="menu-item"]:hover {
-        background-color: #70C4B0 !important; /* Teal */
-    }
-    
-    /* Ensure text stays white on hover */
-    li[data-baseweb="menu-item"]:hover * {
-        color: #FFFFFF !important;
+        background-color: #70C4B0 !important;
+        color: white !important;
     }
 
     /* 6. TOAST FIX */
@@ -106,7 +106,7 @@ st.markdown(
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
-    /* 7. HIDE STREAMLIT BRANDING */
+    /* 7. HIDE BRANDING */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
