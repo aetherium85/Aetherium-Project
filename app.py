@@ -59,7 +59,7 @@ st.markdown(
     div[data-testid="stVerticalBlockBorderWrapper"] p,
     div[data-testid="stVerticalBlockBorderWrapper"] li, 
     div[data-testid="stVerticalBlockBorderWrapper"] div {
-        color: #FFFFFF !important;
+        color: #000000 !important;
         font-size: 0.95rem !important;
         line-height: 1.6 !important;
     }
