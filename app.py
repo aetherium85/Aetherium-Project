@@ -23,7 +23,10 @@ LOGO_BASE64 = "iVBORw0KGgoAAAANSUhEUgAABlcAAAZXCAYAAAD6rSYVAAAAAXNSR0IArs4c6QAAA
 st.markdown(
     """
     <style>
-    /* 1. GLOBAL FONTS & BASICS */
+    /* 1. FORCE DARK MODE (Browser Level) */
+    :root { color-scheme: dark; }
+    
+    /* 2. GLOBAL FONTS & BASICS */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Michroma&display=swap');
     
     /* Force all base text to be white */
@@ -32,7 +35,7 @@ st.markdown(
         color: #ffffff !important;
     }
 
-    /* 2. BACKGROUND IMAGE */
+    /* 3. BACKGROUND IMAGE */
     .stApp::before {
         content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
@@ -42,7 +45,7 @@ st.markdown(
     }
     .stApp { background: transparent !important; }
 
-    /* 3. THE "RESULT BOX" FIX */
+    /* 4. THE "RESULT BOX" FIX */
     div[data-testid="stVerticalBlockBorderWrapper"] {
         background-color: rgba(0, 0, 0, 0.75) !important;
         backdrop-filter: blur(10px);
@@ -53,7 +56,7 @@ st.markdown(
         color: #FFFFFF !important;
     }
 
-    /* 4. BUTTON FIX */
+    /* 5. BUTTON FIX */
     div[data-testid="stVerticalBlockBorderWrapper"] .stButton > button {
         background-color: #222222 !important;
         color: #FFFFFF !important;
@@ -66,7 +69,7 @@ st.markdown(
         border-color: #FFFFFF !important;
     }
 
-    /* 5. SIMPLIFIED DROPDOWN FIX (Targeting the List directly) */
+    /* 6. TITANIUM DROPDOWN FIX (High Specificity) */
     
     /* The Clickable Box */
     div[data-baseweb="select"] > div {
@@ -75,38 +78,45 @@ st.markdown(
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
 
-    /* The Expanded Menu List (The White Box) - TARGETING 'ul' DIRECTLY */
-    ul[data-baseweb="menu"] {
-        background-color: #1E1E1E !important; /* Force Dark Grey */
-        border: 1px solid rgba(255,255,255,0.1) !important;
-    }
-
-    /* The Options inside the list */
-    li[data-baseweb="menu-item"] {
+    /* The Popover Container (Floating Layer) */
+    html body div[data-baseweb="popover"] {
         background-color: #1E1E1E !important;
-        color: white !important;
+        border: 1px solid #444444 !important;
+    }
+    html body div[data-baseweb="popover"] > div {
+        background-color: #1E1E1E !important;
     }
 
-    /* The Text inside the options */
-    div[data-baseweb="select"] span, 
-    li[data-baseweb="menu-item"] span {
-        color: white !important;
+    /* The Menu List */
+    html body ul[data-baseweb="menu"] {
+        background-color: #1E1E1E !important;
     }
 
-    /* Hover Effects */
-    li[data-baseweb="menu-item"]:hover {
+    /* The Options */
+    html body li[data-baseweb="menu-item"] {
+        background-color: #1E1E1E !important;
+        color: #ffffff !important;
+    }
+
+    /* Force inner text white */
+    html body li[data-baseweb="menu-item"] * {
+        background-color: transparent !important;
+        color: #ffffff !important;
+    }
+
+    /* Hover State */
+    html body li[data-baseweb="menu-item"]:hover {
         background-color: #70C4B0 !important;
-        color: white !important;
     }
 
-    /* 6. TOAST FIX */
+    /* 7. TOAST FIX */
     div[data-testid="stToast"] {
         background-color: rgba(30, 30, 30, 0.95) !important;
         color: white !important;
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
-    /* 7. HIDE BRANDING */
+    /* 8. HIDE BRANDING */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
