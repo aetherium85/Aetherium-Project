@@ -893,7 +893,7 @@ render_metric_card(m3, "Form (TSB)", current_form, "Fresh" if current_form >= 0 
 
 
 # ==============================================================================
-# --- SECTION 7.1: AI WORKOUT PLANNER (CLASS WRAPPER FIX) ---
+# --- SECTION 7.1: AI WORKOUT PLANNER (CONTRAST FIX) ---
 # ==============================================================================
 st.markdown("---") # Visual Separator
 
@@ -975,44 +975,36 @@ if generate_btn:
                 st.session_state.last_workout = response.text
                 st.session_state.last_sport = selected_sport
 
-                # 3. INJECT CUSTOM CSS CLASS (The method that worked before)
-                # We add 'important' to everything to force the override
+                # 3. CONTRAST CSS (Updated)
+                # We give the .ai-response box a DARK BACKGROUND so white text is readable
                 st.markdown("""
                 <style>
                 .ai-response { 
+                    background-color: #1E1E1E !important; /* Dark Grey Background */
+                    border: 1px solid #333 !important;
+                    border-radius: 10px !important;
+                    padding: 20px !important;
                     color: #FFFFFF !important; 
                 }
-                .ai-response p, 
-                .ai-response li, 
-                .ai-response strong, 
-                .ai-response h1, 
-                .ai-response h2, 
-                .ai-response h3, 
-                .ai-response b, 
-                .ai-response span { 
+                .ai-response p, .ai-response li, .ai-response strong, .ai-response b, .ai-response span { 
                     color: #FFFFFF !important; 
-                    opacity: 1 !important;
-                    font-family: 'Inter', sans-serif !important;
                 }
                 </style>
                 """, unsafe_allow_html=True)
 
-                # 4. DISPLAY RESULT (Using the HTML Wrapper)
+                # 4. DISPLAY RESULT
                 st.markdown("---")
                 st.markdown(f"### ⚡ Recommended: {selected_discipline}")
                 
-                # We wrap the response in the div. 
-                # CRITICAL: The newlines (\n) allow Markdown (bold/bullets) to render INSIDE the HTML div.
+                # We output the HTML div which now has a dark background color
                 st.markdown(f"""
                 <div class="ai-response">
-
                 {response.text}
-
                 </div>
                 """, unsafe_allow_html=True)
                 
                 # 5. DOWNLOAD PDF
-                st.markdown("###") # Spacer
+                st.markdown("###") 
                 c_dl, c_void = st.columns([1, 2])
                 with c_dl:
                     fname, pdf_data = create_pdf_from_text(response.text, selected_sport)
