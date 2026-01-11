@@ -1081,20 +1081,7 @@ if generate_btn:
                 else:
                     st.error(f"Generation Failed: {e}")
 
-st.markdown("###")
-c_dl, c_void = st.columns([1, 2])
-with c_dl:
-# Generate PDF
-    fname, pdf_data = generate_workout_pdf(clean_json, selected_sport)
-                    
-st.download_button(
-label="📄 Download Workout Card (.pdf)",
-data=pdf_data,
-file_name=fname,
-mime="application/pdf",
-type="primary",
-icon="📥"
-)
+
 
 # # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD) ---
