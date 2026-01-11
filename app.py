@@ -1009,9 +1009,9 @@ if 'df_daily' in locals() and not df_daily.empty:
         y=df_daily['ctl'], 
         mode='lines',
         name='Fitness (CTL)',
-        line=dict(color="#975305", width=4), # Teal color, slightly thicker
+        line=dict(color="#70C4B0", width=4), # Teal color, slightly thicker
         fill='tozeroy', # Fills the area under the line
-        fillcolor='rgba(151, 83, 5, 0.15)', # Semi-transparent teal glow
+        fillcolor='rgba(112, 196, 176, 0.15)', # Semi-transparent teal glow
         hovertemplate="<b>Fitness</b>: %{y:.1f}<extra></extra>"
     ))
 
