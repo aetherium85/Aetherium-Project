@@ -624,7 +624,7 @@ class PDF(FPDF):
     def header(self):
         # Header: Aetherium Branding
         self.set_font('Arial', 'B', 12)
-        self.set_text_color(112, 196, 176) # Teal Color (#70C4B0)
+        self.set_text_color(112, 196, 176) # Teal Color
         self.cell(0, 10, 'AETHERIUM AI COACH', 0, 1, 'C')
         self.ln(5)
 
@@ -635,79 +635,66 @@ class PDF(FPDF):
         self.set_text_color(128)
         self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
 
-def generate_workout_pdf(workout_json, sport):
-    """Generates a professional PDF workout card."""
-    try:
-        data = json.loads(workout_json)
-        name = data.get("workout_name", "AI Workout")
-        desc = data.get("description", "")
-        
-        pdf = PDF()
-        pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        
-        # 1. TITLE & SPORT
-        pdf.set_font("Arial", "B", 16)
-        pdf.set_text_color(0, 0, 0) # Black
-        pdf.cell(0, 10, name.upper(), 0, 1, 'L')
-        
-        pdf.set_font("Arial", "I", 10)
-        pdf.set_text_color(100, 100, 100) # Grey
-        today = datetime.now().strftime("%B %d, %Y")
-        pdf.cell(0, 5, f"{sport} Session | Generated on {today}", 0, 1, 'L')
-        
-        pdf.ln(5)
-        
-        # 2. COACH'S LOGIC BOX
-        pdf.set_fill_color(240, 240, 240) # Light Grey Bg
-        pdf.set_font("Arial", "B", 10)
-        pdf.set_text_color(0)
-        pdf.cell(0, 8, "COACH'S LOGIC:", 0, 1, 'L', fill=True)
-        
-        pdf.set_font("Arial", "", 10)
-        pdf.multi_cell(0, 5, desc, fill=True)
-        pdf.ln(10)
-        
-        # 3. WORKOUT STRUCTURE (The Steps)
-        pdf.set_font("Arial", "B", 12)
-        pdf.cell(0, 10, "WORKOUT STRUCTURE", 0, 1, 'L')
-        pdf.set_line_width(0.5)
-        pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Draw line
-        pdf.ln(5)
-        
-        for step in data.get("steps", []):
-            # Calculate Time
-            mins = step['duration_sec'] // 60
-            secs = step['duration_sec'] % 60
-            time_str = f"{mins}m {secs}s" if mins > 0 else f"{secs}s"
-            
-            # Format Step
-            # Bullet point circle
-            pdf.set_fill_color(112, 196, 176) # Teal dot
-            
-            # Type & Duration
-            pdf.set_font("Arial", "B", 10)
-            pdf.set_text_color(0)
-            pdf.cell(30, 6, f"{step['type'].upper()}", 0, 0)
-            
-            pdf.set_font("Arial", "", 10)
-            pdf.cell(30, 6, f"{time_str}", 0, 0)
-            
-            # Target & Desc
-            pdf.set_font("Arial", "B", 10)
-            pdf.set_text_color(112, 196, 176) # Teal text for power
-            pdf.cell(30, 6, f"{step['power_pct']}% Power", 0, 0)
-            
-            pdf.set_font("Arial", "", 10)
-            pdf.set_text_color(50)
-            pdf.multi_cell(0, 6, f"- {step['description']}")
-            pdf.ln(2) # Little gap between steps
+def create_pdf_from_text(raw_text, sport):
+    """Converts AI Markdown text into a formatted PDF."""
+    pdf = PDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    
+    # 1. Title Area
+    pdf.set_font("Arial", "B", 16)
+    pdf.set_text_color(0, 0, 0)
+    pdf.cell(0, 10, f"{sport} Session", 0, 1, 'L')
+    
+    pdf.set_font("Arial", "I", 10)
+    pdf.set_text_color(100, 100, 100)
+    today = datetime.now().strftime("%B %d, %Y")
+    pdf.cell(0, 5, f"Generated on {today}", 0, 1, 'L')
+    pdf.ln(10)
 
-        # Output PDF as byte string
-        return f"{name.replace(' ', '_')}.pdf", pdf.output(dest='S').encode('latin-1')
+    # 2. Parse and Write Text
+    lines = raw_text.split('\n')
+    
+    for line in lines:
+        clean_line = line.strip()
+        
+        # Skip empty lines to save space, but add small gap
+        if not clean_line:
+            pdf.ln(2)
+            continue
+            
+        # DETECT HEADERS (Lines starting with **)
+        if clean_line.startswith("**") and clean_line.endswith("**"):
+            header_text = clean_line.replace("**", "").upper()
+            pdf.ln(5) # Extra space before header
+            pdf.set_fill_color(240, 240, 240) # Light Grey Box
+            pdf.set_font("Arial", "B", 11)
+            pdf.set_text_color(112, 196, 176) # Teal Text
+            pdf.cell(0, 8, header_text, 0, 1, 'L', fill=True)
+            pdf.set_text_color(50) # Reset to dark grey
+            
+        # DETECT BULLET POINTS (Lines starting with * or -)
+        elif clean_line.startswith("* ") or clean_line.startswith("- "):
+            bullet_text = clean_line[2:] # Remove symbol
+            pdf.set_font("Arial", "", 10)
+            pdf.set_x(15) # Indent
+            # Draw a manual bullet dot
+            pdf.cell(5, 5, chr(149), 0, 0) 
+            pdf.multi_cell(0, 5, bullet_text)
+            
+        # DETECT BOLD INLINE (Simple check)
+        elif "**" in clean_line:
+            # Simple cleanup for mixed bold text
+            text = clean_line.replace("**", "") 
+            pdf.set_font("Arial", "B", 10)
+            pdf.multi_cell(0, 5, text)
+            
+        # STANDARD TEXT
+        else:
+            pdf.set_font("Arial", "", 10)
+            pdf.multi_cell(0, 5, clean_line)
 
-    except Exception as e:
-        return "error.pdf", str(e).encode()
+    return f"{sport}_Workout.pdf", pdf.output(dest='S').encode('latin-1')
 
 # ==============================================================================
 # --- SECTION 5: APP ROUTING & SESSION STATE ---
@@ -1047,33 +1034,50 @@ if generate_btn:
         st.error("❌ AI Client not connected.")
     else:
         with st.spinner(f"Designing {selected_sport} ({selected_discipline}) session..."):
-            # Update build_ai_prompt to accept the discipline!
-            # Ensure you updated the function definition in Section 3 as discussed previously.
             ai_prompt = build_ai_prompt(selected_sport, selected_discipline, user_goal, time_avail, current_form, act_json)
             
             try:
+                # 1. GENERATE
                 response = client.models.generate_content(
                     model="gemini-2.0-flash-lite", 
                     contents=ai_prompt
                 )
 
-                # INJECT CSS
-                st.markdown("""
-<style>
-.ai-response { color: white !important; }
-.ai-response p, .ai-response li, .ai-response strong { color: white !important; font-size: 0.9rem; }
-</style>
-""", unsafe_allow_html=True)
+                # 2. SAVE TO SESSION STATE
+                st.session_state.last_workout = response.text
+                st.session_state.last_sport = selected_sport
 
-                # DISPLAY RESULT
+                # 3. INJECT CSS
+                st.markdown("""
+                <style>
+                .ai-response { color: white !important; }
+                .ai-response p, .ai-response li, .ai-response strong { color: white !important; font-size: 0.9rem; }
+                </style>
+                """, unsafe_allow_html=True)
+
+                # 4. DISPLAY RESULT
                 st.markdown("---")
                 st.markdown(f"### ⚡ Recommended: {selected_discipline}")
                 
-                st.markdown(f"""
-<div class="ai-response">
-{response.text}
-</div>
-""", unsafe_allow_html=True)
+                with st.container(border=True):
+                    # Show exactly what the AI returned
+                    st.markdown(response.text)
+                
+                # 5. DOWNLOAD PDF (NEW FEATURE)
+                st.markdown("###") # Spacer
+                c_dl, c_void = st.columns([1, 2])
+                with c_dl:
+                    # Generate PDF from the raw text
+                    fname, pdf_data = create_pdf_from_text(response.text, selected_sport)
+                    
+                    st.download_button(
+                        label="📄 Download Workout Card (.pdf)",
+                        data=pdf_data,
+                        file_name=fname,
+                        mime="application/pdf",
+                        type="primary",
+                        icon="📥"
+                    )
 
             except Exception as e:
                 if "429" in str(e):
