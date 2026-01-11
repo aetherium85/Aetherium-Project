@@ -1055,6 +1055,7 @@ if generate_btn:
                 div[data-testid="stVerticalBlockBorderWrapper"] h1,
                 div[data-testid="stVerticalBlockBorderWrapper"] h2,
                 div[data-testid="stVerticalBlockBorderWrapper"] h3,
+                div[data-testid="stVerticalBlockBorderWrapper"] h4,
                 div[data-testid="stVerticalBlockBorderWrapper"] strong {
                     color: #FFFFFF !important;
                     opacity: 1 !important;
