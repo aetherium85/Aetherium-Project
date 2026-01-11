@@ -429,7 +429,7 @@ class ProPDF(FPDF):
         self.set_font('Arial', 'I', 8)
         self.set_text_color(128)
         self.cell(0, 10, f'Aetherium AI Project | Page {self.page_no()}', 0, 0, 'C')
-        
+
 def get_status_label(metric, value):
     m = metric.lower()
     
@@ -704,7 +704,7 @@ def create_pdf_from_text(raw_text, sport):
         pdf.set_font("Arial", "I", 10)
         pdf.set_text_color(112, 196, 176) # Teal
         timestamp = datetime.now().strftime("%A, %B %d, %Y")
-        pdf.cell(0, 5, f"Designed by Aetherium Intelligence | {timestamp}", 0, 1, 'L')
+        pdf.cell(0, 5, f"Designed by Aetherium Project | {timestamp}", 0, 1, 'L')
         
         pdf.ln(15)
 
@@ -1042,7 +1042,7 @@ if generate_btn:
                     fname, pdf_data = create_pdf_from_text(response.text, selected_sport)
                     
                     st.download_button(
-                        label="📄 Download Pro Workout Card (.pdf)",
+                        label="📄 Download Workout Card (.pdf)",
                         data=pdf_data,
                         file_name=fname,
                         mime="application/pdf",
