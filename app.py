@@ -57,7 +57,8 @@ background-attachment: fixed; filter: blur(2px); transform: scale(1.1); z-index:
 }
 .stApp { background: transparent !important; }
 
-div[data-testid="stVerticalBlockBorderWrapper"] {
+    /* 3. THE "RESULT BOX" FIX (Force Dark Background & White Text) */
+    div[data-testid="stVerticalBlockBorderWrapper"] {
         background-color: #1E1E1E !important; /* Solid Dark Grey */
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 10px !important;
