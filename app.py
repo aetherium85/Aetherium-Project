@@ -893,7 +893,7 @@ render_metric_card(m3, "Form (TSB)", current_form, "Fresh" if current_form >= 0 
 
 
 # ==============================================================================
-# --- SECTION 7.1: AI WORKOUT PLANNER (CONTRAST FIX) ---
+# --- SECTION 7.1: AI WORKOUT PLANNER (CLEAN FIX) ---
 # ==============================================================================
 st.markdown("---") # Visual Separator
 
@@ -975,35 +975,16 @@ if generate_btn:
                 st.session_state.last_workout = response.text
                 st.session_state.last_sport = selected_sport
 
-                # 3. CONTRAST CSS (Updated)
-                # We give the .ai-response box a DARK BACKGROUND so white text is readable
-                st.markdown("""
-                <style>
-                .ai-response { 
-                    background-color: #1E1E1E !important; /* Dark Grey Background */
-                    border: 1px solid #333 !important;
-                    border-radius: 10px !important;
-                    padding: 20px !important;
-                    color: #FFFFFF !important; 
-                }
-                .ai-response p, .ai-response li, .ai-response strong, .ai-response b, .ai-response span { 
-                    color: #FFFFFF !important; 
-                }
-                </style>
-                """, unsafe_allow_html=True)
-
-                # 4. DISPLAY RESULT
+                # 3. DISPLAY RESULT
                 st.markdown("---")
                 st.markdown(f"### ⚡ Recommended: {selected_discipline}")
                 
-                # We output the HTML div which now has a dark background color
-                st.markdown(f"""
-                <div class="ai-response">
-                {response.text}
-                </div>
-                """, unsafe_allow_html=True)
+                # USE CONTAINER (No HTML tags here to break things!)
+                # The CSS in Section 1 will turn this box Dark Grey with White Text.
+                with st.container(border=True):
+                    st.markdown(response.text)
                 
-                # 5. DOWNLOAD PDF
+                # 4. DOWNLOAD PDF
                 st.markdown("###") 
                 c_dl, c_void = st.columns([1, 2])
                 with c_dl:
