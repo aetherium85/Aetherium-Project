@@ -1,4 +1,5 @@
 from google import genai
+from fpdf import FPDF
 import os
 import textwrap
 import streamlit.components.v1 as components
@@ -619,6 +620,95 @@ def build_ai_prompt(sport, discipline, goal, time_str, form, recent_activities):
     """
     return prompt
 
+class PDF(FPDF):
+    def header(self):
+        # Header: Aetherium Branding
+        self.set_font('Arial', 'B', 12)
+        self.set_text_color(112, 196, 176) # Teal Color (#70C4B0)
+        self.cell(0, 10, 'AETHERIUM AI COACH', 0, 1, 'C')
+        self.ln(5)
+
+    def footer(self):
+        # Footer: Page number
+        self.set_y(-15)
+        self.set_font('Arial', 'I', 8)
+        self.set_text_color(128)
+        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+
+def generate_workout_pdf(workout_json, sport):
+    """Generates a professional PDF workout card."""
+    try:
+        data = json.loads(workout_json)
+        name = data.get("workout_name", "AI Workout")
+        desc = data.get("description", "")
+        
+        pdf = PDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        
+        # 1. TITLE & SPORT
+        pdf.set_font("Arial", "B", 16)
+        pdf.set_text_color(0, 0, 0) # Black
+        pdf.cell(0, 10, name.upper(), 0, 1, 'L')
+        
+        pdf.set_font("Arial", "I", 10)
+        pdf.set_text_color(100, 100, 100) # Grey
+        today = datetime.now().strftime("%B %d, %Y")
+        pdf.cell(0, 5, f"{sport} Session | Generated on {today}", 0, 1, 'L')
+        
+        pdf.ln(5)
+        
+        # 2. COACH'S LOGIC BOX
+        pdf.set_fill_color(240, 240, 240) # Light Grey Bg
+        pdf.set_font("Arial", "B", 10)
+        pdf.set_text_color(0)
+        pdf.cell(0, 8, "COACH'S LOGIC:", 0, 1, 'L', fill=True)
+        
+        pdf.set_font("Arial", "", 10)
+        pdf.multi_cell(0, 5, desc, fill=True)
+        pdf.ln(10)
+        
+        # 3. WORKOUT STRUCTURE (The Steps)
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 10, "WORKOUT STRUCTURE", 0, 1, 'L')
+        pdf.set_line_width(0.5)
+        pdf.line(10, pdf.get_y(), 200, pdf.get_y()) # Draw line
+        pdf.ln(5)
+        
+        for step in data.get("steps", []):
+            # Calculate Time
+            mins = step['duration_sec'] // 60
+            secs = step['duration_sec'] % 60
+            time_str = f"{mins}m {secs}s" if mins > 0 else f"{secs}s"
+            
+            # Format Step
+            # Bullet point circle
+            pdf.set_fill_color(112, 196, 176) # Teal dot
+            
+            # Type & Duration
+            pdf.set_font("Arial", "B", 10)
+            pdf.set_text_color(0)
+            pdf.cell(30, 6, f"{step['type'].upper()}", 0, 0)
+            
+            pdf.set_font("Arial", "", 10)
+            pdf.cell(30, 6, f"{time_str}", 0, 0)
+            
+            # Target & Desc
+            pdf.set_font("Arial", "B", 10)
+            pdf.set_text_color(112, 196, 176) # Teal text for power
+            pdf.cell(30, 6, f"{step['power_pct']}% Power", 0, 0)
+            
+            pdf.set_font("Arial", "", 10)
+            pdf.set_text_color(50)
+            pdf.multi_cell(0, 6, f"- {step['description']}")
+            pdf.ln(2) # Little gap between steps
+
+        # Output PDF as byte string
+        return f"{name.replace(' ', '_')}.pdf", pdf.output(dest='S').encode('latin-1')
+
+    except Exception as e:
+        return "error.pdf", str(e).encode()
+
 # ==============================================================================
 # --- SECTION 5: APP ROUTING & SESSION STATE ---
 # ==============================================================================
@@ -816,7 +906,7 @@ render_metric_card(m3, "Form (TSB)", current_form, "Fresh" if current_form >= 0 
 
 
 # ==============================================================================
-# --- SECTION 7.1: AI WORKOUT PLANNER ---
+# --- SECTION 7.1: AI WORKOUT PLANNER (PDF VERSION) ---
 # ==============================================================================
 st.markdown("---") # Visual Separator
 
@@ -841,7 +931,6 @@ SPORT_DISCIPLINES = {
 }
 
 # --- B. GOAL CATEGORIES ---
-# We define distinct lists so the dropdown is always relevant
 GOAL_SETS = {
     "Cardio": ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max", "Race Pace Intervals", "Recovery"],
     "Strength": ["Hypertrophy (Muscle Gain)", "Max Strength (Low Reps)", "Power / Explosiveness", "Muscular Endurance", "Recovery / Mobility"],
@@ -849,24 +938,11 @@ GOAL_SETS = {
     "Hyrox": ["Race Simulation", "Sled Power", "Running Engine", "Muscular Endurance", "Technique"]
 }
 
-# --- C. HELPER: GET GOALS FOR SELECTION ---
 def get_relevant_goals(sport, discipline):
-    """Returns the correct list of goals based on the chosen activity."""
     d = discipline.lower()
-    
-    # 1. Detect Strength/Gym Context
-    if "strength" in d or "plyo" in d or "upper" in d or "lower" in d:
-        return GOAL_SETS["Strength"]
-    
-    # 2. Detect Swim Context
-    if "swim" in d or "pool" in d:
-        return GOAL_SETS["Swim"]
-    
-    # 3. Detect Hyrox Specifics
-    if "hyrox" in d or "sled" in d or "metcon" in d:
-        return GOAL_SETS["Hyrox"]
-    
-    # 4. Default to Cardio (Run/Bike/Row)
+    if "strength" in d or "plyo" in d or "upper" in d or "lower" in d: return GOAL_SETS["Strength"]
+    if "swim" in d or "pool" in d: return GOAL_SETS["Swim"]
+    if "hyrox" in d or "sled" in d or "metcon" in d: return GOAL_SETS["Hyrox"]
     return GOAL_SETS["Cardio"]
 
 # --- D. SMART AUTO-DETECT DEFAULTS ---
@@ -874,122 +950,80 @@ default_sport_index = 0
 if 'act_json' in locals() and act_json:
     try:
         detected_raw = infer_primary_sport(act_json)
-        mapping_map = {
-            "Run": "Running", "Ride": "Cycling", "Swim": "Swimming",
-            "WeightTraining": "General Fitness", "CrossFit": "Hyrox / Functional"
-        }
+        mapping_map = { "Run": "Running", "Ride": "Cycling", "Swim": "Swimming", "WeightTraining": "General Fitness", "CrossFit": "Hyrox / Functional" }
         detected = mapping_map.get(detected_raw, detected_raw)
         sport_keys = list(SPORT_DISCIPLINES.keys())
-        if detected in sport_keys:
-            default_sport_index = sport_keys.index(detected)
+        if detected in sport_keys: default_sport_index = sport_keys.index(detected)
     except: pass
 
-# --- E. RENDER INPUTS (4 Columns) ---
+# --- E. RENDER INPUTS ---
 c1, c2, c3, c4 = st.columns([1.2, 1.2, 1.2, 0.8])
-
-with c1:
-    # 1. SPORT SELECTOR
-    selected_sport = st.selectbox(
-        "Sport Focus", 
-        list(SPORT_DISCIPLINES.keys()), 
-        index=default_sport_index, 
-        key="sport_select"
-    )
-
-with c2:
-    # 2. DISCIPLINE SELECTOR
-    discipline_options = SPORT_DISCIPLINES[selected_sport]
-    selected_discipline = st.selectbox(
-        "Discipline", 
-        discipline_options, 
-        index=0, 
-        key="disc_select"
-    )
-
-with c3:
-    # 3. DYNAMIC GOAL SELECTOR
-    # Get the filtered list based on the discipline selected above
-    available_goals = get_relevant_goals(selected_sport, selected_discipline)
-    
-    # Auto-Select Logic based on TSB (Fatigue)
-    default_goal_idx = 0
-    if 'current_form' in locals():
-        # A. RECOVERY (High Fatigue)
-        if current_form < -10: 
-            # Find the item containing "Recovery"
-            for i, g in enumerate(available_goals):
-                if "Recovery" in g: default_goal_idx = i; break
-        
-        # B. INTENSITY (Fresh)
-        elif current_form >= 0:
-            # Pick the "Hard" option based on category
-            keywords = ["Threshold", "Max Strength", "Race Simulation", "CSS"]
-            for i, g in enumerate(available_goals):
-                if any(k in g for k in keywords): default_goal_idx = i; break
-        
-        # C. BASE (Neutral) -> Defaults to index 0 (usually Base/Hypertrophy)
-        else:
-            default_goal_idx = 0
-
-    user_goal = st.selectbox("Goal", available_goals, index=default_goal_idx, key="goal_select")
-
-with c4:
-    # 4. TIME SELECTOR (Custom Options)
-    # We use select_slider to allow for text like "No Limit"
-    time_options = ["30 mins", "45 mins", "60 mins", "75 mins", "90 mins", "120 mins", "No Limit"]
-    
-    time_avail = st.select_slider(
-        "Time Available", 
-        options=time_options, 
-        value="60 mins",  # Default
-        key="time_select"
-    )
+with c1: selected_sport = st.selectbox("Sport Focus", list(SPORT_DISCIPLINES.keys()), index=default_sport_index, key="sport_select")
+with c2: selected_discipline = st.selectbox("Discipline", SPORT_DISCIPLINES[selected_sport], index=0, key="disc_select")
+with c3: user_goal = st.selectbox("Goal", get_relevant_goals(selected_sport, selected_discipline), index=0, key="goal_select")
+with c4: time_avail = st.select_slider("Time Available", options=["30 mins", "45 mins", "60 mins", "75 mins", "90 mins", "120 mins", "No Limit"], value="60 mins", key="time_select")
 
 # 3. GENERATION ACTION
 b1, b2, b3 = st.columns([1, 2, 1])
-
 with b2:
     st.markdown("""<style>div[data-testid="column"] { margin-top: 15px; }</style>""", unsafe_allow_html=True)
-    generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
+    generate_btn = st.button("✨ GENERATE WORKOUT", type="primary", use_container_width=True)
 
 if generate_btn:
     if not client:
         st.error("❌ AI Client not connected.")
     else:
-        with st.spinner(f"Designing {selected_sport} ({selected_discipline}) session..."):
-            # Update build_ai_prompt to accept the discipline!
-            # Ensure you updated the function definition in Section 3 as discussed previously.
+        with st.spinner(f"Designing {selected_sport} structure..."):
+            # Ensure we use the JSON-strict prompt from Section 3
             ai_prompt = build_ai_prompt(selected_sport, selected_discipline, user_goal, time_avail, current_form, act_json)
             
             try:
-                response = client.models.generate_content(
-                    model="gemini-2.0-flash-lite", 
-                    contents=ai_prompt
-                )
-
-                # INJECT CSS
-                st.markdown("""
-<style>
-.ai-response { color: white !important; }
-.ai-response p, .ai-response li, .ai-response strong { color: white !important; font-size: 0.9rem; }
-</style>
-""", unsafe_allow_html=True)
-
-                # DISPLAY RESULT
-                st.markdown("---")
-                st.markdown(f"### ⚡ Recommended: {selected_discipline}")
+                # 1. GENERATE JSON
+                response = client.models.generate_content(model="gemini-2.0-flash-lite", contents=ai_prompt)
                 
-                st.markdown(f"""
-<div class="ai-response">
-{response.text}
-</div>
-""", unsafe_allow_html=True)
+                # --- THIS IS THE FIX: DEFINE clean_json HERE ---
+                clean_json = response.text.replace("```json", "").replace("```", "").strip()
+                workout_data = json.loads(clean_json) # Load it to python dict for display
+                
+                # 2. DISPLAY UI
+                st.markdown("---")
+                st.markdown(f"### ⚡ {workout_data.get('workout_name', 'Workout')}")
+                st.caption(workout_data.get('description'))
+
+                # Render Steps Table
+                with st.container(border=True):
+                    for step in workout_data.get('steps', []):
+                        mins = step['duration_sec'] // 60
+                        secs = step['duration_sec'] % 60
+                        time_fmt = f"{mins}m {secs}s" if mins > 0 else f"{secs}s"
+                        
+                        col_a, col_b, col_c = st.columns([1, 1, 3])
+                        col_a.markdown(f"**{step['type']}**")
+                        col_b.markdown(f"{time_fmt}")
+                        col_c.markdown(f"Target: **{step['power_pct']}%** - {step['description']}")
+                        st.markdown("<hr style='margin: 5px 0; opacity: 0.1;'>", unsafe_allow_html=True)
+
+                # 3. DOWNLOAD BUTTON (PDF)
+                st.markdown("###")
+                c_dl, c_void = st.columns([1, 2])
+                with c_dl:
+                    # Now clean_json is definitely defined!
+                    fname, pdf_data = generate_workout_pdf(clean_json, selected_sport)
+                    
+                    st.download_button(
+                        label="📄 Download Workout Card (.pdf)",
+                        data=pdf_data,
+                        file_name=fname,
+                        mime="application/pdf",
+                        type="primary",
+                        icon="📥"
+                    )
 
             except Exception as e:
-                if "429" in str(e):
-                    st.toast("⚠️ Primary model busy. Retrying...", icon="🔄")
-                else:
-                    st.error(f"Generation Failed: {e}")
+                st.error(f"Generation Failed: {e}")
+                # Debug info if json fails
+                if 'response' in locals():
+                    st.expander("Raw AI Response").text(response.text)
 
 # # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD) ---
