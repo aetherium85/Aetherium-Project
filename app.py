@@ -42,7 +42,7 @@ st.markdown(
     }
     .stApp { background: transparent !important; }
 
-    /* 3. THE "RESULT BOX" FIX */
+    /* 3. THE "RESULT BOX" FIX (Dark Glass Container) */
     div[data-testid="stVerticalBlockBorderWrapper"] {
         background-color: rgba(0, 0, 0, 0.75) !important;
         backdrop-filter: blur(10px);
@@ -53,7 +53,7 @@ st.markdown(
         color: #FFFFFF !important;
     }
 
-    /* 4. BUTTON FIX */
+    /* 4. BUTTON FIX (Dark Background for Visibility) */
     div[data-testid="stVerticalBlockBorderWrapper"] .stButton > button {
         background-color: #222222 !important;
         color: #FFFFFF !important;
@@ -66,42 +66,36 @@ st.markdown(
         border-color: #FFFFFF !important;
     }
 
-    /* 5. SUPER-NUCLEAR DROPDOWN FIX */
+    /* 5. NUCLEAR DROPDOWN FIX (Targets Popover & Menu) */
     
-    /* Target the container that floats on top of the page */
-    html body div[data-baseweb="popover"] > div {
+    /* The Box you click (Unopened) */
+    div[data-baseweb="select"] > div {
         background-color: #262626 !important;
+        color: black !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    /* The Popover Container (The expanded white box) */
+    div[data-baseweb="popover"] {
+        background-color: #000000 !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
 
-    /* Target the list inside */
-    html body ul[data-baseweb="menu"] {
-        background-color: #262626 !important;
+    /* The Menu List inside the Popover */
+    ul[data-baseweb="menu"] {
+        background-color: #000000 !important;
     }
 
-    /* Target the options */
-    html body li[data-baseweb="menu-item"] {
-        background-color: #262626 !important;
-        color: #FFFFFF !important;
-    }
-
-    /* Force all text inside options to be white */
-    html body li[data-baseweb="menu-item"] * {
-        color: #FFFFFF !important;
-    }
-
-    /* Hover State */
-    html body li[data-baseweb="menu-item"]:hover {
-        background-color: #70C4B0 !important;
-    }
-    html body li[data-baseweb="menu-item"]:hover * {
-        color: #FFFFFF !important;
+    /* The Options */
+    li[data-baseweb="menu-item"] {
+        background-color: #000000 !important; /* Force dark background */
+        color: white !important;
     }
     
-    /* Selected Item */
-    html body li[aria-selected="true"] {
-        background-color: rgba(112, 196, 176, 0.3) !important;
-        color: #70C4B0 !important;
+    /* Hover/Selected State */
+    li[data-baseweb="menu-item"]:hover, li[aria-selected="true"] {
+        background-color: #70C4B0 !important; /* Teal Highlight */
+        color: white !important;
     }
 
     /* 6. TOAST FIX */
@@ -111,7 +105,7 @@ st.markdown(
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
-    /* 7. HIDE BRANDING */
+    /* 7. HIDE STREAMLIT BRANDING */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
