@@ -66,36 +66,37 @@ st.markdown(
         border-color: #FFFFFF !important;
     }
 
-    /* 5. NUCLEAR DROPDOWN FIX (Targets Popover & Menu) */
+    /* 5. SUPER-NUCLEAR DROPDOWN FIX (The Fix) */
     
-    /* The Box you click (Unopened) */
-    div[data-baseweb="select"] > div {
-        background-color: #262626 !important;
-        color: black !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    }
-    
-    /* The Popover Container (The expanded white box) */
-    div[data-baseweb="popover"] {
-        background-color: #000000 !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    }
-
-    /* The Menu List inside the Popover */
+    /* Target the Popover Container (The expanded box) */
+    div[data-baseweb="popover"],
+    div[data-baseweb="popover"] > div,
     ul[data-baseweb="menu"] {
-        background-color: #000000 !important;
+        background-color: #1E1E1E !important; /* Dark Background */
+        border: none !important;
     }
 
-    /* The Options */
+    /* Target the List Items (The Options) */
     li[data-baseweb="menu-item"] {
-        background-color: #000000 !important; /* Force dark background */
+        background-color: #1E1E1E !important;
         color: white !important;
     }
+
+    /* CRITICAL: Target ALL children inside the option (spans, divs) */
+    /* This overrides the inner text elements that were staying white/black */
+    li[data-baseweb="menu-item"] * {
+        background-color: transparent !important; 
+        color: #FFFFFF !important;
+    }
+
+    /* Hover State */
+    li[data-baseweb="menu-item"]:hover {
+        background-color: #70C4B0 !important; /* Teal */
+    }
     
-    /* Hover/Selected State */
-    li[data-baseweb="menu-item"]:hover, li[aria-selected="true"] {
-        background-color: #70C4B0 !important; /* Teal Highlight */
-        color: white !important;
+    /* Ensure text stays white on hover */
+    li[data-baseweb="menu-item"]:hover * {
+        color: #FFFFFF !important;
     }
 
     /* 6. TOAST FIX */
