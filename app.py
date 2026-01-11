@@ -685,9 +685,14 @@ def create_pdf_from_text(raw_text, sport):
             pdf.image(bg_path, x=0, y=0, w=210, h=297)
 
         # 2. Draw "Card" (White Box)
+        pdf.set_alpha(0.85)
         pdf.set_fill_color(255, 255, 255)
         pdf.rect(10, 10, 190, 277, 'F') 
-
+        pdf.set_alpha(1.0)
+    except AttributeError:
+            # Graceful fallback for older FPDF versions that don't support alpha
+        pdf.set_fill_color(255, 255, 255)
+        pdf.rect(10, 10, 190, 277, 'F')
         # --- C. DRAW HEADER ---
         if logo_path:
             pdf.image(logo_path, x=15, y=15, w=20)
