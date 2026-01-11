@@ -893,7 +893,7 @@ render_metric_card(m3, "Form (TSB)", current_form, "Fresh" if current_form >= 0 
 
 
 # ==============================================================================
-# --- SECTION 7.1: AI WORKOUT PLANNER ---
+# --- SECTION 7.1: AI WORKOUT PLANNER (CLASS WRAPPER FIX) ---
 # ==============================================================================
 st.markdown("---") # Visual Separator
 
@@ -918,7 +918,6 @@ SPORT_DISCIPLINES = {
 }
 
 # --- B. GOAL CATEGORIES ---
-# We define distinct lists so the dropdown is always relevant
 GOAL_SETS = {
     "Cardio": ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max", "Race Pace Intervals", "Recovery"],
     "Strength": ["Hypertrophy (Muscle Gain)", "Max Strength (Low Reps)", "Power / Explosiveness", "Muscular Endurance", "Recovery / Mobility"],
@@ -928,22 +927,10 @@ GOAL_SETS = {
 
 # --- C. HELPER: GET GOALS FOR SELECTION ---
 def get_relevant_goals(sport, discipline):
-    """Returns the correct list of goals based on the chosen activity."""
     d = discipline.lower()
-    
-    # 1. Detect Strength/Gym Context
-    if "strength" in d or "plyo" in d or "upper" in d or "lower" in d:
-        return GOAL_SETS["Strength"]
-    
-    # 2. Detect Swim Context
-    if "swim" in d or "pool" in d:
-        return GOAL_SETS["Swim"]
-    
-    # 3. Detect Hyrox Specifics
-    if "hyrox" in d or "sled" in d or "metcon" in d:
-        return GOAL_SETS["Hyrox"]
-    
-    # 4. Default to Cardio (Run/Bike/Row)
+    if "strength" in d or "plyo" in d or "upper" in d or "lower" in d: return GOAL_SETS["Strength"]
+    if "swim" in d or "pool" in d: return GOAL_SETS["Swim"]
+    if "hyrox" in d or "sled" in d or "metcon" in d: return GOAL_SETS["Hyrox"]
     return GOAL_SETS["Cardio"]
 
 # --- D. SMART AUTO-DETECT DEFAULTS ---
@@ -951,80 +938,21 @@ default_sport_index = 0
 if 'act_json' in locals() and act_json:
     try:
         detected_raw = infer_primary_sport(act_json)
-        mapping_map = {
-            "Run": "Running", "Ride": "Cycling", "Swim": "Swimming",
-            "WeightTraining": "General Fitness", "CrossFit": "Hyrox / Functional"
-        }
+        mapping_map = { "Run": "Running", "Ride": "Cycling", "Swim": "Swimming", "WeightTraining": "General Fitness", "CrossFit": "Hyrox / Functional" }
         detected = mapping_map.get(detected_raw, detected_raw)
         sport_keys = list(SPORT_DISCIPLINES.keys())
-        if detected in sport_keys:
-            default_sport_index = sport_keys.index(detected)
+        if detected in sport_keys: default_sport_index = sport_keys.index(detected)
     except: pass
 
-# --- E. RENDER INPUTS (4 Columns) ---
+# --- E. RENDER INPUTS ---
 c1, c2, c3, c4 = st.columns([1.2, 1.2, 1.2, 0.8])
-
-with c1:
-    # 1. SPORT SELECTOR
-    selected_sport = st.selectbox(
-        "Sport Focus", 
-        list(SPORT_DISCIPLINES.keys()), 
-        index=default_sport_index, 
-        key="sport_select"
-    )
-
-with c2:
-    # 2. DISCIPLINE SELECTOR
-    discipline_options = SPORT_DISCIPLINES[selected_sport]
-    selected_discipline = st.selectbox(
-        "Discipline", 
-        discipline_options, 
-        index=0, 
-        key="disc_select"
-    )
-
-with c3:
-    # 3. DYNAMIC GOAL SELECTOR
-    # Get the filtered list based on the discipline selected above
-    available_goals = get_relevant_goals(selected_sport, selected_discipline)
-    
-    # Auto-Select Logic based on TSB (Fatigue)
-    default_goal_idx = 0
-    if 'current_form' in locals():
-        # A. RECOVERY (High Fatigue)
-        if current_form < -10: 
-            # Find the item containing "Recovery"
-            for i, g in enumerate(available_goals):
-                if "Recovery" in g: default_goal_idx = i; break
-        
-        # B. INTENSITY (Fresh)
-        elif current_form >= 0:
-            # Pick the "Hard" option based on category
-            keywords = ["Threshold", "Max Strength", "Race Simulation", "CSS"]
-            for i, g in enumerate(available_goals):
-                if any(k in g for k in keywords): default_goal_idx = i; break
-        
-        # C. BASE (Neutral) -> Defaults to index 0 (usually Base/Hypertrophy)
-        else:
-            default_goal_idx = 0
-
-    user_goal = st.selectbox("Goal", available_goals, index=default_goal_idx, key="goal_select")
-
-with c4:
-    # 4. TIME SELECTOR (Custom Options)
-    # We use select_slider to allow for text like "No Limit"
-    time_options = ["30 mins", "45 mins", "60 mins", "75 mins", "90 mins", "120 mins", "No Limit"]
-    
-    time_avail = st.select_slider(
-        "Time Available", 
-        options=time_options, 
-        value="60 mins",  # Default
-        key="time_select"
-    )
+with c1: selected_sport = st.selectbox("Sport Focus", list(SPORT_DISCIPLINES.keys()), index=default_sport_index, key="sport_select")
+with c2: selected_discipline = st.selectbox("Discipline", SPORT_DISCIPLINES[selected_sport], index=0, key="disc_select")
+with c3: user_goal = st.selectbox("Goal", get_relevant_goals(selected_sport, selected_discipline), index=0, key="goal_select")
+with c4: time_avail = st.select_slider("Time Available", options=["30 mins", "45 mins", "60 mins", "75 mins", "90 mins", "120 mins", "No Limit"], value="60 mins", key="time_select")
 
 # 3. GENERATION ACTION
 b1, b2, b3 = st.columns([1, 2, 1])
-
 with b2:
     st.markdown("""<style>div[data-testid="column"] { margin-top: 15px; }</style>""", unsafe_allow_html=True)
     generate_btn = st.button("✨ GENERATE NEXT WORKOUT", type="primary", use_container_width=True)
@@ -1047,41 +975,41 @@ if generate_btn:
                 st.session_state.last_workout = response.text
                 st.session_state.last_sport = selected_sport
 
-                # 3. FORCE WHITE TEXT (The Fix)
+                # 3. INJECT CUSTOM CSS CLASS (The method that worked before)
+                # We add 'important' to everything to force the override
                 st.markdown("""
-<style>
-/* 1. Target the Wrapper */
-div[data-testid="stVerticalBlockBorderWrapper"] {
---text-color: #ffffff !important; 
-color: #ffffff !important;
-}
-                
-/* 2. Target Every Possible Text Element Inside It */
-div[data-testid="stVerticalBlockBorderWrapper"] p, 
-div[data-testid="stVerticalBlockBorderWrapper"] span,
-div[data-testid="stVerticalBlockBorderWrapper"] li,
-div[data-testid="stVerticalBlockBorderWrapper"] h1,
-div[data-testid="stVerticalBlockBorderWrapper"] h2,
-div[data-testid="stVerticalBlockBorderWrapper"] h3,
-div[data-testid="stVerticalBlockBorderWrapper"] h4,
-div[data-testid="stVerticalBlockBorderWrapper"] strong,
-div[data-testid="stVerticalBlockBorderWrapper"] em,
-div[data-testid="stVerticalBlockBorderWrapper"] b,
-div[data-testid="stVerticalBlockBorderWrapper"] div {
-color: #ffffff !important;
--webkit-text-fill-color: #ffffff !important;
-opacity: 1 !important;
-}
-</style>
-""", unsafe_allow_html=True)
+                <style>
+                .ai-response { 
+                    color: #FFFFFF !important; 
+                }
+                .ai-response p, 
+                .ai-response li, 
+                .ai-response strong, 
+                .ai-response h1, 
+                .ai-response h2, 
+                .ai-response h3, 
+                .ai-response b, 
+                .ai-response span { 
+                    color: #FFFFFF !important; 
+                    opacity: 1 !important;
+                    font-family: 'Inter', sans-serif !important;
+                }
+                </style>
+                """, unsafe_allow_html=True)
 
-                # 4. DISPLAY RESULT
+                # 4. DISPLAY RESULT (Using the HTML Wrapper)
                 st.markdown("---")
                 st.markdown(f"### ⚡ Recommended: {selected_discipline}")
                 
-                # We use a container with a border. The CSS above targets this specific type of box.
-                with st.container(border=True):
-                    st.markdown(response.text)
+                # We wrap the response in the div. 
+                # CRITICAL: The newlines (\n) allow Markdown (bold/bullets) to render INSIDE the HTML div.
+                st.markdown(f"""
+                <div class="ai-response">
+
+                {response.text}
+
+                </div>
+                """, unsafe_allow_html=True)
                 
                 # 5. DOWNLOAD PDF
                 st.markdown("###") # Spacer
