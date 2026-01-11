@@ -57,6 +57,18 @@ background-attachment: fixed; filter: blur(2px); transform: scale(1.1); z-index:
 }
 .stApp { background: transparent !important; }
 
+div[data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #1E1E1E !important; /* Solid Dark Grey */
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 10px !important;
+    }
+    
+    /* Force ALL text inside the result box to be white */
+    div[data-testid="stVerticalBlockBorderWrapper"] * {
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
+    }
+
 /* 4. TEXT DEFAULTS (RESTORED & FIXED) */
 /* I removed 'li', 'ul' from here so they go back to the "smaller" standard size */
 h1, h2, h3, h4, h5, h6, p, label, strong, b, .performance-row, .performance-row div, .performance-row b {
