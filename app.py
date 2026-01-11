@@ -1047,21 +1047,34 @@ if generate_btn:
                 st.session_state.last_workout = response.text
                 st.session_state.last_sport = selected_sport
 
+                # 3. FORCE WHITE TEXT (The Fix)
+                st.markdown("""
+                <style>
+                /* Force text inside the container to be white */
+                div[data-testid="stVerticalBlockBorderWrapper"] * {
+                    color: white !important;
+                }
+                div[data-testid="stVerticalBlockBorderWrapper"] p, 
+                div[data-testid="stVerticalBlockBorderWrapper"] li,
+                div[data-testid="stVerticalBlockBorderWrapper"] strong {
+                    color: white !important;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+
+                # 4. DISPLAY RESULT
                 st.markdown("---")
                 st.markdown(f"### ⚡ Recommended: {selected_discipline}")
                 
-                # We use a container with a border. 
-                # Our Section 1 CSS (Result Box Fix) automatically makes text inside this white.
+                # We use a container with a border. The CSS above targets this specific type of box.
                 with st.container(border=True):
                     st.markdown(response.text)
                 
-                # 4. DOWNLOAD BUTTON (PDF)
+                # 5. DOWNLOAD PDF
                 st.markdown("###") # Spacer
                 c_dl, c_void = st.columns([1, 2])
                 with c_dl:
-                    # Generate PDF from the raw text
                     fname, pdf_data = create_pdf_from_text(response.text, selected_sport)
-                    
                     st.download_button(
                         label="📄 Download Workout Card (.pdf)",
                         data=pdf_data,
@@ -1076,7 +1089,6 @@ if generate_btn:
                     st.toast("⚠️ Primary model busy. Retrying...", icon="🔄")
                 else:
                     st.error(f"Generation Failed: {e}")
-
 
 
 # # ==============================================================================
