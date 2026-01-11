@@ -1049,18 +1049,18 @@ if generate_btn:
 
                 # 3. FORCE WHITE TEXT (The Fix)
                 st.markdown("""
-                <style>
-                /* Force text inside the container to be white */
-                div[data-testid="stVerticalBlockBorderWrapper"] * {
-                    color: white !important;
-                }
-                div[data-testid="stVerticalBlockBorderWrapper"] p, 
-                div[data-testid="stVerticalBlockBorderWrapper"] li,
-                div[data-testid="stVerticalBlockBorderWrapper"] strong {
-                    color: white !important;
-                }
-                </style>
-                """, unsafe_allow_html=True)
+<style>
+/* Force text inside the container to be white */
+div[data-testid="stVerticalBlockBorderWrapper"] * {
+color: white !important;
+}
+div[data-testid="stVerticalBlockBorderWrapper"] p, 
+div[data-testid="stVerticalBlockBorderWrapper"] li,
+div[data-testid="stVerticalBlockBorderWrapper"] strong {
+color: white !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
                 # 4. DISPLAY RESULT
                 st.markdown("---")
