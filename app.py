@@ -948,18 +948,18 @@ if generate_btn:
                 
                 # INJECT CSS SPECIFICALLY FOR THIS BOX
                 st.markdown("""
-                <style>
-                /* Force the Container Background to be Dark Grey */
-                div[data-testid="stVerticalBlockBorderWrapper"] {
-                    background-color: #1E1E1E !important; 
-                    border: 1px solid rgba(255,255,255,0.2) !important;
-                }
-                /* Force ALL Text inside it to be White */
-                div[data-testid="stVerticalBlockBorderWrapper"] * {
-                    color: #FFFFFF !important;
-                }
-                </style>
-                """, unsafe_allow_html=True)
+<style>
+/* Force the Container Background to be Dark Grey */
+div[data-testid="stVerticalBlockBorderWrapper"] {
+background-color: #1E1E1E !important; 
+border: 1px solid rgba(255,255,255,0.2) !important;
+}
+/* Force ALL Text inside it to be White */
+div[data-testid="stVerticalBlockBorderWrapper"] * {
+color: #FFFFFF !important;
+}
+</style>
+""", unsafe_allow_html=True)
                 
                 # USE CONTAINER
                 with st.container(border=True):
