@@ -860,7 +860,7 @@ else:
         current_form = 0
 
 # ==============================================================================
-# --- SECTION 7.1: AI WORKOUT PLANNER (FORCE WHITE TEXT) ---
+# --- SECTION 7.1: AI WORKOUT PLANNER (INDENTATION FIX) ---
 # ==============================================================================
 st.markdown("---") # Visual Separator
 
@@ -942,30 +942,47 @@ if generate_btn:
                 st.session_state.last_workout = response.text
                 st.session_state.last_sport = selected_sport
 
-                # 3. DISPLAY RESULT (WITH FORCED COLORS)
+                # 3. INJECT CSS (CORRECTED INDENTATION)
+                # Note: This is now indented INSIDE the try block
+                st.markdown("""
+                <style>
+                .ai-card {
+                    background-color: #1E1E1E !important;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin-top: 20px;
+                }
+                .ai-card p, 
+                .ai-card li, 
+                .ai-card strong, 
+                .ai-card h1, 
+                .ai-card h2, 
+                .ai-card h3, 
+                .ai-card b, 
+                .ai-card span,
+                .ai-card div {
+                    color: #FFFFFF !important;
+                    opacity: 1 !important;
+                    font-family: 'Inter', sans-serif !important;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+
+                # 4. DISPLAY RESULT
                 st.markdown("---")
                 st.markdown(f"### ⚡ Recommended: {selected_discipline}")
                 
-                # INJECT CSS SPECIFICALLY FOR THIS BOX
-                st.markdown("""
-<style>
-/* Force the Container Background to be Dark Grey */
-div[data-testid="stVerticalBlockBorderWrapper"] {
-background-color: #1E1E1E !important; 
-border: 1px solid rgba(255,255,255,0.2) !important;
-}
-/* Force ALL Text inside it to be White */
-div[data-testid="stVerticalBlockBorderWrapper"] * {
-color: #FFFFFF !important;
-}
-</style>
+                # We use f-string with newlines to ensure Markdown renders inside the HTML
+                st.markdown(f"""
+<div class="ai-card">
+
+{response.text}
+
+</div>
 """, unsafe_allow_html=True)
                 
-                # USE CONTAINER
-                with st.container(border=True):
-                    st.markdown(response.text)
-                
-                # 4. DOWNLOAD PDF
+                # 5. DOWNLOAD PDF
                 st.markdown("###") 
                 c_dl, c_void = st.columns([1, 2])
                 with c_dl:
@@ -980,6 +997,7 @@ color: #FFFFFF !important;
                     )
 
             except Exception as e:
+                # This except block is now correctly aligned with the try block above
                 if "429" in str(e):
                     st.toast("⚠️ Primary model busy. Retrying...", icon="🔄")
                 else:
