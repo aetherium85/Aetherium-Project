@@ -418,6 +418,18 @@ MUSCLE_KEYWORDS = {
 # ==============================================================================
 # --- SECTION 3: UTILITY FUNCTIONS (Logic & Processing) ---
 # ==============================================================================
+class ProPDF(FPDF):
+    def header(self):
+        # We leave this empty because we draw the background manually in the function
+        pass 
+
+    def footer(self):
+        # Professional Footer
+        self.set_y(-15)
+        self.set_font('Arial', 'I', 8)
+        self.set_text_color(128)
+        self.cell(0, 10, f'Aetherium AI Project | Page {self.page_no()}', 0, 0, 'C')
+        
 def get_status_label(metric, value):
     m = metric.lower()
     
@@ -635,79 +647,54 @@ def build_ai_prompt(sport, discipline, goal, time_str, form, recent_activities):
     """
     return prompt
 
-class PDF(FPDF):
-    def header(self):
-        # Header: Aetherium Branding
-        self.set_font('Arial', 'B', 12)
-        self.set_text_color(112, 196, 176) # Teal Color
-        self.cell(0, 10, 'AETHERIUM AI COACH', 0, 1, 'C')
-        self.ln(5)
 
-    def footer(self):
-        # Footer: Page number
-        self.set_y(-15)
-        self.set_font('Arial', 'I', 8)
-        self.set_text_color(128)
-        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
-
-def create_pdf_from_text(raw_text, sport):
-    class ProPDF(FPDF):
-        def header(self):
-        # We don't use standard header() because we want a full-page background
-            pass 
-
-    def footer(self):
-        self.set_y(-15)
-        self.set_font('Arial', 'I', 8)
-        self.set_text_color(100)
-        self.cell(0, 10, f'Aetherium AI Project | Page {self.page_no()}', 0, 0, 'C')
-
+# 2. DEFINE THE GENERATOR FUNCTION
 def create_pdf_from_text(raw_text, sport):
     """Generates a premium PDF with background, logo, and card layout."""
     try:
+        # Initialize the class we defined above
         pdf = ProPDF()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=20)
 
-        # 1. SETUP IMAGES (Background & Logo)
-        # Create temp files because FPDF needs paths on disk
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp_bg:
-            # Download background (same as app)
-            bg_url = "https://images.unsplash.com/photo-1663104192417-6804188a9a8e"
-            response = requests.get(bg_url)
-            tmp_bg.write(response.content)
-            bg_path = tmp_bg.name
+        # --- A. SETUP IMAGES ---
+        # 1. Background Image
+        bg_path = None
+        try:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp_bg:
+                bg_url = "https://images.unsplash.com/photo-1663104192417-6804188a9a8e"
+                response = requests.get(bg_url, timeout=5)
+                tmp_bg.write(response.content)
+                bg_path = tmp_bg.name
+        except:
+            bg_path = None
 
-        # Save Base64 Logo to file
+        # 2. Logo (Check if global variable exists)
         logo_path = None
         if 'LOGO_BASE64' in globals():
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_logo:
-                tmp_logo.write(base64.b64decode(LOGO_BASE64))
-                logo_path = tmp_logo.name
+            try:
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_logo:
+                    tmp_logo.write(base64.b64decode(LOGO_BASE64))
+                    logo_path = tmp_logo.name
+            except:
+                logo_path = None
 
-        # 2. DRAW BACKGROUND
-        # Full page image
-        pdf.image(bg_path, x=0, y=0, w=210, h=297)
-        
-        # Add a white overlay (opacity hack using semi-transparent look isn't native in FPDF 
-        # so we draw a white box with 'alpha' if using FPDF2, but standard FPDF handles this simply 
-        # by drawing a big white rect that covers the image partially if supported, 
-        # OR we just rely on the 'Card' look below).
-        
-        # 3. DRAW "GLASS" CARD (The writing area)
-        # We draw a white rectangle in the middle to hold text
+        # --- B. DRAW VISUALS ---
+        # 1. Draw Background
+        if bg_path:
+            pdf.image(bg_path, x=0, y=0, w=210, h=297)
+
+        # 2. Draw "Card" (White Box)
         pdf.set_fill_color(255, 255, 255)
-        pdf.rect(10, 10, 190, 277, 'F') # White page with 10mm margin
-        
-        # 4. HEADER
-        # Add Logo
+        pdf.rect(10, 10, 190, 277, 'F') 
+
+        # --- C. DRAW HEADER ---
         if logo_path:
-            pdf.image(logo_path, x=15, y=15, w=20) # 20mm wide logo
+            pdf.image(logo_path, x=15, y=15, w=20)
             title_x = 40
         else:
             title_x = 15
 
-        # Title
         pdf.set_xy(title_x, 18)
         pdf.set_font("Arial", "B", 24)
         pdf.set_text_color(30, 30, 30)
@@ -719,62 +706,57 @@ def create_pdf_from_text(raw_text, sport):
         timestamp = datetime.now().strftime("%A, %B %d, %Y")
         pdf.cell(0, 5, f"Designed by Aetherium Intelligence | {timestamp}", 0, 1, 'L')
         
-        pdf.ln(15) # Spacing after header
+        pdf.ln(15)
 
-        # 5. PARSE & WRITE TEXT
+        # --- D. PARSE CONTENT ---
         lines = raw_text.split('\n')
         
         for line in lines:
             clean_line = line.strip()
             if not clean_line:
-                pdf.ln(3)
+                pdf.ln(2)
                 continue
                 
-            # HEADERS (**Text**)
+            # HEADERS
             if clean_line.startswith("**") and clean_line.endswith("**"):
                 header_text = clean_line.replace("**", "").upper()
                 pdf.ln(5)
-                
-                # Teal Header Box
                 pdf.set_fill_color(112, 196, 176) # Teal
                 pdf.set_font("Arial", "B", 11)
-                pdf.set_text_color(255, 255, 255) # White text
-                # Calculate width of text + padding
+                pdf.set_text_color(255, 255, 255)
                 width = pdf.get_string_width(header_text) + 10
                 pdf.cell(width, 8, header_text, 0, 1, 'C', fill=True)
-                
-                pdf.set_text_color(50) # Reset text color
+                pdf.set_text_color(50) 
                 pdf.ln(2)
 
-            # BULLET POINTS
+            # BULLETS
             elif clean_line.startswith("* ") or clean_line.startswith("- "):
                 bullet_text = clean_line[2:]
                 pdf.set_font("Arial", "", 11)
-                pdf.set_text_color(50)
-                pdf.set_x(20) # Indent
-                pdf.cell(5, 6, chr(149), 0, 0) # Dot
+                pdf.set_text_color(40)
+                pdf.set_x(20) 
+                pdf.cell(5, 6, chr(149), 0, 0)
                 pdf.multi_cell(0, 6, bullet_text)
                 
-            # BOLD INLINE
+            # BOLD
             elif "**" in clean_line:
                 clean_line = clean_line.replace("**", "")
                 pdf.set_font("Arial", "B", 11)
-                pdf.set_text_color(30)
+                pdf.set_text_color(20)
                 pdf.multi_cell(0, 6, clean_line)
                 
-            # NORMAL TEXT
+            # TEXT
             else:
                 pdf.set_font("Arial", "", 11)
                 pdf.set_text_color(60)
                 pdf.multi_cell(0, 6, clean_line)
 
-        # 6. CLEANUP (Remove temp files)
+        # --- E. CLEANUP ---
         try:
-            os.remove(bg_path)
+            if bg_path: os.remove(bg_path)
             if logo_path: os.remove(logo_path)
         except: pass
 
-        # Generate Unique Filename
         clean_name = f"Aetherium_{sport}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
         return clean_name, pdf.output(dest='S').encode('latin-1')
 
@@ -1053,20 +1035,20 @@ if generate_btn:
 </div>
 """, unsafe_allow_html=True)
                 
-                # 5. DOWNLOAD PDF
                 st.markdown("###") 
                 c_dl, c_void = st.columns([1, 2])
                 with c_dl:
+                    # New Pro Function is called here
                     fname, pdf_data = create_pdf_from_text(response.text, selected_sport)
+                    
                     st.download_button(
-                        label="📄 Download Workout Card (.pdf)",
+                        label="📄 Download Pro Workout Card (.pdf)",
                         data=pdf_data,
                         file_name=fname,
                         mime="application/pdf",
                         type="primary",
                         icon="📥"
                     )
-
             except Exception as e:
                 # This except block is now correctly aligned with the try block above
                 if "429" in str(e):
