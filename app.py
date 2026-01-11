@@ -77,7 +77,7 @@ st.markdown(
     
     /* The Popover Container (The expanded white box) */
     div[data-baseweb="popover"] {
-        background-color: #262626 !important;
+        background-color: #000000 !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
 
