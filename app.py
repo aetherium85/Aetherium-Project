@@ -906,7 +906,7 @@ render_metric_card(m3, "Form (TSB)", current_form, "Fresh" if current_form >= 0 
 
 
 # ==============================================================================
-# --- SECTION 7.1: AI WORKOUT PLANNER (PDF VERSION) ---
+# --- SECTION 7.1: AI WORKOUT PLANNER (ROBUST FIX) ---
 # ==============================================================================
 st.markdown("---") # Visual Separator
 
@@ -974,56 +974,66 @@ if generate_btn:
         st.error("❌ AI Client not connected.")
     else:
         with st.spinner(f"Designing {selected_sport} structure..."):
-            # Ensure we use the JSON-strict prompt from Section 3
             ai_prompt = build_ai_prompt(selected_sport, selected_discipline, user_goal, time_avail, current_form, act_json)
             
             try:
-                # 1. GENERATE JSON
+                # 1. GENERATE RAW CONTENT
                 response = client.models.generate_content(model="gemini-2.0-flash-lite", contents=ai_prompt)
+                raw_text = response.text
                 
-                # --- THIS IS THE FIX: DEFINE clean_json HERE ---
-                clean_json = response.text.replace("```json", "").replace("```", "").strip()
-                workout_data = json.loads(clean_json) # Load it to python dict for display
-                
-                # 2. DISPLAY UI
-                st.markdown("---")
-                st.markdown(f"### ⚡ {workout_data.get('workout_name', 'Workout')}")
-                st.caption(workout_data.get('description'))
-
-                # Render Steps Table
-                with st.container(border=True):
-                    for step in workout_data.get('steps', []):
-                        mins = step['duration_sec'] // 60
-                        secs = step['duration_sec'] % 60
-                        time_fmt = f"{mins}m {secs}s" if mins > 0 else f"{secs}s"
-                        
-                        col_a, col_b, col_c = st.columns([1, 1, 3])
-                        col_a.markdown(f"**{step['type']}**")
-                        col_b.markdown(f"{time_fmt}")
-                        col_c.markdown(f"Target: **{step['power_pct']}%** - {step['description']}")
-                        st.markdown("<hr style='margin: 5px 0; opacity: 0.1;'>", unsafe_allow_html=True)
-
-                # 3. DOWNLOAD BUTTON (PDF)
-                st.markdown("###")
-                c_dl, c_void = st.columns([1, 2])
-                with c_dl:
-                    # Now clean_json is definitely defined!
-                    fname, pdf_data = generate_workout_pdf(clean_json, selected_sport)
+                # 2. ROBUST JSON PARSING (The Fix)
+                # This logic finds the first '{' and the last '}' to strip away any conversational text
+                try:
+                    start_idx = raw_text.find('{')
+                    end_idx = raw_text.rfind('}') + 1
                     
-                    st.download_button(
-                        label="📄 Download Workout Card (.pdf)",
-                        data=pdf_data,
-                        file_name=fname,
-                        mime="application/pdf",
-                        type="primary",
-                        icon="📥"
-                    )
+                    if start_idx == -1 or end_idx == 0:
+                        raise ValueError("No JSON object found in response")
+                        
+                    clean_json = raw_text[start_idx:end_idx]
+                    workout_data = json.loads(clean_json)
+                    
+                    # 3. DISPLAY UI (If JSON was successful)
+                    st.markdown("---")
+                    st.markdown(f"### ⚡ {workout_data.get('workout_name', 'Workout')}")
+                    st.caption(workout_data.get('description'))
+
+                    # Render Steps Table
+                    with st.container(border=True):
+                        for step in workout_data.get('steps', []):
+                            mins = step['duration_sec'] // 60
+                            secs = step['duration_sec'] % 60
+                            time_fmt = f"{mins}m {secs}s" if mins > 0 else f"{secs}s"
+                            
+                            col_a, col_b, col_c = st.columns([1, 1, 3])
+                            col_a.markdown(f"**{step['type']}**")
+                            col_b.markdown(f"{time_fmt}")
+                            col_c.markdown(f"Target: **{step['power_pct']}%** - {step['description']}")
+                            st.markdown("<hr style='margin: 5px 0; opacity: 0.1;'>", unsafe_allow_html=True)
+
+                    # 4. DOWNLOAD BUTTON (PDF)
+                    st.markdown("###")
+                    c_dl, c_void = st.columns([1, 2])
+                    with c_dl:
+                        fname, pdf_data = generate_workout_pdf(clean_json, selected_sport)
+                        st.download_button(
+                            label="📄 Download Workout Card (.pdf)",
+                            data=pdf_data,
+                            file_name=fname,
+                            mime="application/pdf",
+                            type="primary",
+                            icon="📥"
+                        )
+
+                except (json.JSONDecodeError, ValueError) as parse_err:
+                    # FALLBACK MODE: If AI messed up the JSON, just show the text!
+                    # This prevents the app from crashing.
+                    st.warning("⚠️ The AI returned a creative format. Showing raw plan instead of PDF.")
+                    st.markdown("---")
+                    st.markdown(raw_text)
 
             except Exception as e:
                 st.error(f"Generation Failed: {e}")
-                # Debug info if json fails
-                if 'response' in locals():
-                    st.expander("Raw AI Response").text(response.text)
 
 # # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD) ---
