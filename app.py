@@ -66,26 +66,35 @@ st.markdown(
         border-color: #FFFFFF !important;
     }
 
-    /* 5. DROPDOWN & SLIDER FIX (The New Addition) */
-    /* This targets the 'Selectbox' container */
+    /* 5. NUCLEAR DROPDOWN FIX (Targets Popover & Menu) */
+    
+    /* The Box you click (Unopened) */
     div[data-baseweb="select"] > div {
-        background-color: #262626 !important; /* Dark Grey Background */
+        background-color: #262626 !important;
         color: white !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
     
-    /* This targets the dropdown menu that pops up */
+    /* The Popover Container (The expanded white box) */
+    div[data-baseweb="popover"] {
+        background-color: #262626 !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* The Menu List inside the Popover */
     ul[data-baseweb="menu"] {
         background-color: #262626 !important;
     }
-    
-    /* This targets the text inside the dropdown options */
+
+    /* The Options */
     li[data-baseweb="menu-item"] {
+        background-color: #262626 !important; /* Force dark background */
         color: white !important;
     }
     
-    /* This targets the Slider */
-    div[data-testid="stSlider"] div {
+    /* Hover/Selected State */
+    li[data-baseweb="menu-item"]:hover, li[aria-selected="true"] {
+        background-color: #70C4B0 !important; /* Teal Highlight */
         color: white !important;
     }
 
@@ -104,6 +113,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 # ==============================================================================
 # --- SECTION 2: MAPPINGS & CONFIGURATION ---
 # ==============================================================================
