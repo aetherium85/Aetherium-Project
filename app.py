@@ -1075,10 +1075,16 @@ if generate_btn:
 </div>
 """, unsafe_allow_html=True)
 
+            except Exception as e:
+                if "429" in str(e):
+                    st.toast("⚠️ Primary model busy. Retrying...", icon="🔄")
+                else:
+                    st.error(f"Generation Failed: {e}")
+
 st.markdown("###")
 c_dl, c_void = st.columns([1, 2])
 with c_dl:
-# Now clean_json is definitely defined!
+# Generate PDF
     fname, pdf_data = generate_workout_pdf(clean_json, selected_sport)
                     
 st.download_button(
@@ -1089,12 +1095,6 @@ mime="application/pdf",
 type="primary",
 icon="📥"
 )
-
-except Exception as e:
-st.error(f"Generation Failed: {e}")
-# Debug info if json fails
-if 'response' in locals():
-    st.expander("Raw AI Response").text(response.text)
 
 # # ==============================================================================
 # --- (NEXT SECTION: YEARLY TRAINING LOAD) ---
