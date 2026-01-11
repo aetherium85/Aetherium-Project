@@ -83,12 +83,12 @@ st.markdown(
 
     /* The Menu List inside the Popover */
     ul[data-baseweb="menu"] {
-        background-color: #262626 !important;
+        background-color: #000000 !important;
     }
 
     /* The Options */
     li[data-baseweb="menu-item"] {
-        background-color: #262626 !important; /* Force dark background */
+        background-color: #000000 !important; /* Force dark background */
         color: white !important;
     }
     
