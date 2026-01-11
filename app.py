@@ -1034,50 +1034,33 @@ if generate_btn:
         st.error("❌ AI Client not connected.")
     else:
         with st.spinner(f"Designing {selected_sport} ({selected_discipline}) session..."):
+            # Update build_ai_prompt to accept the discipline!
+            # Ensure you updated the function definition in Section 3 as discussed previously.
             ai_prompt = build_ai_prompt(selected_sport, selected_discipline, user_goal, time_avail, current_form, act_json)
             
             try:
-                # 1. GENERATE
                 response = client.models.generate_content(
                     model="gemini-2.0-flash-lite", 
                     contents=ai_prompt
                 )
 
-                # 2. SAVE TO SESSION STATE
-                st.session_state.last_workout = response.text
-                st.session_state.last_sport = selected_sport
-
-                # 3. INJECT CSS
+                # INJECT CSS
                 st.markdown("""
-                <style>
-                .ai-response { color: white !important; }
-                .ai-response p, .ai-response li, .ai-response strong { color: white !important; font-size: 0.9rem; }
-                </style>
-                """, unsafe_allow_html=True)
+<style>
+.ai-response { color: white !important; }
+.ai-response p, .ai-response li, .ai-response strong { color: white !important; font-size: 0.9rem; }
+</style>
+""", unsafe_allow_html=True)
 
-                # 4. DISPLAY RESULT
+                # DISPLAY RESULT
                 st.markdown("---")
                 st.markdown(f"### ⚡ Recommended: {selected_discipline}")
                 
-                with st.container(border=True):
-                    # Show exactly what the AI returned
-                    st.markdown(response.text)
-                
-                # 5. DOWNLOAD PDF (NEW FEATURE)
-                st.markdown("###") # Spacer
-                c_dl, c_void = st.columns([1, 2])
-                with c_dl:
-                    # Generate PDF from the raw text
-                    fname, pdf_data = create_pdf_from_text(response.text, selected_sport)
-                    
-                    st.download_button(
-                        label="📄 Download Workout Card (.pdf)",
-                        data=pdf_data,
-                        file_name=fname,
-                        mime="application/pdf",
-                        type="primary",
-                        icon="📥"
-                    )
+                st.markdown(f"""
+<div class="ai-response">
+{response.text}
+</div>
+""", unsafe_allow_html=True)
 
             except Exception as e:
                 if "429" in str(e):
