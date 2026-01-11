@@ -84,6 +84,7 @@ letter-spacing: 1px !important;
 h1 { font-size: 2.2rem !important; font-weight: 700 !important; color: white !important; }
 h2 { font-size: 1.5rem !important; font-weight: 600 !important; margin-top: 20px !important; margin-bottom: 10px !important; }
 h3 { font-size: 1.1rem !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: 2px !important; opacity: 0.9 !important; color: white !important; margin-top: 10px !important; }
+h4 { font-size: 1.1rem !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: 2px !important; opacity: 0.9 !important; color: white !important; margin-top: 10px !important; }
 
 /* 🎯 TARGETED FIX FOR THE RESULT BOX (TITANIUM VERSION) */
     
@@ -859,54 +860,7 @@ else:
         current_form = 0
 
 # ==============================================================================
-# --- SECTION 7: TRAINING STATUS DASHBOARD ---
-# ==============================================================================
-st.markdown("### ⚡ Your Current Training Status")
-
-# 1. THE INSIGHT BOX (The "Green Zone" Box)
-# -----------------------------------------------------------
-# (This logic remains the same as your previous code)
-if current_form >= 5:
-    status_color = "#4CAF50" # Green
-    status_title = "PRIME FOR INTENSITY"
-    status_msg = "You are fresh and ready to absorb stress. Recommended: Threshold Intervals, Hill Repeats, or Heavy Strength Session."
-elif -10 < current_form < 5:
-    status_color = "#FFC107" # Amber
-    status_title = "MAINTENANCE / PRODUCTIVE"
-    status_msg = "You are in the sweet spot. Keep training consistent. Recommended: Zone 2 Base, Tempo work, or Technique drills."
-else:
-    status_color = "#FF5252" # Red
-    status_title = "HIGH FATIGUE WARNING"
-    status_msg = "Your fatigue is high. Risk of overtraining or injury. Recommended: Active Recovery, Yoga, or a Complete Rest Day."
-
-st.markdown(f"""
-    <div style="background-color: rgba(255,255,255,0.05); border-left: 4px solid {status_color}; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-        <strong style="color: {status_color}; letter-spacing: 1px;">{status_title}</strong><br>
-        <span style="font-size: 0.9rem; color: #ddd;">{status_msg}</span>
-    </div>
-""", unsafe_allow_html=True)
-
-# 2. THE METRICS CARDS (Moved UP to be visible immediately)
-# -----------------------------------------------------------
-m1, m2, m3 = st.columns(3)
-
-def render_metric_card(col, title, value, subtext, color="#70C4B0"):
-    with col:
-        st.markdown(f"""
-            <div style="background-color: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; text-align: center;">
-                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px;">{title}</div>
-                <div style="font-size: 2rem; font-weight: 700; color: white; margin: 5px 0;">{int(value)}</div>
-                <div style="font-size: 0.7rem; color: {color}; font-weight: 600; text-transform: uppercase;">● {subtext}</div>
-            </div>
-        """, unsafe_allow_html=True)
-
-render_metric_card(m1, "Fitness (CTL)", current_fitness, "Building")
-render_metric_card(m2, "Fatigue (ATL)", current_fatigue, "Productive")
-render_metric_card(m3, "Form (TSB)", current_form, "Fresh" if current_form >= 0 else "Tired", color=status_color)
-
-
-# ==============================================================================
-# --- SECTION 7.1: AI WORKOUT PLANNER (CLEAN FIX) ---
+# --- SECTION 7.1: AI WORKOUT PLANNER (FORCE WHITE TEXT) ---
 # ==============================================================================
 st.markdown("---") # Visual Separator
 
@@ -988,12 +942,26 @@ if generate_btn:
                 st.session_state.last_workout = response.text
                 st.session_state.last_sport = selected_sport
 
-                # 3. DISPLAY RESULT
+                # 3. DISPLAY RESULT (WITH FORCED COLORS)
                 st.markdown("---")
                 st.markdown(f"### ⚡ Recommended: {selected_discipline}")
                 
-                # USE CONTAINER (No HTML tags here to break things!)
-                # The CSS in Section 1 will turn this box Dark Grey with White Text.
+                # INJECT CSS SPECIFICALLY FOR THIS BOX
+                st.markdown("""
+                <style>
+                /* Force the Container Background to be Dark Grey */
+                div[data-testid="stVerticalBlockBorderWrapper"] {
+                    background-color: #1E1E1E !important; 
+                    border: 1px solid rgba(255,255,255,0.2) !important;
+                }
+                /* Force ALL Text inside it to be White */
+                div[data-testid="stVerticalBlockBorderWrapper"] * {
+                    color: #FFFFFF !important;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+                
+                # USE CONTAINER
                 with st.container(border=True):
                     st.markdown(response.text)
                 
