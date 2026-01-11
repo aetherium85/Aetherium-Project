@@ -1050,14 +1050,15 @@ if generate_btn:
                 # 3. FORCE WHITE TEXT (The Fix)
                 st.markdown("""
 <style>
-/* Force text inside the container to be white */
-div[data-testid="stVerticalBlockBorderWrapper"] * {
-color: white !important;
-}
 div[data-testid="stVerticalBlockBorderWrapper"] p, 
 div[data-testid="stVerticalBlockBorderWrapper"] li,
+div[data-testid="stVerticalBlockBorderWrapper"] h1,
+div[data-testid="stVerticalBlockBorderWrapper"] h2,
+div[data-testid="stVerticalBlockBorderWrapper"] h3,
 div[data-testid="stVerticalBlockBorderWrapper"] strong {
-color: white !important;
+color: #FFFFFF !important;
+opacity: 1 !important;
+-webkit-text-fill-color: #FFFFFF !important;
 }
 </style>
 """, unsafe_allow_html=True)
