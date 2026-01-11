@@ -563,7 +563,7 @@ render_metric_card(m3, "Form (TSB)", current_form, "Fresh" if current_form >= 0 
 
 
 # ==============================================================================
-# --- SECTION 7.1: AI WORKOUT PLANNER ---
+# --- SECTION 7.1: AI WORKOUT PLANNER (WITH SAVE BUTTON) ---
 # ==============================================================================
 st.markdown("---") # Visual Separator
 
@@ -588,7 +588,6 @@ SPORT_DISCIPLINES = {
 }
 
 # --- B. GOAL CATEGORIES ---
-# We define distinct lists so the dropdown is always relevant
 GOAL_SETS = {
     "Cardio": ["Base Building (Zone 2)", "Threshold / FTP", "VO2 Max", "Race Pace Intervals", "Recovery"],
     "Strength": ["Hypertrophy (Muscle Gain)", "Max Strength (Low Reps)", "Power / Explosiveness", "Muscular Endurance", "Recovery / Mobility"],
@@ -598,22 +597,10 @@ GOAL_SETS = {
 
 # --- C. HELPER: GET GOALS FOR SELECTION ---
 def get_relevant_goals(sport, discipline):
-    """Returns the correct list of goals based on the chosen activity."""
     d = discipline.lower()
-    
-    # 1. Detect Strength/Gym Context
-    if "strength" in d or "plyo" in d or "upper" in d or "lower" in d:
-        return GOAL_SETS["Strength"]
-    
-    # 2. Detect Swim Context
-    if "swim" in d or "pool" in d:
-        return GOAL_SETS["Swim"]
-    
-    # 3. Detect Hyrox Specifics
-    if "hyrox" in d or "sled" in d or "metcon" in d:
-        return GOAL_SETS["Hyrox"]
-    
-    # 4. Default to Cardio (Run/Bike/Row)
+    if "strength" in d or "plyo" in d or "upper" in d or "lower" in d: return GOAL_SETS["Strength"]
+    if "swim" in d or "pool" in d: return GOAL_SETS["Swim"]
+    if "hyrox" in d or "sled" in d or "metcon" in d: return GOAL_SETS["Hyrox"]
     return GOAL_SETS["Cardio"]
 
 # --- D. SMART AUTO-DETECT DEFAULTS ---
@@ -635,62 +622,27 @@ if 'act_json' in locals() and act_json:
 c1, c2, c3, c4 = st.columns([1.2, 1.2, 1.2, 0.8])
 
 with c1:
-    # 1. SPORT SELECTOR
-    selected_sport = st.selectbox(
-        "Sport Focus", 
-        list(SPORT_DISCIPLINES.keys()), 
-        index=default_sport_index, 
-        key="sport_select"
-    )
-
+    selected_sport = st.selectbox("Sport Focus", list(SPORT_DISCIPLINES.keys()), index=default_sport_index, key="sport_select")
 with c2:
-    # 2. DISCIPLINE SELECTOR
     discipline_options = SPORT_DISCIPLINES[selected_sport]
-    selected_discipline = st.selectbox(
-        "Discipline", 
-        discipline_options, 
-        index=0, 
-        key="disc_select"
-    )
-
+    selected_discipline = st.selectbox("Discipline", discipline_options, index=0, key="disc_select")
 with c3:
-    # 3. DYNAMIC GOAL SELECTOR
-    # Get the filtered list based on the discipline selected above
     available_goals = get_relevant_goals(selected_sport, selected_discipline)
-    
-    # Auto-Select Logic based on TSB (Fatigue)
     default_goal_idx = 0
     if 'current_form' in locals():
-        # A. RECOVERY (High Fatigue)
         if current_form < -10: 
-            # Find the item containing "Recovery"
             for i, g in enumerate(available_goals):
                 if "Recovery" in g: default_goal_idx = i; break
-        
-        # B. INTENSITY (Fresh)
         elif current_form >= 0:
-            # Pick the "Hard" option based on category
             keywords = ["Threshold", "Max Strength", "Race Simulation", "CSS"]
             for i, g in enumerate(available_goals):
                 if any(k in g for k in keywords): default_goal_idx = i; break
-        
-        # C. BASE (Neutral) -> Defaults to index 0 (usually Base/Hypertrophy)
         else:
             default_goal_idx = 0
-
     user_goal = st.selectbox("Goal", available_goals, index=default_goal_idx, key="goal_select")
-
 with c4:
-    # 4. TIME SELECTOR (Custom Options)
-    # We use select_slider to allow for text like "No Limit"
     time_options = ["30 mins", "45 mins", "60 mins", "75 mins", "90 mins", "120 mins", "No Limit"]
-    
-    time_avail = st.select_slider(
-        "Time Available", 
-        options=time_options, 
-        value="60 mins",  # Default
-        key="time_select"
-    )
+    time_avail = st.select_slider("Time Available", options=time_options, value="60 mins", key="time_select")
 
 # 3. GENERATION ACTION
 b1, b2, b3 = st.columns([1, 2, 1])
@@ -704,33 +656,66 @@ if generate_btn:
         st.error("❌ AI Client not connected.")
     else:
         with st.spinner(f"Designing {selected_sport} ({selected_discipline}) session..."):
-            # Update build_ai_prompt to accept the discipline!
-            # Ensure you updated the function definition in Section 3 as discussed previously.
             ai_prompt = build_ai_prompt(selected_sport, selected_discipline, user_goal, time_avail, current_form, act_json)
             
             try:
+                # 1. GENERATE CONTENT
                 response = client.models.generate_content(
                     model="gemini-2.0-flash-lite", 
                     contents=ai_prompt
                 )
 
-                # INJECT CSS
-                st.markdown("""
-<style>
-.ai-response { color: white !important; }
-.ai-response p, .ai-response li, .ai-response strong { color: white !important; font-size: 0.9rem; }
-</style>
-""", unsafe_allow_html=True)
+                # 2. SAVE TO SESSION STATE (Crucial for the Save Button to work!)
+                st.session_state.last_workout = response.text
+                st.session_state.last_sport = selected_sport
 
-                # DISPLAY RESULT
+                # 3. INJECT CSS FOR RESPONSE TEXT
+                st.markdown("""
+                <style>
+                .ai-response { color: white !important; }
+                .ai-response p, .ai-response li, .ai-response strong { color: white !important; font-size: 0.9rem; }
+                </style>
+                """, unsafe_allow_html=True)
+
+                # 4. DISPLAY RESULT
                 st.markdown("---")
                 st.markdown(f"### ⚡ Recommended: {selected_discipline}")
                 
-                st.markdown(f"""
-<div class="ai-response">
-{response.text}
-</div>
-""", unsafe_allow_html=True)
+                with st.container(border=True):
+                    st.markdown(response.text)
+                
+                # 5. SAVE BUTTON (THIS IS THE PART YOU WERE MISSING)
+                st.markdown("###") # Spacer
+                c_save, c_void = st.columns([1, 2])
+                
+                with c_save:
+                    # Using type="primary" forces a filled button, ensuring visibility
+                    if st.button("📅 Add to Calendar (Tomorrow)", type="primary", icon="📤"):
+                        # Get ID and Token
+                        athlete = st.session_state.get('athlete_profile', {})
+                        athlete_id = athlete.get('id', '0')
+                        token = st.session_state.token_data.get('access_token') if st.session_state.token_data else None
+                        
+                        if not token:
+                            st.error("You must be logged in to save workouts.")
+                        else:
+                            # Set Date (Tomorrow)
+                            tomorrow = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+                            
+                            # Upload
+                            success, msg = upload_workout_to_intervals(
+                                token,
+                                athlete_id,
+                                st.session_state.last_workout,
+                                st.session_state.last_sport,
+                                tomorrow
+                            )
+                            
+                            if success:
+                                st.toast(f"✅ Saved to {tomorrow}!", icon="📅")
+                                st.balloons()
+                            else:
+                                st.error(f"Save failed: {msg}")
 
             except Exception as e:
                 if "429" in str(e):
