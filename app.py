@@ -652,9 +652,9 @@ class PDF(FPDF):
 
 def create_pdf_from_text(raw_text, sport):
     class ProPDF(FPDF):
-    def header(self):
+        def header(self):
         # We don't use standard header() because we want a full-page background
-        pass 
+            pass 
 
     def footer(self):
         self.set_y(-15)
