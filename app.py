@@ -1047,23 +1047,15 @@ if generate_btn:
                 st.session_state.last_workout = response.text
                 st.session_state.last_sport = selected_sport
 
-                # 3. INJECT CSS
-                st.markdown("""
-<style>
-.ai-response { color: white !important; }
-.ai-response p, .ai-response li, .ai-response strong { color: white !important; font-size: 0.9rem; }
-</style>
-""", unsafe_allow_html=True)
-
-                # 4. DISPLAY RESULT
                 st.markdown("---")
                 st.markdown(f"### ⚡ Recommended: {selected_discipline}")
                 
+                # We use a container with a border. 
+                # Our Section 1 CSS (Result Box Fix) automatically makes text inside this white.
                 with st.container(border=True):
-                    # Show exactly what the AI returned
                     st.markdown(response.text)
                 
-                # 5. DOWNLOAD PDF (NEW FEATURE)
+                # 4. DOWNLOAD BUTTON (PDF)
                 st.markdown("###") # Spacer
                 c_dl, c_void = st.columns([1, 2])
                 with c_dl:
