@@ -11,6 +11,7 @@ import json
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import tempfile
 from datetime import datetime, timedelta
 
 
@@ -650,65 +651,135 @@ class PDF(FPDF):
         self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
 
 def create_pdf_from_text(raw_text, sport):
-    """Converts AI Markdown text into a formatted PDF."""
-    pdf = PDF()
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    
-    # 1. Title Area
-    pdf.set_font("Arial", "B", 16)
-    pdf.set_text_color(0, 0, 0)
-    pdf.cell(0, 10, f"{sport} Session", 0, 1, 'L')
-    
-    pdf.set_font("Arial", "I", 10)
-    pdf.set_text_color(100, 100, 100)
-    today = datetime.now().strftime("%B %d, %Y")
-    pdf.cell(0, 5, f"Generated on {today}", 0, 1, 'L')
-    pdf.ln(10)
+    class ProPDF(FPDF):
+    def header(self):
+        # We don't use standard header() because we want a full-page background
+        pass 
 
-    # 2. Parse and Write Text
-    lines = raw_text.split('\n')
-    
-    for line in lines:
-        clean_line = line.strip()
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Arial', 'I', 8)
+        self.set_text_color(100)
+        self.cell(0, 10, f'Aetherium AI Project | Page {self.page_no()}', 0, 0, 'C')
+
+def create_pdf_from_text(raw_text, sport):
+    """Generates a premium PDF with background, logo, and card layout."""
+    try:
+        pdf = ProPDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=20)
+
+        # 1. SETUP IMAGES (Background & Logo)
+        # Create temp files because FPDF needs paths on disk
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp_bg:
+            # Download background (same as app)
+            bg_url = "https://images.unsplash.com/photo-1663104192417-6804188a9a8e"
+            response = requests.get(bg_url)
+            tmp_bg.write(response.content)
+            bg_path = tmp_bg.name
+
+        # Save Base64 Logo to file
+        logo_path = None
+        if 'LOGO_BASE64' in globals():
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_logo:
+                tmp_logo.write(base64.b64decode(LOGO_BASE64))
+                logo_path = tmp_logo.name
+
+        # 2. DRAW BACKGROUND
+        # Full page image
+        pdf.image(bg_path, x=0, y=0, w=210, h=297)
         
-        # Skip empty lines to save space, but add small gap
-        if not clean_line:
-            pdf.ln(2)
-            continue
-            
-        # DETECT HEADERS (Lines starting with **)
-        if clean_line.startswith("**") and clean_line.endswith("**"):
-            header_text = clean_line.replace("**", "").upper()
-            pdf.ln(5) # Extra space before header
-            pdf.set_fill_color(240, 240, 240) # Light Grey Box
-            pdf.set_font("Arial", "B", 11)
-            pdf.set_text_color(112, 196, 176) # Teal Text
-            pdf.cell(0, 8, header_text, 0, 1, 'L', fill=True)
-            pdf.set_text_color(50) # Reset to dark grey
-            
-        # DETECT BULLET POINTS (Lines starting with * or -)
-        elif clean_line.startswith("* ") or clean_line.startswith("- "):
-            bullet_text = clean_line[2:] # Remove symbol
-            pdf.set_font("Arial", "", 10)
-            pdf.set_x(15) # Indent
-            # Draw a manual bullet dot
-            pdf.cell(5, 5, chr(149), 0, 0) 
-            pdf.multi_cell(0, 5, bullet_text)
-            
-        # DETECT BOLD INLINE (Simple check)
-        elif "**" in clean_line:
-            # Simple cleanup for mixed bold text
-            text = clean_line.replace("**", "") 
-            pdf.set_font("Arial", "B", 10)
-            pdf.multi_cell(0, 5, text)
-            
-        # STANDARD TEXT
+        # Add a white overlay (opacity hack using semi-transparent look isn't native in FPDF 
+        # so we draw a white box with 'alpha' if using FPDF2, but standard FPDF handles this simply 
+        # by drawing a big white rect that covers the image partially if supported, 
+        # OR we just rely on the 'Card' look below).
+        
+        # 3. DRAW "GLASS" CARD (The writing area)
+        # We draw a white rectangle in the middle to hold text
+        pdf.set_fill_color(255, 255, 255)
+        pdf.rect(10, 10, 190, 277, 'F') # White page with 10mm margin
+        
+        # 4. HEADER
+        # Add Logo
+        if logo_path:
+            pdf.image(logo_path, x=15, y=15, w=20) # 20mm wide logo
+            title_x = 40
         else:
-            pdf.set_font("Arial", "", 10)
-            pdf.multi_cell(0, 5, clean_line)
+            title_x = 15
 
-    return f"{sport}_Workout.pdf", pdf.output(dest='S').encode('latin-1')
+        # Title
+        pdf.set_xy(title_x, 18)
+        pdf.set_font("Arial", "B", 24)
+        pdf.set_text_color(30, 30, 30)
+        pdf.cell(0, 10, f"{sport.upper()} SESSION", 0, 1, 'L')
+        
+        pdf.set_xy(title_x, 28)
+        pdf.set_font("Arial", "I", 10)
+        pdf.set_text_color(112, 196, 176) # Teal
+        timestamp = datetime.now().strftime("%A, %B %d, %Y")
+        pdf.cell(0, 5, f"Designed by Aetherium Intelligence | {timestamp}", 0, 1, 'L')
+        
+        pdf.ln(15) # Spacing after header
+
+        # 5. PARSE & WRITE TEXT
+        lines = raw_text.split('\n')
+        
+        for line in lines:
+            clean_line = line.strip()
+            if not clean_line:
+                pdf.ln(3)
+                continue
+                
+            # HEADERS (**Text**)
+            if clean_line.startswith("**") and clean_line.endswith("**"):
+                header_text = clean_line.replace("**", "").upper()
+                pdf.ln(5)
+                
+                # Teal Header Box
+                pdf.set_fill_color(112, 196, 176) # Teal
+                pdf.set_font("Arial", "B", 11)
+                pdf.set_text_color(255, 255, 255) # White text
+                # Calculate width of text + padding
+                width = pdf.get_string_width(header_text) + 10
+                pdf.cell(width, 8, header_text, 0, 1, 'C', fill=True)
+                
+                pdf.set_text_color(50) # Reset text color
+                pdf.ln(2)
+
+            # BULLET POINTS
+            elif clean_line.startswith("* ") or clean_line.startswith("- "):
+                bullet_text = clean_line[2:]
+                pdf.set_font("Arial", "", 11)
+                pdf.set_text_color(50)
+                pdf.set_x(20) # Indent
+                pdf.cell(5, 6, chr(149), 0, 0) # Dot
+                pdf.multi_cell(0, 6, bullet_text)
+                
+            # BOLD INLINE
+            elif "**" in clean_line:
+                clean_line = clean_line.replace("**", "")
+                pdf.set_font("Arial", "B", 11)
+                pdf.set_text_color(30)
+                pdf.multi_cell(0, 6, clean_line)
+                
+            # NORMAL TEXT
+            else:
+                pdf.set_font("Arial", "", 11)
+                pdf.set_text_color(60)
+                pdf.multi_cell(0, 6, clean_line)
+
+        # 6. CLEANUP (Remove temp files)
+        try:
+            os.remove(bg_path)
+            if logo_path: os.remove(logo_path)
+        except: pass
+
+        # Generate Unique Filename
+        clean_name = f"Aetherium_{sport}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
+        return clean_name, pdf.output(dest='S').encode('latin-1')
+
+    except Exception as e:
+        return "error.pdf", str(e).encode()
 
 # ==============================================================================
 # --- SECTION 5: APP ROUTING & SESSION STATE ---
