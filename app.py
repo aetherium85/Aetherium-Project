@@ -379,7 +379,7 @@ with tab1:
         ))
 
         fig1.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0.5)", plot_bgcolor="rgba(0,0,0,0.5)",
             font=dict(color="white", family="Inter"), hovermode="x unified",
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
             xaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title=""),
@@ -403,7 +403,7 @@ with tab2:
         )
         
         fig2.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0.5)", plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="white", family="Inter"), hovermode="x unified",
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=""),
             xaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title="Week Of"),
@@ -432,7 +432,7 @@ with tab3:
         ))
 
         fig3.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0.5)", plot_bgcolor="rgba(0,0,0,0.5)",
             font=dict(color="white", family="Inter"), hovermode="x unified",
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
             xaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title=""),
