@@ -176,6 +176,12 @@ def process_pmc_data(activities):
     return df_pmc, current_ctl, current_atl, current_tsb
 
 def get_schedule_df(activities, events):
+    # 1. SAFETY CHECK: Ensure the API returned lists, not an error dictionary
+    if not isinstance(activities, list):
+        activities = []
+    if not isinstance(events, list):
+        events = []
+        
     # Combine past activities and future planned events into a single timeline
     schedule = []
     
@@ -185,7 +191,6 @@ def get_schedule_df(activities, events):
             "Type": act.get('type', 'Activity'),
             "Title": act.get('name', 'Unnamed'),
             "Status": "Completed",
-            # Use 'or 0' to catch None types before rounding
             "Load (TSS)": round(act.get('icu_training_load') or 0)
         })
         
@@ -196,7 +201,6 @@ def get_schedule_df(activities, events):
                 "Type": ev.get('type', 'Planned'),
                 "Title": ev.get('name', 'Planned Session'),
                 "Status": "Upcoming",
-                # Apply the same fix to future events
                 "Load (TSS)": round(ev.get('icu_training_load') or 0)
             })
             
@@ -204,6 +208,7 @@ def get_schedule_df(activities, events):
     if not df.empty:
         df['DateObj'] = pd.to_datetime(df['Date'])
         df = df.sort_values('DateObj', ascending=False).drop(columns=['DateObj'])
+    
     return df
 
 # ==============================================================================
