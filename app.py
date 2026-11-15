@@ -6,6 +6,13 @@ import json
 import pandas as pd
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
+import base64
+
+def get_base64_image(file_path):
+    with open(file_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
+local_bg = get_base64_image("assets/background.jpg")
 
 # ==============================================================================
 # --- SECTION 1: APP CONFIGURATION & STYLING ---
@@ -24,13 +31,14 @@ st.markdown(
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Michroma&display=swap');
 
-.stApp::before {
+.stApp::before {{
     content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: linear-gradient(rgba(10, 15, 20, 0.85), rgba(10, 15, 20, 0.95)), 
-    url("https://images.unsplash.com/photo-1663104192417-6804188a9a8e");
+    /* 👇 Inject the base64 string here */
+    url("data:image/jpeg;base64,{local_bg}");
     background-size: cover; background-position: center;
     background-attachment: fixed; filter: blur(2px); transform: scale(1.1); z-index: -1;
-}
+}}
 .stApp { background: transparent !important; }
 
 h1, h2, h3, h4, p, label, .metric-label {
