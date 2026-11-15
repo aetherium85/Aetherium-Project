@@ -458,24 +458,3 @@ if not df_schedule.empty:
         df_schedule.style.map(style_dataframe, subset=['Status']),
         use_container_width=True, hide_index=True, height=400
     )
-
-# --- 4.3: TRAINING SCHEDULE & HISTORY ---
-st.markdown("<h2>Schedule & History</h2>", unsafe_allow_html=True)
-
-if not df_schedule.empty:
-    # Use Pandas styling to integrate with the dark UI
-    def style_dataframe(val):
-        if val == 'Upcoming':
-            return 'color: #E16C45; font-weight: bold;'
-        elif val == 'Completed':
-            return 'color: #70C4B0;'
-        return ''
-
-    st.dataframe(
-        df_schedule.style.map(style_dataframe, subset=['Status']),
-        use_container_width=True,
-        hide_index=True,
-        height=400
-    )
-else:
-    st.info("No recent history or upcoming scheduled workouts found.")
