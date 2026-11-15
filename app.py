@@ -379,7 +379,7 @@ with tab1:
         ))
 
         fig1.update_layout(
-            paper_bgcolor="rgba(255,255,255,0.5)", plot_bgcolor="rgba(255,255,255,0.5)",
+            paper_bgcolor="rgba(255,255,255,0.5)", plot_bgcolor="rgba(255,255,255,0)",
             font=dict(color="white", family="Inter"), hovermode="x unified",
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
             xaxis=dict(gridcolor="rgba(255, 255, 255, 0)", title=""),
