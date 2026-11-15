@@ -327,50 +327,112 @@ with col1:
 with col2:
     st.markdown(render_metric("Fatigue (ATL)", atl, "#E16C45", "Acute Training Load (7d)"), unsafe_allow_html=True)
 with col3:
-    form_color = "#70C4B0" if tsb >= -10 and tsb <= 20 else ("#E16C45" if tsb < -20 else "#FFFFFF")
+    form_color = "#70C4B0" if -10 <= tsb <= 20 else ("#E16C45" if tsb < -20 else "#FFFFFF")
     st.markdown(render_metric("Form (TSB)", tsb, form_color, "Training Stress Balance"), unsafe_allow_html=True)
 
 st.write("")
 st.write("")
 
-# --- 4.2: PERFORMANCE CHART (PMC) ---
-st.markdown("<h2>Training Load Dynamics</h2>", unsafe_allow_html=True)
+# --- 4.2: TRIPLE CHART VIEW ---
+tab1, tab2, tab3 = st.tabs(["⚡ Training Load", "📊 Volume Profile", "🧬 Physiological Response"])
 
-if not df_pmc.empty:
-    fig = go.Figure()
+# CHART 1: TRAINING LOAD (TSS vs CTL)
+with tab1:
+    if not df_pmc.empty:
+        fig1 = go.Figure()
+        
+        # Daily TSS Bars
+        fig1.add_trace(go.Bar(
+            x=df_pmc['Date'], y=df_pmc['TSS'], name='Daily Load (TSS)',
+            marker_color='rgba(225, 108, 69, 0.4)'
+        ))
+        
+        # Fitness Trend Line
+        fig1.add_trace(go.Scatter(
+            x=df_pmc['Date'], y=df_pmc['CTL'], mode='lines', name='Fitness (CTL)',
+            line=dict(color="#70C4B0", width=3)
+        ))
 
-    # Fitness (CTL) - Solid Area
-    fig.add_trace(go.Scatter(
-        x=df_pmc['Date'], y=df_pmc['CTL'], mode='lines', name='Fitness (CTL)',
-        line=dict(color="#70C4B0", width=3), fill='tozeroy', fillcolor='rgba(112, 196, 176, 0.2)'
-    ))
-    
-    # Fatigue (ATL) - Dashed Line
-    fig.add_trace(go.Scatter(
-        x=df_pmc['Date'], y=df_pmc['ATL'], mode='lines', name='Fatigue (ATL)',
-        line=dict(color="#E16C45", width=2, dash='dot')
-    ))
+        fig1.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="white", family="Inter"), hovermode="x unified",
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title=""),
+            yaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title="TSS"),
+            margin=dict(l=0, r=0, t=40, b=0), height=400
+        )
+        st.plotly_chart(fig1, use_container_width=True)
 
-    # Form (TSB) - Bar Chart on Secondary Y-Axis
-    fig.add_trace(go.Bar(
-        x=df_pmc['Date'], y=df_pmc['TSB'], name='Form (TSB)',
-        marker_color=['rgba(112, 196, 176, 0.6)' if val >= 0 else 'rgba(225, 108, 69, 0.6)' for val in df_pmc['TSB']],
-        yaxis='y2'
-    ))
+# CHART 2: VOLUME BY SPORT
+with tab2:
+    if not df_volume.empty:
+        # Cyberpunk colors mapping to common multisport disciplines
+        sport_colors = {
+            "Running": "#E16C45", "Cycling": "#70C4B0", 
+            "Swimming": "#3D85C6", "Strength": "#F5A623"
+        }
+        
+        fig2 = px.bar(
+            df_volume, x='start_date_local', y='Hours', color='Sport',
+            color_discrete_map=sport_colors, barmode='stack'
+        )
+        
+        fig2.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="white", family="Inter"), hovermode="x unified",
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=""),
+            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title="Week Of"),
+            yaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title="Training Hours"),
+            margin=dict(l=0, r=0, t=40, b=0), height=400
+        )
+        st.plotly_chart(fig2, use_container_width=True)
+    else:
+        st.info("Insufficient activity data to generate volume profile.")
 
-    fig.update_layout(
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="white", family="Inter"),
-        hovermode="x unified",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        xaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title=""),
-        yaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title="TSS / Load", side='left'),
-        yaxis2=dict(title="Form Balance", overlaying='y', side='right', showgrid=False),
-        margin=dict(l=0, r=0, t=40, b=0)
+# CHART 3: PHYSIOLOGICAL RESPONSE (HRV vs RHR)
+with tab3:
+    if not df_well.empty and 'hrv' in df_well.columns and 'restingHR' in df_well.columns:
+        fig3 = go.Figure()
+        
+        # HRV Trace
+        fig3.add_trace(go.Scatter(
+            x=df_well['Date'], y=df_well['hrv'], mode='lines+markers', name='HRV (ms)',
+            line=dict(color="#70C4B0", width=2), marker=dict(size=4)
+        ))
+        
+        # Resting Heart Rate Trace
+        fig3.add_trace(go.Scatter(
+            x=df_well['Date'], y=df_well['restingHR'], mode='lines', name='Resting HR',
+            line=dict(color="#E16C45", width=2, dash='dot'), yaxis='y2'
+        ))
+
+        fig3.update_layout(
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="white", family="Inter"), hovermode="x unified",
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title=""),
+            yaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title="HRV (ms)", side='left'),
+            yaxis2=dict(title="Resting HR (bpm)", overlaying='y', side='right', showgrid=False),
+            margin=dict(l=0, r=0, t=40, b=0), height=400
+        )
+        st.plotly_chart(fig3, use_container_width=True)
+    else:
+        st.info("No recent HRV or Resting Heart Rate data synced to Intervals.icu.")
+
+# --- 4.4: TRAINING SCHEDULE & HISTORY ---
+st.markdown("<h2>Schedule & History (Last 14 Days)</h2>", unsafe_allow_html=True)
+if not df_schedule.empty:
+    def style_dataframe(val):
+        if val == 'Upcoming':
+            return 'color: #E16C45; font-weight: bold;'
+        elif val == 'Completed':
+            return 'color: #70C4B0;'
+        return ''
+
+    st.dataframe(
+        df_schedule.style.map(style_dataframe, subset=['Status']),
+        use_container_width=True, hide_index=True, height=400
     )
-    st.plotly_chart(fig, use_container_width=True)
-else:
-    st.info("Insufficient data to plot training load dynamics.")
 
 # --- 4.3: TRAINING SCHEDULE & HISTORY ---
 st.markdown("<h2>Schedule & History</h2>", unsafe_allow_html=True)
