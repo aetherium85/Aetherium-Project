@@ -403,11 +403,11 @@ with tab2:
         )
         
         fig2.update_layout(
-            paper_bgcolor="rgba(0,0,0,0.5)", plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(255,255,255,0.7)", plot_bgcolor="rgba(255,255,255,0)",
             font=dict(color="white", family="Inter"), hovermode="x unified",
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=""),
-            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title="Week Of"),
-            yaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title="Training Hours"),
+            xaxis=dict(gridcolor="rgba(255, 255, 255, 0)", title="Week Of"),
+            yaxis=dict(gridcolor="rgba(255, 255, 255, 0)", title="Training Hours"),
             margin=dict(l=0, r=0, t=40, b=0), height=400
         )
         st.plotly_chart(fig2, use_container_width=True)
@@ -432,11 +432,11 @@ with tab3:
         ))
 
         fig3.update_layout(
-            paper_bgcolor="rgba(0,0,0,0.5)", plot_bgcolor="rgba(0,0,0,0.5)",
+            paper_bgcolor="rgba(255,255,255,0.7)", plot_bgcolor="rgba(255,255,255,0)",
             font=dict(color="white", family="Inter"), hovermode="x unified",
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title=""),
-            yaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title="HRV (ms)", side='left'),
+            xaxis=dict(gridcolor="rgba(255, 255, 255, 0)", title=""),
+            yaxis=dict(gridcolor="rgba(255, 255, 255, 0)", title="HRV (ms)", side='left'),
             yaxis2=dict(title="Resting HR (bpm)", overlaying='y', side='right', showgrid=False),
             margin=dict(l=0, r=0, t=40, b=0), height=400
         )
