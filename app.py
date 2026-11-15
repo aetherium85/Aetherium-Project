@@ -109,11 +109,19 @@ def get_access_token(auth_code):
     return response.json() if response.status_code == 200 else {}
 
 def get_intervals_data():
+    # Safely check if token_data exists and is a dictionary
+    if "token_data" not in st.session_state or not isinstance(st.session_state.token_data, dict):
+        return [], []
+        
     token = st.session_state.token_data.get('access_token')
+    
+    # Abort API call if the token is missing
+    if not token:
+        return [], []
+
     headers = {"Authorization": f"Bearer {token}"}
     base_url = "https://intervals.icu/api/v1/athlete/0" 
     
-    # Fetch past year for PMC chart, and next 14 days for schedule
     start_date = datetime.now() - timedelta(days=365)
     end_date = datetime.now() + timedelta(days=14)
     params = {
@@ -123,7 +131,7 @@ def get_intervals_data():
     
     try:
         act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
-        events_res = requests.get(f"{base_url}/events", headers=headers, params=params) # For future planned workouts
+        events_res = requests.get(f"{base_url}/events", headers=headers, params=params)
         return act_res.json(), events_res.json()
     except:
         return [], []
@@ -177,7 +185,8 @@ def get_schedule_df(activities, events):
             "Type": act.get('type', 'Activity'),
             "Title": act.get('name', 'Unnamed'),
             "Status": "Completed",
-            "Load (TSS)": round(act.get('icu_training_load', 0))
+            # Use 'or 0' to catch None types before rounding
+            "Load (TSS)": round(act.get('icu_training_load') or 0)
         })
         
     for ev in events:
@@ -187,7 +196,8 @@ def get_schedule_df(activities, events):
                 "Type": ev.get('type', 'Planned'),
                 "Title": ev.get('name', 'Planned Session'),
                 "Status": "Upcoming",
-                "Load (TSS)": round(ev.get('icu_training_load', 0))
+                # Apply the same fix to future events
+                "Load (TSS)": round(ev.get('icu_training_load') or 0)
             })
             
     df = pd.DataFrame(schedule)
@@ -199,8 +209,12 @@ def get_schedule_df(activities, events):
 # ==============================================================================
 # --- SECTION 3: AUTHENTICATION ROUTING ---
 # ==============================================================================
+
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+# Add this explicit initialization
+if "token_data" not in st.session_state:
+    st.session_state.token_data = None
 
 if not st.session_state.authenticated:
     saved_token = load_token_from_disk()
