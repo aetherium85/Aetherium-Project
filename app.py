@@ -116,15 +116,12 @@ def get_access_token(auth_code):
     return response.json() if response.status_code == 200 else {}
 
 def get_intervals_data():
-    # Safely check if token_data exists and is a dictionary
     if "token_data" not in st.session_state or not isinstance(st.session_state.token_data, dict):
-        return [], []
+        return [], [], []
         
     token = st.session_state.token_data.get('access_token')
-    
-    # Abort API call if the token is missing
     if not token:
-        return [], []
+        return [], [], []
 
     headers = {"Authorization": f"Bearer {token}"}
     base_url = "https://intervals.icu/api/v1/athlete/0" 
@@ -139,18 +136,18 @@ def get_intervals_data():
     try:
         act_res = requests.get(f"{base_url}/activities", headers=headers, params=params)
         events_res = requests.get(f"{base_url}/events", headers=headers, params=params)
-        return act_res.json(), events_res.json()
+        well_res = requests.get(f"{base_url}/wellness", headers=headers, params=params)
+        return act_res.json(), events_res.json(), well_res.json()
     except:
-        return [], []
+        return [], [], []
 
 def process_pmc_data(activities):
-    if not activities:
-        return pd.DataFrame(), 0, 0, 0
+    if not isinstance(activities, list) or not activities:
+        return pd.DataFrame(), pd.DataFrame(), 0, 0, 0
 
     df = pd.DataFrame(activities)
     df['start_date_local'] = pd.to_datetime(df['start_date_local'])
     
-    # Extract TSS (Training Stress Score) or estimate it
     def get_tss(row):
         if pd.notna(row.get('icu_training_load')):
             return row['icu_training_load']
@@ -160,30 +157,54 @@ def process_pmc_data(activities):
 
     df['TSS'] = df.apply(get_tss, axis=1)
     
-    # Group by day
+    # Process for PMC (Daily Load, CTL, ATL)
     df_indexed = df.set_index('start_date_local')
     daily_load = df_indexed['TSS'].resample('D').sum().fillna(0)
 
-    # Reindex to ensure continuous dates up to today
     idx = pd.date_range(daily_load.index.min(), datetime.now().date())
     daily_load = daily_load.reindex(idx, fill_value=0)
 
-    # Exponential Weighted Moving Averages for CTL (42 days) and ATL (7 days)
     ctl = daily_load.ewm(span=42, adjust=False).mean()
     atl = daily_load.ewm(span=7, adjust=False).mean()
     tsb = ctl - atl
 
-    df_pmc = pd.DataFrame({'CTL': ctl, 'ATL': atl, 'TSB': tsb})
+    df_pmc = pd.DataFrame({'TSS': daily_load, 'CTL': ctl, 'ATL': atl, 'TSB': tsb})
     df_pmc['Date'] = df_pmc.index
     
     current_ctl = df_pmc['CTL'].iloc[-1] if not df_pmc.empty else 0
     current_atl = df_pmc['ATL'].iloc[-1] if not df_pmc.empty else 0
     current_tsb = df_pmc['TSB'].iloc[-1] if not df_pmc.empty else 0
 
-    return df_pmc, current_ctl, current_atl, current_tsb
+    # Process for Weekly Volume
+    df['Hours'] = df['moving_time'].fillna(0) / 3600
+    
+    # Map raw types to multisport categories
+    sport_map = {
+        "Ride": "Cycling", "VirtualRide": "Cycling", "GravelRide": "Cycling",
+        "Run": "Running", "VirtualRun": "Running", "Treadmill": "Running",
+        "Swim": "Swimming", "WeightTraining": "Strength"
+    }
+    df['Sport'] = df['type'].map(sport_map).fillna(df['type'])
+    
+    df_volume = df.groupby([pd.Grouper(key='start_date_local', freq='W-MON'), 'Sport'])['Hours'].sum().reset_index()
+    df_volume = df_volume[df_volume['start_date_local'] >= (datetime.now() - timedelta(days=90))] # Last 3 months
+
+    return df_pmc, df_volume, current_ctl, current_atl, current_tsb
+
+def process_wellness_data(wellness):
+    if not isinstance(wellness, list) or not wellness:
+        return pd.DataFrame()
+    
+    df_well = pd.DataFrame(wellness)
+    if 'id' in df_well.columns:
+        df_well['Date'] = pd.to_datetime(df_well['id'])
+        # Filter for the last 60 days to keep the chart readable
+        sixty_days_ago = datetime.now() - timedelta(days=60)
+        df_well = df_well[df_well['Date'] >= sixty_days_ago]
+        df_well = df_well.sort_values('Date')
+    return df_well
 
 def get_schedule_df(activities, events):
-    # 1. SAFETY CHECK: Ensure the API returned lists
     if not isinstance(activities, list):
         activities = []
     if not isinstance(events, list):
@@ -212,14 +233,9 @@ def get_schedule_df(activities, events):
             
     df = pd.DataFrame(schedule)
     if not df.empty:
-        # Create a temporary datetime object column for math and sorting
         df['DateObj'] = pd.to_datetime(df['Date'])
-        
-        # FILTER: Only keep rows from the last 14 days (and future planned events)
         two_weeks_ago = datetime.now() - timedelta(days=14)
         df = df[df['DateObj'] >= two_weeks_ago]
-        
-        # Sort chronologically and drop the temporary datetime object column
         df = df.sort_values('DateObj', ascending=False).drop(columns=['DateObj'])
     
     return df
@@ -287,8 +303,9 @@ with st.sidebar:
         st.session_state.token_data = None
         st.rerun()
 
-activities, events = get_intervals_data()
-df_pmc, ctl, atl, tsb = process_pmc_data(activities)
+activities, events, wellness = get_intervals_data()
+df_pmc, df_volume, ctl, atl, tsb = process_pmc_data(activities)
+df_well = process_wellness_data(wellness)
 df_schedule = get_schedule_df(activities, events)
 
 st.markdown("<h1>Performance Cockpit</h1>", unsafe_allow_html=True)
