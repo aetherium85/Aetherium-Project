@@ -379,11 +379,11 @@ with tab1:
         ))
 
         fig1.update_layout(
-            paper_bgcolor="rgba(0,0,0,0.5)", plot_bgcolor="rgba(0,0,0,0.5)",
+            paper_bgcolor="rgba(255,255,255,0.5)", plot_bgcolor="rgba(255,255,255,0.5)",
             font=dict(color="white", family="Inter"), hovermode="x unified",
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            xaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title=""),
-            yaxis=dict(gridcolor="rgba(255, 255, 255, 0.05)", title="TSS"),
+            xaxis=dict(gridcolor="rgba(255, 255, 255, 0)", title=""),
+            yaxis=dict(gridcolor="rgba(255, 255, 255, 0)", title="TSS"),
             margin=dict(l=0, r=0, t=40, b=0), height=400
         )
         st.plotly_chart(fig1, use_container_width=True)
