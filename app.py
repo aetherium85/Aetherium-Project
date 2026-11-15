@@ -27,40 +27,39 @@ LOGO_BASE64 = "iVBORw0KGgoAAAANSUhEUgAABlcAAAZXCAYAAAD6rSYVAAAAAXNSR0IArs4c6QAAA
 
 # Cyberpunk Athletics UI - High Contrast Lava Orange & Teal
 st.markdown(
-"""
+f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Michroma&display=swap');
 
 .stApp::before {{
     content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: linear-gradient(rgba(10, 15, 20, 0.85), rgba(10, 15, 20, 0.95)), 
-    /* 👇 Inject the base64 string here */
     url("data:image/jpeg;base64,{local_bg}");
     background-size: cover; background-position: center;
     background-attachment: fixed; filter: blur(2px); transform: scale(1.1); z-index: -1;
 }}
-.stApp { background: transparent !important; }
+.stApp {{ background: transparent !important; }}
 
-h1, h2, h3, h4, p, label, .metric-label {
+h1, h2, h3, h4, p, label, .metric-label {{
     font-family: 'Inter', sans-serif !important; 
     color: #FFFFFF !important; 
-}
+}}
 
-h1 { font-family: 'Michroma', sans-serif !important; font-size: 2.5rem !important; text-transform: uppercase; color: #70C4B0 !important; text-shadow: 0 0 10px rgba(112, 196, 176, 0.3); }
-h2 { font-size: 1.5rem !important; font-weight: 600 !important; color: #E16C45 !important; margin-top: 20px !important; }
+h1 {{ font-family: 'Michroma', sans-serif !important; font-size: 2.5rem !important; text-transform: uppercase; color: #70C4B0 !important; text-shadow: 0 0 10px rgba(112, 196, 176, 0.3); }}
+h2 {{ font-size: 1.5rem !important; font-weight: 600 !important; color: #E16C45 !important; margin-top: 20px !important; }}
 
 /* Glassmorphism Containers */
-div[data-testid="stVerticalBlockBorderWrapper"], .metric-container {
+div[data-testid="stVerticalBlockBorderWrapper"], .metric-container {{
     background-color: rgba(20, 25, 30, 0.6) !important;
     backdrop-filter: blur(12px);
     border: 1px solid rgba(112, 196, 176, 0.2) !important;
     border-radius: 12px !important;
     padding: 20px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-}
+}}
 
 /* Login Button */
-a[href*="intervals.icu"] {
+a[href*="intervals.icu"] {{
     display: block !important;
     width: 100% !important;
     text-align: center !important;
@@ -73,17 +72,17 @@ a[href*="intervals.icu"] {
     border-radius: 8px !important;
     box-shadow: 0 4px 15px rgba(225, 108, 69, 0.4) !important;
     transition: all 0.3s ease !important;
-}
-a[href*="intervals.icu"]:hover {
+}}
+a[href*="intervals.icu"]:hover {{
     transform: translateY(-2px) !important;
     box-shadow: 0 6px 20px rgba(225, 108, 69, 0.6) !important;
-}
+}}
 
 /* Sidebar */
-section[data-testid="stSidebar"] {
+section[data-testid="stSidebar"] {{
     background-color: rgba(10, 15, 20, 0.95) !important;
     border-right: 1px solid rgba(112, 196, 176, 0.2) !important;
-}
+}}
 </style>
 """,
 unsafe_allow_html=True
