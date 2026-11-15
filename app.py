@@ -313,22 +313,46 @@ st.markdown("<h1>Performance Cockpit</h1>", unsafe_allow_html=True)
 # --- 4.1: CORE METRICS ---
 col1, col2, col3 = st.columns(3)
 
-def render_metric(label, value, color, description):
+# Bio-Feedback Logic 
+def get_fitness_status(ctl):
+    if ctl >= 85: return "PEAK BASE", "#70C4B0"    # Teal
+    if ctl >= 50: return "STRONG BASE", "#70C4B0"  # Teal
+    return "BUILDING", "#F5A623"                   # Amber
+
+def get_fatigue_status(atl):
+    if atl >= 80: return "HEAVY LOAD", "#E16C45"   # Orange/Red
+    if atl >= 40: return "PRODUCTIVE", "#70C4B0"   # Teal
+    return "LIGHT LOAD", "#FFFFFF"                 # White
+
+def get_form_status(tsb):
+    if tsb < -30: return "HIGH RISK", "#E16C45"    # Orange/Red
+    if tsb < -10: return "OVERLOAD", "#F5A623"     # Amber
+    if tsb <= 15: return "OPTIMAL / READY", "#70C4B0" # Teal
+    return "TRANSITION", "#FFFFFF"                 # White
+
+def render_metric(label, value, main_color, description, status_text, status_color):
     return f"""
-    <div class="metric-container" style="border-top: 4px solid {color} !important; text-align: center;">
+    <div class="metric-container" style="border-top: 4px solid {main_color} !important; text-align: center;">
         <div style="color: rgba(255,255,255,0.6); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">{label}</div>
-        <div style="color: {color}; font-size: 3.5rem; font-family: 'Michroma', sans-serif; line-height: 1.2; text-shadow: 0 0 20px {color}80;">{int(value)}</div>
-        <div style="color: rgba(255,255,255,0.8); font-size: 0.8rem;">{description}</div>
+        <div style="color: {main_color}; font-size: 3.5rem; font-family: 'Michroma', sans-serif; line-height: 1.2; text-shadow: 0 0 20px {main_color}80; margin: 5px 0;">{int(value)}</div>
+        <div style="color: rgba(255,255,255,0.8); font-size: 0.8rem; margin-bottom: 15px;">{description}</div>
+        <div style="display: inline-block; padding: 5px 15px; background: rgba(0,0,0,0.4); border: 1px solid {status_color}60; border-radius: 20px; color: {status_color}; font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; box-shadow: 0 0 10px {status_color}20;">
+            ● {status_text}
+        </div>
     </div>
     """
 
+# Evaluate current state
+fit_stat, fit_col = get_fitness_status(ctl)
+fat_stat, fat_col = get_fatigue_status(atl)
+form_stat, form_col = get_form_status(tsb)
+
 with col1:
-    st.markdown(render_metric("Fitness (CTL)", ctl, "#70C4B0", "Chronic Training Load (42d)"), unsafe_allow_html=True)
+    st.markdown(render_metric("Fitness (CTL)", ctl, "#70C4B0", "Chronic Load (42d)", fit_stat, fit_col), unsafe_allow_html=True)
 with col2:
-    st.markdown(render_metric("Fatigue (ATL)", atl, "#E16C45", "Acute Training Load (7d)"), unsafe_allow_html=True)
+    st.markdown(render_metric("Fatigue (ATL)", atl, "#E16C45", "Acute Load (7d)", fat_stat, fat_col), unsafe_allow_html=True)
 with col3:
-    form_color = "#70C4B0" if -10 <= tsb <= 20 else ("#E16C45" if tsb < -20 else "#FFFFFF")
-    st.markdown(render_metric("Form (TSB)", tsb, form_color, "Training Stress Balance"), unsafe_allow_html=True)
+    st.markdown(render_metric("Form (TSB)", tsb, form_col, "Stress Balance", form_stat, form_col), unsafe_allow_html=True)
 
 st.write("")
 st.write("")
