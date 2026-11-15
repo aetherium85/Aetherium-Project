@@ -33,7 +33,7 @@ f"""
 
 .stApp::before {{
     content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: linear-gradient(rgba(10, 15, 20, 0.2), rgba(10, 15, 20, 0.1)), 
+    background: linear-gradient(rgba(221, 149, 186, 0.4), rgba(221, 149, 186, 0.2)), 
     url("data:image/jpeg;base64,{local_bg}");
     background-size: cover; background-position: center;
     background-attachment: fixed; filter: blur(2px); transform: scale(1.1); z-index: -1;
