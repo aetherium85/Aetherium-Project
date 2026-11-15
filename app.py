@@ -183,13 +183,12 @@ def process_pmc_data(activities):
     return df_pmc, current_ctl, current_atl, current_tsb
 
 def get_schedule_df(activities, events):
-    # 1. SAFETY CHECK: Ensure the API returned lists, not an error dictionary
+    # 1. SAFETY CHECK: Ensure the API returned lists
     if not isinstance(activities, list):
         activities = []
     if not isinstance(events, list):
         events = []
         
-    # Combine past activities and future planned events into a single timeline
     schedule = []
     
     for act in activities:
@@ -213,7 +212,14 @@ def get_schedule_df(activities, events):
             
     df = pd.DataFrame(schedule)
     if not df.empty:
+        # Create a temporary datetime object column for math and sorting
         df['DateObj'] = pd.to_datetime(df['Date'])
+        
+        # FILTER: Only keep rows from the last 14 days (and future planned events)
+        two_weeks_ago = datetime.now() - timedelta(days=14)
+        df = df[df['DateObj'] >= two_weeks_ago]
+        
+        # Sort chronologically and drop the temporary datetime object column
         df = df.sort_values('DateObj', ascending=False).drop(columns=['DateObj'])
     
     return df
